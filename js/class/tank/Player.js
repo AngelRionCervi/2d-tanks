@@ -25,6 +25,6 @@ export class Player {
     }
 
     getPlayerPos() {
-        return {x: this.x, y: this.y}
+        return {x: this.x+this.size/2, y: this.y+this.size/2}
     }
 }

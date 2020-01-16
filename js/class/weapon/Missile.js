@@ -7,7 +7,7 @@ export class Missile {
         this.radius = 10;
         this.color = "blue";
         this.ctx = ctx;
-        this.speed = 5;
+        this.speed = 0.5;
         this.shotPos = curPos;
         this.playerPos = playerPos;
     }
