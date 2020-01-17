@@ -22,10 +22,10 @@ export class Missile {
     }
 
     draw() {
-        if (this.y + this.vy > canvas.height-this.radius || this.y + this.vy < this.radius) {
+        if (this.y + this.vy > canvas.height || this.y + this.vy < 0) {
             this.vy = -this.vy;
         } 
-        if (this.x + this.vx > canvas.width-this.radius || this.x + this.vx < this.radius) {
+        if (this.x + this.vx > canvas.width || this.x + this.vx < 0) {
             this.vx = -this.vx;
         }
 
