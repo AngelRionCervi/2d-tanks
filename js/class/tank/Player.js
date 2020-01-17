@@ -76,10 +76,10 @@ export class Player {
             
             //totalAimSize = totalAimSize - (this.aimSize - (canvas.width - (curPos.x + this.centerX)))
             let xInWall = (canvas.width - (this.centerX + xEndAim))*-1;
-            
-            let yWallOffset = (xInWall * Math.tan(angle*2));
+            let yWallOffset = xInWall * Math.tan(angle*2);
             console.log(yWallOffset)
-            this.aimProjection(xEndAim, yEndAim, angle, "xWall");
+
+            this.aimProjection(xEndAim - xInWall, yEndAim + yWallOffset, angle, "xWall");
         }
         if (this.centerX + xEndAim < 0) {
             this.aimProjection(xEndAim, yEndAim, angle, "xWall");
