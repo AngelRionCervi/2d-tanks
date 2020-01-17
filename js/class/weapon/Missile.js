@@ -4,10 +4,10 @@ export class Missile {
         this.y = playerPos.y;
         this.vx;
         this.vy;
-        this.radius = 10;
+        this.radius = 2;
         this.color = "blue";
         this.ctx = ctx;
-        this.speed = 0.5;
+        this.speed = 2;
         this.shotPos = curPos;
         this.playerPos = playerPos;
     }

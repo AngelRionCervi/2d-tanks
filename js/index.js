@@ -1,5 +1,5 @@
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
 import {Missile} from "/js/class/weapon/Missile.js"; 
 import {Player} from "/js/class/tank/Player.js"; 
@@ -23,17 +23,20 @@ canvas.addEventListener('mousedown', () => {
 
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  player.draw();
+  
   
   if (curPos) {
+    player.draw(curPos);
     player.drawAim(curPos);
+  } else {
+    player.draw();
   }
 
   playerShots.forEach((missile) => {
     if (!missile.vx && !missile.vy) {
       missile.initDir();
     }
-    missile.draw()
+    missile.draw();
   })
 
   window.requestAnimationFrame(render);
