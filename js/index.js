@@ -1,5 +1,6 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const frameRate = 1000/60;
 
 import {Missile} from "/js/class/weapon/Missile.js"; 
 import {Player} from "/js/class/tank/Player.js"; 
@@ -26,18 +27,15 @@ canvas.addEventListener('mousedown', () => {
 });
 
 document.addEventListener('keydown', (evt) => {
-    
   vel = keyboard.getDirection(evt);
 });
 
 document.addEventListener('keyup', (evt) => {
-    
   vel = keyboard.getDirection(evt);
 });
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
   
     if (curPos) {
         player.draw(vel, curPos);
@@ -53,8 +51,11 @@ function render() {
         missile.draw();
     })
 
-    window.requestAnimationFrame(render);
 }
 
-render()
+setInterval(()=>{
+  render()
+}, frameRate)
+
+
 
