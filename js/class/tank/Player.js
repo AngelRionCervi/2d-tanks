@@ -55,7 +55,7 @@ export class Player {
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
         this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.centerX - this.baseSizeX/2), -(this.centerY - this.canonOffsetCenter))
+        this.ctx.translate(-(this.centerX - this.baseSizeX), -(this.centerY - this.canonOffsetCenter))
         this.ctx.rect(this.x + this.vx, this.y - this.vy, this.canonSizeX, this.canonSizeY);
         this.ctx.closePath();
         this.ctx.fillStyle = this.canonColor;
@@ -73,13 +73,13 @@ export class Player {
         let ty = curPos.y - this.centerY;
         let dist = Math.sqrt(tx * tx + ty * ty);
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize + 1000;
-        console.log(this.centerX, this.centerY)
+        
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
         this.ctx.rotate(-angle);
         this.ctx.translate(-(this.centerX), -(this.centerY - (this.canonOffsetCenter + this.canonSizeY)))
-        this.ctx.rect(this.x + this.vx + this.canonSizeX/2 - this.aimWidth/2, this.y + this.vy, this.aimWidth, totalAimSize);
+        this.ctx.rect(this.centerX + this.canonSizeX/2 - this.aimWidth/2, this.centerY, this.aimWidth, totalAimSize);
         this.ctx.closePath();
         this.ctx.fillStyle = this.aimColor;
         this.ctx.fill();
@@ -131,9 +131,8 @@ export class Player {
 
         this.ctx.translate(this.centerX + x, this.centerY + y)
         this.ctx.rotate(angle);
-        this.ctx.translate(-(this.centerX + x), -(this.centerY + y))
-
-        this.ctx.rect(this.centerX + x, this.centerY + y, this.aimWidth, size);
+        this.ctx.translate(-(this.centerX), -(this.centerY - (this.canonOffsetCenter + this.canonSizeY)))
+        this.ctx.rect(this.centerX + this.canonSizeX/2 - this.aimWidth/2, this.centerY, this.aimWidth, size);
         
         this.ctx.closePath();
         this.ctx.fillStyle = "red";
