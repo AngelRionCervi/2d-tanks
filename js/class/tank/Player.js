@@ -14,19 +14,25 @@ export class Player {
         this.baseColor = "purple";
         this.canonColor = "red";
         this.aimColor = "black";
-        this.centerX = this.x + this.baseSizeX/2 + this.vx;
-        this.centerY = this.y + this.baseSizeY/2 - this.vy;
+        this.centerX = this.x + this.baseSizeX/2;
+        this.centerY = this.y + this.baseSizeY/2;
         this.canonOffsetCenter = 5;
 
         this.updCenters = () => {
-            this.centerX = this.x + this.baseSizeX/2 + this.vx;
-            this.centerY = this.y + this.baseSizeY/2 - this.vy;
+            this.centerX = this.x + this.baseSizeX/2;
+            this.centerY = this.y + this.baseSizeY/2;
         }
-        this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
+
+        this.getAngle = (curPos) => Math.atan2(curPos.x - (this.x + this.baseSizeX/2), curPos.y - (this.y + this.baseSizeY/2));
         this.radToDeg = (rad) => rad * 180 / Math.PI
     }
 
-    draw(desiredDir, curPos = null) {
+    draw(vel, curPos = null) {
+
+        this.x += vel[1];
+        this.y -= vel[0];
+
+        this.updCenters();
 
         let angle;
         if (curPos) {
@@ -35,16 +41,13 @@ export class Player {
             angle = 0;
         }
 
-        this.vx += desiredDir[1];
-        this.vy += desiredDir[0];
-
         // draw base
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.translate(this.centerX, this.centerY)
+        this.ctx.translate(this.x + this.baseSizeX/2, this.y + this.baseSizeY/2)
         this.ctx.rotate(0);
-        this.ctx.translate(-(this.centerX), -(this.centerY))
-        this.ctx.rect(this.centerX + this.canonSizeX/2, this.y - this.vy, this.baseSizeX, this.baseSizeY);
+        this.ctx.translate(-(this.x + this.baseSizeX/2), -(this.y + this.baseSizeY/2))
+        this.ctx.rect(this.x + desiredDir[0], this.y + desiredDir[1], this.baseSizeX, this.baseSizeY);
         this.ctx.closePath();
         this.ctx.fillStyle = this.baseColor;
         this.ctx.fill();
@@ -55,14 +58,12 @@ export class Player {
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
         this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.centerX - this.baseSizeX), -(this.centerY - this.canonOffsetCenter))
-        this.ctx.rect(this.x + this.vx, this.y - this.vy, this.canonSizeX, this.canonSizeY);
+        this.ctx.translate(-(this.x + this.canonSizeX/2), -(this.y + this.canonSizeY/2 - this.canonOffsetCenter))
+        this.ctx.rect(this.x, this.y, this.canonSizeX, this.canonSizeY);
         this.ctx.closePath();
         this.ctx.fillStyle = this.canonColor;
         this.ctx.fill();
         this.ctx.restore();
-
-        this.updCenters();
     }
 
     drawAim(curPos) {
@@ -78,8 +79,8 @@ export class Player {
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
         this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.centerX), -(this.centerY - (this.canonOffsetCenter + this.canonSizeY)))
-        this.ctx.rect(this.centerX + this.canonSizeX/2 - this.aimWidth/2, this.centerY, this.aimWidth, totalAimSize);
+        this.ctx.translate(-(this.x + this.canonSizeX/2), -(this.y + this.canonSizeY/2 - (this.canonOffsetCenter + this.canonSizeY)))
+        this.ctx.rect(this.x + this.canonSizeX/2 - this.aimWidth/2, this.y, this.aimWidth, totalAimSize);
         this.ctx.closePath();
         this.ctx.fillStyle = this.aimColor;
         this.ctx.fill();
@@ -131,8 +132,9 @@ export class Player {
 
         this.ctx.translate(this.centerX + x, this.centerY + y)
         this.ctx.rotate(angle);
-        this.ctx.translate(-(this.centerX), -(this.centerY - (this.canonOffsetCenter + this.canonSizeY)))
-        this.ctx.rect(this.centerX + this.canonSizeX/2 - this.aimWidth/2, this.centerY, this.aimWidth, size);
+        this.ctx.translate(-(this.centerX + x), -(this.centerY + y))
+
+        this.ctx.rect(this.centerX + x, this.centerY + y, this.aimWidth, size);
         
         this.ctx.closePath();
         this.ctx.fillStyle = "red";
