@@ -12,7 +12,7 @@ let mouse = new Mouse(canvas);
 let keyboard = new Keyboard(canvas);
 
 let curPos;
-let desiredDir = [0, 0];
+let vel = [0, 0];
 let playerShots = [];
 
 canvas.addEventListener('mousemove', (evt) => {
@@ -27,12 +27,12 @@ canvas.addEventListener('mousedown', () => {
 
 document.addEventListener('keydown', (evt) => {
     
-  desiredDir = keyboard.getDirection(evt);
+  vel = keyboard.getDirection(evt);
 });
 
 document.addEventListener('keyup', (evt) => {
     
-  desiredDir = keyboard.getDirection(evt);
+  vel = keyboard.getDirection(evt);
 });
 
 function render() {
@@ -40,10 +40,10 @@ function render() {
   
   
     if (curPos) {
-        player.draw(desiredDir, curPos);
+        player.draw(vel, curPos);
         player.drawAim(curPos);
     } else {
-        player.draw(desiredDir);
+        player.draw(vel);
     }
 
     playerShots.forEach((missile) => {

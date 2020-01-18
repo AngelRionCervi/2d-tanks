@@ -3,14 +3,14 @@ export class Player {
         this.ctx = ctx;
         this.x = 200;
         this.y = 100;
-        this.vx = 0;
-        this.vy = 0;
+        this.speed = 2; 
         this.baseSizeX = 20;
         this.baseSizeY = 25;
         this.canonSizeX = 8;
         this.canonSizeY = 18;
         this.aimWidth = 1;
-        this.aimSize = 100;
+        this.aimSize = 1000;
+        this.projectionSize = 100;
         this.baseColor = "purple";
         this.canonColor = "red";
         this.aimColor = "black";
@@ -29,8 +29,8 @@ export class Player {
 
     draw(vel, curPos = null) {
 
-        this.x += vel[1];
-        this.y -= vel[0];
+        this.x += vel[1] * this.speed;
+        this.y -= vel[0] * this.speed;
 
         this.updCenters();
 
@@ -47,7 +47,7 @@ export class Player {
         this.ctx.translate(this.x + this.baseSizeX/2, this.y + this.baseSizeY/2)
         this.ctx.rotate(0);
         this.ctx.translate(-(this.x + this.baseSizeX/2), -(this.y + this.baseSizeY/2))
-        this.ctx.rect(this.x + desiredDir[0], this.y + desiredDir[1], this.baseSizeX, this.baseSizeY);
+        this.ctx.rect(this.x, this.y, this.baseSizeX, this.baseSizeY);
         this.ctx.closePath();
         this.ctx.fillStyle = this.baseColor;
         this.ctx.fill();
@@ -73,7 +73,7 @@ export class Player {
         let tx = curPos.x - this.centerX;
         let ty = curPos.y - this.centerY;
         let dist = Math.sqrt(tx * tx + ty * ty);
-        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize + 1000;
+        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
         
         this.ctx.save();
         this.ctx.beginPath();
@@ -122,9 +122,9 @@ export class Player {
 
     aimProjection(x, y, angle, wallType) {
         
-        let size = this.aimSize
+        let size = this.projectionSize
         if (wallType === "yWall") {
-            size = -this.aimSize
+            size = -this.projectionSize
         }
 
         this.ctx.save();
