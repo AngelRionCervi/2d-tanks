@@ -63,34 +63,8 @@ export class Player {
         let tx = curPos.x - this.centerX;
         let ty = curPos.y - this.centerY;
         let dist = Math.sqrt(tx * tx + ty * ty);
-        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
+        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize + 1000;
         
-        let yEndAim = (totalAimSize + 18 - 4) * Math.cos(angle);
-        let xEndAim = (totalAimSize + 18 - 4) * Math.sin(angle);
-/*
-        if (totalAimSize + this.centerX > canvas.width) {
-            totalAimSize = canvas.width - this.centerX;
-        }*/
-
-        if (this.centerX + xEndAim > canvas.width) {
-            
-            //totalAimSize = totalAimSize - (this.aimSize - (canvas.width - (curPos.x + this.centerX)))
-            let xInWall = (canvas.width - (this.centerX + xEndAim))*-1;
-            let yWallOffset = xInWall * Math.tan(angle*2);
-            console.log(yWallOffset)
-
-            this.aimProjection(xEndAim - xInWall, yEndAim + yWallOffset, angle, "xWall");
-        }
-        if (this.centerX + xEndAim < 0) {
-            this.aimProjection(xEndAim, yEndAim, angle, "xWall");
-        }
-        if (this.centerY + yEndAim > canvas.height) {
-            this.aimProjection(xEndAim, yEndAim, angle, "yWall");
-        }
-        if (this.centerY + yEndAim < 0) {
-            this.aimProjection(xEndAim, yEndAim, angle, "yWall");
-        }
-
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
@@ -102,21 +76,42 @@ export class Player {
         this.ctx.fill();
         this.ctx.restore();
 
-        if (this.x + xEndAim > canvas.width 
-            || this.x + xEndAim < 0 
-            || this.y + yEndAim > canvas.height
-            || this.y + yEndAim < 0) {
+        let yEndAim = (totalAimSize + 15) * Math.cos(angle);
+        let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
-            
+        //right
+        if (this.centerX + xEndAim > canvas.width) {
+            let xInWall = (canvas.width - (this.centerX + xEndAim))*-1;
+            let yWallOffset = xInWall / Math.tan(angle); // ???????????????????????????????????????????????????????????????????????????????????
+
+            this.aimProjection(xEndAim - xInWall, yEndAim - yWallOffset, angle, "xWall");
+        }
+        //left
+        if (this.centerX + xEndAim < 0) {
+            let xInWall = (this.centerX + xEndAim)*-1;
+            let yWallOffset = xInWall / Math.tan(angle); // ???????????????????????????????????????????????????????????????????????????????????
+
+            this.aimProjection(xEndAim + xInWall, yEndAim + yWallOffset, angle, "xWall");
+        }
+        //bottom
+        if (this.centerY + yEndAim > canvas.height) {
+            let yInWall = (canvas.height - (this.centerY + yEndAim))*-1;
+            let xWallOffset = yInWall * Math.tan(angle);
+
+            this.aimProjection(xEndAim - xWallOffset, yEndAim - yInWall, angle, "yWall");
+        }
+        //top
+        if (this.centerY + yEndAim < 0) {
+            let yInWall = (this.centerY + yEndAim)*-1;
+            let xWallOffset = yInWall * Math.tan(angle);
+
+            this.aimProjection(xEndAim + xWallOffset, yEndAim + yInWall, angle, "yWall");
         }
 
-        
-
-        //this.aimProjection(xEndAim, yEndAim, angle, wallType);
     }
 
     aimProjection(x, y, angle, wallType) {
-        //console.log(x, y)
+        
         let size = this.aimSize
         if (wallType === "yWall") {
             size = -this.aimSize
@@ -138,6 +133,6 @@ export class Player {
     }
 
     getPlayerPos() {
-        return {x: this.x+this.baseSizeX/2, y: this.y+this.baseSizeY/2}
+        return {x: this.centerX, y: this.centerY}
     }
 }
