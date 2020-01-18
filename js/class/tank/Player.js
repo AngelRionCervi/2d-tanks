@@ -76,7 +76,7 @@ export class Player {
         this.ctx.fill();
         this.ctx.restore();
 
-        let yEndAim = (totalAimSize + 15) * Math.cos(angle);
+        let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
         //right
