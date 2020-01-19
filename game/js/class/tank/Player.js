@@ -1,6 +1,7 @@
 export class Player {
-    constructor(ctx) {
+    constructor(canvas, ctx) {
         this.ctx = ctx;
+        this.canvas = canvas;
         this.x = 200;
         this.y = 100;
         this.speed = 2;
@@ -98,8 +99,8 @@ export class Player {
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
         //right
-        if (this.centerX + xEndAim > canvas.width) {
-            let xInWall = (canvas.width - (this.centerX + xEndAim)) * -1;
+        if (this.centerX + xEndAim > this.canvas.width) {
+            let xInWall = (this.canvas.width - (this.centerX + xEndAim)) * -1;
             let yWallOffset = xInWall / Math.tan(angle); // ???????????????????????????????????????????????????????????????????????????????????
 
             this.aimProjection(xEndAim - xInWall, yEndAim - yWallOffset, angle, "xWall");
@@ -112,8 +113,8 @@ export class Player {
             this.aimProjection(xEndAim + xInWall, yEndAim + yWallOffset, angle, "xWall");
         }
         //bottom
-        if (this.centerY + yEndAim > canvas.height) {
-            let yInWall = (canvas.height - (this.centerY + yEndAim)) * -1;
+        if (this.centerY + yEndAim > this.canvas.height) {
+            let yInWall = (this.canvas.height - (this.centerY + yEndAim)) * -1;
             let xWallOffset = yInWall * Math.tan(angle);
 
             this.aimProjection(xEndAim - xWallOffset, yEndAim - yInWall, angle, "yWall");

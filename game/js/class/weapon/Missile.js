@@ -1,12 +1,13 @@
 export class Missile {
-    constructor(ctx, curPos, playerPos) {
+    constructor(canvas, ctx, curPos, playerPos) {
+        this.ctx = ctx;
+        this.canvas = canvas;
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.vx;
         this.vy;
         this.radius = 2;
         this.color = "blue";
-        this.ctx = ctx;
         this.speed = 4;
         this.shotPos = curPos;
         this.playerPos = playerPos;
@@ -22,10 +23,10 @@ export class Missile {
     }
 
     draw() {
-        if (this.y + this.vy > canvas.height || this.y + this.vy < 0) {
+        if (this.y + this.vy > this.canvas.height || this.y + this.vy < 0) {
             this.vy = -this.vy;
         } 
-        if (this.x + this.vx > canvas.width || this.x + this.vx < 0) {
+        if (this.x + this.vx > this.canvas.width || this.x + this.vx < 0) {
             this.vx = -this.vx;
         }
 
