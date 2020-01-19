@@ -14,6 +14,7 @@ export class Player {
         this.baseColor = "purple";
         this.canonColor = "red";
         this.aimColor = "black";
+        this.projectionColor = "red";
         this.centerX = this.x + this.baseSizeX/2;
         this.centerY = this.y + this.baseSizeY/2;
         this.canonOffsetCenter = 5;
@@ -137,7 +138,7 @@ export class Player {
         this.ctx.rect(this.centerX + x, this.centerY + y, this.aimWidth, size);
         
         this.ctx.closePath();
-        this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = this.projectionColor;
         this.ctx.fill();
         this.ctx.restore();
     }
