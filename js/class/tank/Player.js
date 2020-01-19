@@ -52,28 +52,77 @@ export class Player {
         let turn = false;
 
             //droite gauche
-        if ((vel[1] === 1 && vel[0] === 0) || (vel[1] === -1 && vel[0] === 0)) {
-            console.log('droite gauche')
+        if (vel[1] === 1 && vel[0] === 0) {
+            console.log('droite')
             this.turnAngle = tAngle;
-            turn = true;
-            
-            //haut bas
-        } else if ((vel[1] === 0 && vel[0] === 1) || (vel[1] === 0 && vel[0] === -1)) {
-            console.log('haut bas')
+            if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            } else if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            }
+
+        } else if (vel[1] === -1 && vel[0] === 0) {
+            console.log('gauche')
+            this.turnAngle = -tAngle;
+            if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            } else if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            }
+
+        } else if (vel[1] === 0 && vel[0] === 1) {
+            console.log('haut')
             this.turnAngle = 0;
-            turn = true;
+            if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            } else if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            }
+
+        } else if (vel[1] === 0 && vel[0] === -1) {
+            console.log('bas')
+            this.turnAngle = tAngle*2;
+            if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            } else if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            }
                 
-            //droit-haut gauche-bas
-        } else if ((vel[1] === 1 && vel[0] === 1) || (vel[1] === -1 && vel[0] === -1)) {
-            console.log('droit-haut gauche-bas')
+        } else if (vel[1] === 1 && vel[0] === 1) {
+            console.log('droite-haut')
             this.turnAngle = tAngle/2;
-            turn = true;
-                
-            //droit-bas gauche-haut
-        } else if ((vel[1] === -1 && vel[0] === 1) || (vel[1] === 1 && vel[0] === -1)) {
-            console.log('droit-bas gauche-haut')
+            if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            } else if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            }
+
+        } else if (vel[1] === -1 && vel[0] === -1) {
+            console.log('gauche-bas')
+            this.turnAngle = ((tAngle*3) - (tAngle/2));
+            if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            } else if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            }
+            
+        } else if (vel[1] === 1 && vel[0] === -1) {
+            console.log('droit-bas')
+            this.turnAngle = ((tAngle*2) - (tAngle/2));
+            if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            } else if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            }
+
+        } else if (vel[1] === -1 && vel[0] === 1) {
+            console.log('gauche-haut')
             this.turnAngle = -tAngle/2;
-            turn = true;
+            if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            } else if (this.playerAngle > this.turnAngle) {
+                this.playerAngle -= 5;
+            }
 
         } else {
             
@@ -81,11 +130,7 @@ export class Player {
         }
 
         if (turn === true) {
-            if (this.playerAngle < this.turnAngle) {
-                this.playerAngle += 5;
-            } else if (this.playerAngle !== this.turnAngle) {
-                this.playerAngle -= 5;
-            }
+            
         }
         
 
