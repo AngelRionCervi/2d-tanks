@@ -1,4 +1,4 @@
-const canvas = document.getElementById('canvas');
+const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const frameRate = 1000/60;
 
