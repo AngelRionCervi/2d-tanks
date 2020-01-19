@@ -29,7 +29,7 @@ export class Player {
             this.centerY = this.y + this.baseSizeY / 2;
         }
 
-        this.getAngle = (curPos) => Math.atan2(curPos.x - (this.x + this.baseSizeX / 2), curPos.y - (this.y + this.baseSizeY / 2));
+        this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
         this.radToDeg = (rad) => rad * 180 / Math.PI
     }
 
@@ -47,48 +47,7 @@ export class Player {
             angle = 0;
         }
         
-
-        let tAngle = 90;
-        let turn = false;
-
-            //droite gauche
-        if ((vel[1] === 1 && vel[0] === 0) || (vel[1] === -1 && vel[0] === 0)) {
-            console.log('droite gauche')
-            this.turnAngle = tAngle;
-            turn = true;
-            
-            //haut bas
-        } else if ((vel[1] === 0 && vel[0] === 1) || (vel[1] === 0 && vel[0] === -1)) {
-            console.log('haut bas')
-            this.turnAngle = 0;
-            turn = true;
-                
-            //droit-haut gauche-bas
-        } else if ((vel[1] === 1 && vel[0] === 1) || (vel[1] === -1 && vel[0] === -1)) {
-            console.log('droit-haut gauche-bas')
-            this.turnAngle = tAngle/2;
-            turn = true;
-                
-            //droit-bas gauche-haut
-        } else if ((vel[1] === -1 && vel[0] === 1) || (vel[1] === 1 && vel[0] === -1)) {
-            console.log('droit-bas gauche-haut')
-            this.turnAngle = -tAngle/2;
-            turn = true;
-
-        } else {
-            
-            turn = false;
-        }
-
-        if (turn === true) {
-            if (this.playerAngle < this.turnAngle) {
-                this.playerAngle += 5;
-            } else if (this.playerAngle !== this.turnAngle) {
-                this.playerAngle -= 5;
-            }
-        }
-        
-
+        this.turnAnimation(vel);
 
         // draw base
         this.ctx.save();
@@ -189,6 +148,48 @@ export class Player {
         this.ctx.fillStyle = this.projectionColor;
         this.ctx.fill();
         this.ctx.restore();
+    }
+
+    turnAnimation(vel) {
+        let tAngle = 90;
+        let turn = false;
+
+            //droite gauche
+        if ((vel[1] === 1 && vel[0] === 0) || (vel[1] === -1 && vel[0] === 0)) {
+            console.log('droite gauche')
+            this.turnAngle = tAngle;
+            turn = true;
+            
+            //haut bas
+        } else if ((vel[1] === 0 && vel[0] === 1) || (vel[1] === 0 && vel[0] === -1)) {
+            console.log('haut bas')
+            this.turnAngle = 0;
+            turn = true;
+                
+            //droit-haut gauche-bas
+        } else if ((vel[1] === 1 && vel[0] === 1) || (vel[1] === -1 && vel[0] === -1)) {
+            console.log('droit-haut gauche-bas')
+            this.turnAngle = tAngle/2;
+            turn = true;
+                
+            //droit-bas gauche-haut
+        } else if ((vel[1] === -1 && vel[0] === 1) || (vel[1] === 1 && vel[0] === -1)) {
+            console.log('droit-bas gauche-haut')
+            this.turnAngle = -tAngle/2;
+            turn = true;
+
+        } else {
+            
+            turn = false;
+        }
+
+        if (turn === true) {
+            if (this.playerAngle < this.turnAngle) {
+                this.playerAngle += 5;
+            } else if (this.playerAngle !== this.turnAngle) {
+                this.playerAngle -= 5;
+            }
+        }
     }
 
     getPlayerPos() {
