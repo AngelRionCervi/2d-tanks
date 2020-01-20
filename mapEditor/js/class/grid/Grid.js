@@ -31,7 +31,7 @@ export class Grid {
                     this.ctx.moveTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y);
                     this.ctx.lineTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y + this.blockSize); 
                 }
-                this.gridCoords.push({id: (x+y)/this.blockSize + idStart, x: x, y: y, block: false});
+                this.gridCoords.push({id: (x+y) / this.blockSize + idStart, x: x, y: y, block: false});
             }
 
             idStart += this.gridWidth/this.blockSize-1;

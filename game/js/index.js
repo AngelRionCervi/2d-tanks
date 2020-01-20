@@ -2,19 +2,27 @@ const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
 const frameRate = 1000/60;
 
+import {MapManager} from "/js/class/mapManager/MapManager.js";
 import {Missile} from "/js/class/weapon/Missile.js"; 
 import {Player} from "/js/class/tank/Player.js"; 
 import {Mouse} from "/js/class/mouseHandling/Mouse.js";
 import {Keyboard} from "/js/class/keyboardHandling/Keyboard.js";
+import {CollisionDetector} from "/js/class/collision/CollisionDetector.js";
 
 
+let mapManager = new MapManager(gameCanvas, ctx);
 let player = new Player(gameCanvas, ctx);
 let mouse = new Mouse(gameCanvas);
 let keyboard = new Keyboard(gameCanvas);
 
+let map = mapManager.getMap();
+
 let curPos;
 let vel = [0, 0];
 let playerShots = [];
+
+let collisionDetector = new CollisionDetector(player, map, playerShots)
+
 
 gameCanvas.addEventListener('mousemove', (evt) => {
     curPos = mouse.getMousePos(evt);
@@ -36,13 +44,17 @@ document.addEventListener('keyup', (evt) => {
 
 function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    mapManager.renderMap(map);
+    let isColl = collisionDetector.mapPlayerCollision();
   
+
+    player.draw(vel, isColl);
+
     if (curPos) {
-        player.draw(vel, curPos);
-        player.drawAim(curPos);
-    } else {
-        player.draw(vel);
-    }
+      player.drawAim(curPos);
+    } 
+    
 
     playerShots.forEach((missile) => {
         if (!missile.vx && !missile.vy) {
@@ -53,7 +65,7 @@ function render() {
 
 }
 
-setInterval(()=>{
+setInterval(() => {
   render()
 }, frameRate)
 

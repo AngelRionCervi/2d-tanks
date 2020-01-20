@@ -4,7 +4,7 @@ export class Player {
         this.canvas = canvas;
         this.x = 200;
         this.y = 100;
-        this.speed = 2;
+        this.speed = 3;
         this.baseSizeX = 20;
         this.baseSizeY = 25;
         this.canonSizeX = 8;
@@ -24,6 +24,7 @@ export class Player {
         this.turnAngle = 0;
         this.playerAngle = 0;
         this.turnSpeedMult = 0.1;
+        this.curOnCanvas = false;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -34,19 +35,47 @@ export class Player {
         this.radToDeg = (rad) => rad * 180 / Math.PI
     }
 
-    draw(vel, curPos = null) {
+    draw(vel, isColl) {
 
-        this.x += vel[1] * this.speed;
-        this.y -= vel[0] * this.speed;
+        if (isColl === 'left') {
+            if (vel[1] < 0) {
+                this.y -= vel[0] * this.speed;
+                this.x += vel[1] * this.speed;
+            } else {
+                this.y -= vel[0] * this.speed;
+                this.x = this.x;
+            }
+        } else if (isColl === 'right') {
+            if (vel[1] > 0) {
+                this.y -= vel[0] * this.speed;
+                this.x += vel[1] * this.speed;
+            } else {
+                this.y -= vel[0] * this.speed;
+                this.x = this.x;
+            }
+        } else if (isColl === 'top') {
+            if (vel[0] > 0) {
+                this.y -= vel[0] * this.speed;
+                this.x += vel[1] * this.speed;
+            } else {
+                this.x += vel[1] * this.speed;
+                this.y = this.y;
+            }
+        } else if (isColl === 'bottom') {
+            if (vel[0] < 0) {
+                this.y -= vel[0] * this.speed;
+                this.x += vel[1] * this.speed;
+            } else {
+                this.x += vel[1] * this.speed;
+                this.y = this.y;
+            }
+        } else {
+            this.y -= vel[0] * this.speed;
+            this.x += vel[1] * this.speed;
+        }
+        
 
         this.updCenters();
-
-        let angle;
-        if (curPos) {
-            angle = this.getAngle(curPos);
-        } else {
-            angle = 0;
-        }
         
         this.turnAnimation(vel);
 
@@ -62,6 +91,32 @@ export class Player {
         this.ctx.fill();
         this.ctx.restore();
 
+        // initiate canon at angle if cursor not on canvas
+        if (!this.curOnCanvas) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.translate(this.centerX, this.centerY)
+            this.ctx.rotate(0);
+            this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter))
+            this.ctx.rect(this.x, this.y, this.canonSizeX, this.canonSizeY);
+            this.ctx.closePath();
+            this.ctx.fillStyle = this.canonColor;
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+    }
+
+    drawAim(curPos) {
+
+        this.curOnCanvas = true;
+
+        let angle = this.getAngle(curPos);
+
+        let tx = curPos.x - this.centerX;
+        let ty = curPos.y - this.centerY;
+        let dist = Math.sqrt(tx * tx + ty * ty);
+        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
+
         // draw canon
         this.ctx.save();
         this.ctx.beginPath();
@@ -73,17 +128,8 @@ export class Player {
         this.ctx.fillStyle = this.canonColor;
         this.ctx.fill();
         this.ctx.restore();
-    }
 
-    drawAim(curPos) {
-
-        let angle = this.getAngle(curPos);
-
-        let tx = curPos.x - this.centerX;
-        let ty = curPos.y - this.centerY;
-        let dist = Math.sqrt(tx * tx + ty * ty);
-        let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
-
+        //draw aim
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.translate(this.centerX, this.centerY)
@@ -157,37 +203,32 @@ export class Player {
 
             //droite gauche
         if ((vel[1] === 1 && vel[0] === 0) || (vel[1] === -1 && vel[0] === 0)) {
-            console.log('droite gauche')
             this.turnAngle = tAngle;
             turn = true;
             
             //haut bas
         } else if ((vel[1] === 0 && vel[0] === 1) || (vel[1] === 0 && vel[0] === -1)) {
-            console.log('haut bas')
             this.turnAngle = 0;
             turn = true;
                 
             //droit-haut gauche-bas
         } else if ((vel[1] === 1 && vel[0] === 1) || (vel[1] === -1 && vel[0] === -1)) {
-            console.log('droit-haut gauche-bas')
             this.turnAngle = tAngle/2;
             turn = true;
                 
             //droit-bas gauche-haut
         } else if ((vel[1] === -1 && vel[0] === 1) || (vel[1] === 1 && vel[0] === -1)) {
-            console.log('droit-bas gauche-haut')
             this.turnAngle = -tAngle/2;
             turn = true;
 
         } else {
-            
             turn = false;
         }
 
         if (turn === true) {
             if (this.playerAngle < this.turnAngle) {
                 this.playerAngle += 5;
-            } else if (this.playerAngle !== this.turnAngle) {
+            } else if (this.playerAngle > this.turnAngle) {
                 this.playerAngle -= 5;
             }
         }
@@ -196,4 +237,9 @@ export class Player {
     getPlayerPos() {
         return { x: this.centerX, y: this.centerY }
     }
+
+    getPlayerSpecs() {
+        return { baseSizeX: this.baseSizeX, baseSizeY: this.baseSizeY, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
+    }
+
 }
