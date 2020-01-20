@@ -31,7 +31,7 @@ export class Grid {
                     this.ctx.moveTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y);
                     this.ctx.lineTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y + this.blockSize); 
                 }
-                this.gridCoords.push({id: (x+y)/this.blockSize + idStart, x: x, y: y, block: false})
+                this.gridCoords.push({id: (x+y)/this.blockSize + idStart, x: x, y: y, block: false});
             }
 
             idStart += this.gridWidth/this.blockSize-1;
@@ -48,13 +48,15 @@ export class Grid {
 
         let targetCell = this.gridCoords.filter(n => n.x === roundX && n.y === roundY)[0];
         this.gridCoords[targetCell.id].block = true;
-        console.log(targetCell)
 
         this.ctx.beginPath();
         this.ctx.rect(roundX+1, roundY+1, this.blockSize-1, this.blockSize-1);
         this.ctx.fillStyle = this.cellFillStyle;
-        this.ctx.fill()
+        this.ctx.fill();
         this.ctx.closePath();
-        
+    }
+
+    getMap() {
+        return {width: this.gridWidth, height: this.gridHeight, blockSize: this.blockSize, coords: this.gridCoords.filter(n => n.block === true)};
     }
 }
