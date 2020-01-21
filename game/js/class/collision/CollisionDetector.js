@@ -18,7 +18,7 @@ export class CollisionDetector {
         let collReduction = this.mapCollisionReduction;
         let blockSize = this.map.blockSize;
 
-        let isColl = [];
+        let isColl = new Set();
 
         this.map.coords.forEach((v) => {
 
@@ -28,11 +28,11 @@ export class CollisionDetector {
 
                 if (playerX - baseSizeY / 2 <= v.x && playerX + baseSizeY / 2 >= v.x) {
 
-                    isColl.push('left');
+                    isColl.add('left');
 
                 } else if (playerX - baseSizeY / 2 <= v.x + blockSize && playerX + baseSizeY / 2 >= v.x) {
 
-                    isColl.push('right');
+                    isColl.add('right');
 
                 }
             }
@@ -43,26 +43,26 @@ export class CollisionDetector {
 
                 if (playerY - baseSizeY / 2 <= v.y && playerY + baseSizeY / 2 >= v.y) {
 
-                    isColl.push('top');
+                    isColl.add('top');
 
                 } else if (playerY - baseSizeY / 2 <= v.y + blockSize && playerY + baseSizeY / 2 >= v.y) {
 
-                    isColl.push('bottom');
+                    isColl.add('bottom');
 
                 }
             }
         })
 
         if (playerX + baseSizeY / 2 > this.map.width) {
-            isColl.push('left');
+            isColl.add('left');
         } else if (playerX - baseSizeY / 2 < 0) {
-            isColl.push('right');
+            isColl.add('right');
         }
 
         if (playerY + baseSizeY / 2 > this.map.height) {
-            isColl.push('top');
+            isColl.add('top');
         } else if (playerY - baseSizeY / 2 < 0) {
-            isColl.push('bottom');
+            isColl.add('bottom');
         }
         
 

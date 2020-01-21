@@ -139,7 +139,6 @@ export class Player {
 
             this.aimProjection(xEndAim + xWallOffset, yEndAim + yInWall, angle, "yWall");
         }
-
     }
 
     aimProjection(x, y, angle, wallType) {
@@ -202,17 +201,13 @@ export class Player {
     }
 
     mapPlayerColl(vel, isColl) {
-
-        //removes doubles
-        let uniqColl = [...new Set(isColl)];
-
-        console.log(uniqColl);
+   
         let velX = 0;
         let velY = 0;
 
-        if (uniqColl.length > 0) {
+        if (isColl.size > 0) {
 
-            uniqColl.forEach((v, i, a) => {
+            isColl.forEach((v, i, a) => {
 
                 if (v === 'left') {
                     if (vel[1] < 0) {
@@ -220,7 +215,7 @@ export class Player {
                         velX += vel[1] * this.speed;
                     } else {
                         velY -= vel[0] * this.speed;
-                        if (a.length === 1) {
+                        if (a.size === 1) {
                             velX = velX;
                         } else {
                             velX -= vel[1] * this.speed;
@@ -232,7 +227,7 @@ export class Player {
                         velX += vel[1] * this.speed;
                     } else {
                         velY -= vel[0] * this.speed;
-                        if (a.length === 1) {
+                        if (a.size === 1) {
                             velX = velX;
                         } else {
                             velX -= vel[1] * this.speed;
@@ -244,7 +239,7 @@ export class Player {
                         velX += vel[1] * this.speed;
                     } else {
                         velX += vel[1] * this.speed;
-                        if (a.length === 1) {
+                        if (a.size === 1) {
                             velY = velY;
                         } else {
                             velY += vel[0] * this.speed;
@@ -256,7 +251,7 @@ export class Player {
                         velX += vel[1] * this.speed;
                     } else {
                         velX += vel[1] * this.speed;
-                        if (a.length === 1) {
+                        if (a.size === 1) {
                             velY = velY;
                         } else {
                             velY += vel[0] * this.speed;
