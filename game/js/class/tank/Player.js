@@ -37,46 +37,13 @@ export class Player {
 
     draw(vel, isColl) {
 
-        if (isColl === 'left') {
-            if (vel[1] < 0) {
-                this.y -= vel[0] * this.speed;
-                this.x += vel[1] * this.speed;
-            } else {
-                this.y -= vel[0] * this.speed;
-                this.x = this.x;
-            }
-        } else if (isColl === 'right') {
-            if (vel[1] > 0) {
-                this.y -= vel[0] * this.speed;
-                this.x += vel[1] * this.speed;
-            } else {
-                this.y -= vel[0] * this.speed;
-                this.x = this.x;
-            }
-        } else if (isColl === 'top') {
-            if (vel[0] > 0) {
-                this.y -= vel[0] * this.speed;
-                this.x += vel[1] * this.speed;
-            } else {
-                this.x += vel[1] * this.speed;
-                this.y = this.y;
-            }
-        } else if (isColl === 'bottom') {
-            if (vel[0] < 0) {
-                this.y -= vel[0] * this.speed;
-                this.x += vel[1] * this.speed;
-            } else {
-                this.x += vel[1] * this.speed;
-                this.y = this.y;
-            }
-        } else {
-            this.y -= vel[0] * this.speed;
-            this.x += vel[1] * this.speed;
-        }
-        
+        let collVel = this.mapPlayerColl(vel, isColl);
+
+        this.x += collVel.velX;
+        this.y += collVel.velY;
 
         this.updCenters();
-        
+
         this.turnAnimation(vel);
 
         // draw base
@@ -201,24 +168,24 @@ export class Player {
         let tAngle = 90;
         let turn = false;
 
-            //droite gauche
+        //droite gauche
         if ((vel[1] === 1 && vel[0] === 0) || (vel[1] === -1 && vel[0] === 0)) {
             this.turnAngle = tAngle;
             turn = true;
-            
+
             //haut bas
         } else if ((vel[1] === 0 && vel[0] === 1) || (vel[1] === 0 && vel[0] === -1)) {
             this.turnAngle = 0;
             turn = true;
-                
+
             //droit-haut gauche-bas
         } else if ((vel[1] === 1 && vel[0] === 1) || (vel[1] === -1 && vel[0] === -1)) {
-            this.turnAngle = tAngle/2;
+            this.turnAngle = tAngle / 2;
             turn = true;
-                
+
             //droit-bas gauche-haut
         } else if ((vel[1] === -1 && vel[0] === 1) || (vel[1] === 1 && vel[0] === -1)) {
-            this.turnAngle = -tAngle/2;
+            this.turnAngle = -tAngle / 2;
             turn = true;
 
         } else {
@@ -232,6 +199,76 @@ export class Player {
                 this.playerAngle -= 5;
             }
         }
+    }
+
+    mapPlayerColl(vel, isColl) {
+
+        //removes doubles
+        let uniqColl = [...new Set(isColl)];
+
+        let velX = 0;
+        let velY = 0;
+
+        if (uniqColl.length > 0) {
+
+            uniqColl.forEach((v, i, a) => {
+
+                if (v === 'left') {
+                    if (vel[1] < 0) {
+                        velY -= vel[0] * this.speed;
+                        velX += vel[1] * this.speed;
+                    } else {
+                        velY -= vel[0] * this.speed;
+                        if (a.length === 1) {
+                            velX = velX;
+                        } else {
+                            velX -= vel[1] * this.speed;
+                        }
+                    }
+                } else if (v === 'right') {
+                    if (vel[1] > 0) {
+                        velY -= vel[0] * this.speed;
+                        velX += vel[1] * this.speed;
+                    } else {
+                        velY -= vel[0] * this.speed;
+                        if (a.length === 1) {
+                            velX = velX;
+                        } else {
+                            velX -= vel[1] * this.speed;
+                        }
+                    }
+                } else if (v === 'top') {
+                    if (vel[0] > 0) {
+                        velY -= vel[0] * this.speed;
+                        velX += vel[1] * this.speed;
+                    } else {
+                        velX += vel[1] * this.speed;
+                        if (a.length === 1) {
+                            velY = velY;
+                        } else {
+                            velY += vel[0] * this.speed;
+                        }
+                    }
+                } else if (v === 'bottom') {
+                    if (vel[0] < 0) {
+                        velY -= vel[0] * this.speed;
+                        velX += vel[1] * this.speed;
+                    } else {
+                        velX += vel[1] * this.speed;
+                        if (a.length === 1) {
+                            velY = velY;
+                        } else {
+                            velY += vel[0] * this.speed;
+                        }
+                    }
+                }
+            })
+        } else {
+            velY -= vel[0] * this.speed;
+            velX += vel[1] * this.speed;
+        }
+        
+        return { velX: velX, velY: velY };
     }
 
     getPlayerPos() {

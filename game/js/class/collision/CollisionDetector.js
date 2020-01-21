@@ -18,7 +18,7 @@ export class CollisionDetector {
         let collReduction = this.mapCollisionReduction;
         let blockSize = this.map.blockSize;
 
-        let isColl = false;
+        let isColl = [];
 
         this.map.coords.forEach((v) => {
             
@@ -27,25 +27,27 @@ export class CollisionDetector {
                 || (playerY - baseSizeY/2 + collReduction > v.y && playerY - baseSizeY/2 + collReduction < v.y + blockSize)) {
 
                     if (playerX - baseSizeY/2 <= v.x && playerX + baseSizeY/2 >= v.x) {
-                        console.log("left coll")
-                        isColl = 'left';
+                        
+                        isColl.push('left');
 
                     } else if (playerX - baseSizeY/2 <= v.x + blockSize && playerX + baseSizeY/2 >= v.x) {
-                        console.log("right coll")
-                        isColl = 'right';
+                        
+                        isColl.push('right');
 
                     }
+                } 
+                
                 //y
-                } else if ((playerX + baseSizeY/2 - collReduction > v.x && playerX + baseSizeY/2 - collReduction < v.x + blockSize) 
+                if ((playerX + baseSizeY/2 - collReduction > v.x && playerX + baseSizeY/2 - collReduction < v.x + blockSize) 
                 || (playerX - baseSizeY/2 + collReduction > v.x && playerX - baseSizeY/2 + collReduction < v.x + blockSize)) {
 
                     if (playerY - baseSizeY/2 <= v.y && playerY + baseSizeY/2 >= v.y) {
-                        console.log("top coll")
-                        isColl = 'top';
+                        
+                        isColl.push('top');
 
                     } else if (playerY - baseSizeY/2 <= v.y + blockSize && playerY + baseSizeY/2 >= v.y) {
-                        console.log("bottom coll")
-                        isColl = 'bottom';
+                        
+                        isColl.push('bottom');
 
                     }
                 }
