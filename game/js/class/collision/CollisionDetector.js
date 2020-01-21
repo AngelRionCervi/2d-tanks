@@ -7,7 +7,7 @@ export class CollisionDetector {
     }
 
     mapPlayerCollision() {
-        //console.log(this.player.getPlayerPos())
+
         let playerPos = this.player.getPlayerPos();
         let playerSpecs = this.player.getPlayerSpecs();
 
@@ -64,7 +64,54 @@ export class CollisionDetector {
         } else if (playerY - baseSizeY / 2 < 0) {
             isColl.add('bottom');
         }
-        
+
+
+        return isColl;
+    }
+
+    mapMissileCollision(missile) {
+
+        let blockSize = this.map.blockSize;
+        let collReduction = 3;
+        let baseSizeY = 6;
+
+        let isColl = [];
+
+        this.map.coords.forEach((v) => {
+                
+                if ((missile.y + baseSizeY / 2 - collReduction > v.y && missile.y + baseSizeY / 2 - collReduction < v.y + blockSize)
+                || (missile.y - baseSizeY / 2 + collReduction > v.y && missile.y - baseSizeY / 2 + collReduction < v.y + blockSize)) {
+
+                    if ((missile.x - baseSizeY / 2 <= v.x && missile.x + baseSizeY / 2 >= v.x) 
+                    || (missile.x - baseSizeY / 2 <= v.x + blockSize && missile.x + baseSizeY / 2 >= v.x)) {
+
+                        isColl.push('xColl');
+
+                    }
+                }
+                
+                if ((missile.x + baseSizeY / 2 - collReduction > v.x && missile.x + baseSizeY / 2 - collReduction < v.x + blockSize)
+                || (missile.x - baseSizeY / 2 + collReduction > v.x && missile.x - baseSizeY / 2 + collReduction < v.x + blockSize)) {
+
+                    if ((missile.y - baseSizeY / 2 <= v.y && missile.y + baseSizeY / 2 >= v.y) 
+                    || (missile.y - baseSizeY / 2 <= v.y + blockSize && missile.y + baseSizeY / 2 >= v.y)) {
+
+                        isColl.push('yColl');
+
+                    }
+                }
+                
+                /* else if ((missile.x + collReduction >= blockCoord.x && missile.x + collReduction <= blockCoord.x + blockSize)
+                || (missile.x - collReduction >= blockCoord.x && missile.x - collReduction <= blockCoord.x + blockSize)) {
+                    
+                    if ((missile.y + collReduction <= blockCoord.y && missile.y - collReduction >= blockCoord.y) 
+                    || (missile.y + collReduction <= blockCoord.y + blockSize && missile.y - collReduction >= blockCoord.y)) {
+
+                        isColl = 'yColl';
+
+                    } 
+                } */
+            })
 
         return isColl;
     }

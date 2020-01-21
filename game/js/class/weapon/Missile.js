@@ -6,9 +6,9 @@ export class Missile {
         this.y = playerPos.y;
         this.vx;
         this.vy;
-        this.radius = 2;
+        this.radius = 6;
         this.color = "blue";
-        this.speed = 4;
+        this.speed = 5;
         this.shotPos = curPos;
         this.playerPos = playerPos;
     }
@@ -22,7 +22,20 @@ export class Missile {
         this.vy = (ty / dist) * this.speed;
     }
 
-    draw() {
+    draw(coll) {
+
+        
+        coll.forEach((v) => {
+            if (v === "xColl") {
+                console.log(coll);
+                this.vx = -this.vx;
+            } else if (v === "yColl") {
+                console.log(coll);
+                this.vy = -this.vy;
+            }
+        })
+        
+
         if (this.y + this.vy > this.canvas.height || this.y + this.vy < 0) {
             this.vy = -this.vy;
         } 

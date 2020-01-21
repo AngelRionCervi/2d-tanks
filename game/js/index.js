@@ -46,10 +46,9 @@ function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     mapManager.renderMap(map);
-    let isColl = collisionDetector.mapPlayerCollision();
-  
+    let playerMapColl = collisionDetector.mapPlayerCollision();
 
-    player.draw(vel, isColl);
+    player.draw(vel, playerMapColl);
 
     if (curPos) {
       player.drawAim(curPos);
@@ -60,7 +59,8 @@ function render() {
         if (!missile.vx && !missile.vy) {
           missile.initDir();
         } 
-        missile.draw();
+        let missileMapColl = collisionDetector.mapMissileCollision(missile);
+        missile.draw(missileMapColl);
     })
 
 }
