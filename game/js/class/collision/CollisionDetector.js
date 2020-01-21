@@ -21,38 +21,50 @@ export class CollisionDetector {
         let isColl = [];
 
         this.map.coords.forEach((v) => {
-            
-                //x
-                if ((playerY + baseSizeY/2 - collReduction > v.y && playerY + baseSizeY/2 - collReduction < v.y + blockSize) 
-                || (playerY - baseSizeY/2 + collReduction > v.y && playerY - baseSizeY/2 + collReduction < v.y + blockSize)) {
 
-                    if (playerX - baseSizeY/2 <= v.x && playerX + baseSizeY/2 >= v.x) {
-                        
-                        isColl.push('left');
+            //x
+            if ((playerY + baseSizeY / 2 - collReduction > v.y && playerY + baseSizeY / 2 - collReduction < v.y + blockSize)
+                || (playerY - baseSizeY / 2 + collReduction > v.y && playerY - baseSizeY / 2 + collReduction < v.y + blockSize)) {
 
-                    } else if (playerX - baseSizeY/2 <= v.x + blockSize && playerX + baseSizeY/2 >= v.x) {
-                        
-                        isColl.push('right');
+                if (playerX - baseSizeY / 2 <= v.x && playerX + baseSizeY / 2 >= v.x) {
 
-                    }
-                } 
-                
-                //y
-                if ((playerX + baseSizeY/2 - collReduction > v.x && playerX + baseSizeY/2 - collReduction < v.x + blockSize) 
-                || (playerX - baseSizeY/2 + collReduction > v.x && playerX - baseSizeY/2 + collReduction < v.x + blockSize)) {
+                    isColl.push('left');
 
-                    if (playerY - baseSizeY/2 <= v.y && playerY + baseSizeY/2 >= v.y) {
-                        
-                        isColl.push('top');
+                } else if (playerX - baseSizeY / 2 <= v.x + blockSize && playerX + baseSizeY / 2 >= v.x) {
 
-                    } else if (playerY - baseSizeY/2 <= v.y + blockSize && playerY + baseSizeY/2 >= v.y) {
-                        
-                        isColl.push('bottom');
+                    isColl.push('right');
 
-                    }
                 }
-            
+            }
+
+            //y
+            if ((playerX + baseSizeY / 2 - collReduction > v.x && playerX + baseSizeY / 2 - collReduction < v.x + blockSize)
+                || (playerX - baseSizeY / 2 + collReduction > v.x && playerX - baseSizeY / 2 + collReduction < v.x + blockSize)) {
+
+                if (playerY - baseSizeY / 2 <= v.y && playerY + baseSizeY / 2 >= v.y) {
+
+                    isColl.push('top');
+
+                } else if (playerY - baseSizeY / 2 <= v.y + blockSize && playerY + baseSizeY / 2 >= v.y) {
+
+                    isColl.push('bottom');
+
+                }
+            }
         })
+
+        if (playerX + baseSizeY / 2 > this.map.width) {
+            isColl.push('left');
+        } else if (playerX - baseSizeY / 2 < 0) {
+            isColl.push('right');
+        }
+
+        if (playerY + baseSizeY / 2 > this.map.height) {
+            isColl.push('top');
+        } else if (playerY - baseSizeY / 2 < 0) {
+            isColl.push('bottom');
+        }
+        
 
         return isColl;
     }

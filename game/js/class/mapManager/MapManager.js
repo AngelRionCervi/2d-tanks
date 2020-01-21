@@ -21,8 +21,7 @@ export class MapManager {
             this.fillStyle = this.blockColor;    
             this.ctx.closePath();
             this.ctx.fill();
-        });
-                
+        });      
     }
 
     getMap() {
