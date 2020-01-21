@@ -78,39 +78,12 @@ export class CollisionDetector {
         let isColl = "";
 
         this.map.coords.forEach((v) => {
+
+            let tx = missile.x - v.x;
+            let ty = missile.y - v.y;
+            let dist = Math.sqrt(tx * tx + ty * ty);
+              
                 
-                if ((missile.y + baseSizeY / 2 - collReduction > v.y && missile.y + baseSizeY / 2 - collReduction < v.y + blockSize)
-                || (missile.y - baseSizeY / 2 + collReduction > v.y && missile.y - baseSizeY / 2 + collReduction < v.y + blockSize)) {
-
-                    if ((missile.x - baseSizeY / 2 <= v.x && missile.x + baseSizeY / 2 >= v.x) 
-                    || (missile.x - baseSizeY / 2 <= v.x + blockSize && missile.x + baseSizeY / 2 >= v.x)) {
-
-                        isColl = 'xColl';
-
-                    }
-                }
-                
-                if ((missile.x + baseSizeY / 2 - collReduction > v.x && missile.x + baseSizeY / 2 - collReduction < v.x + blockSize)
-                || (missile.x - baseSizeY / 2 + collReduction > v.x && missile.x - baseSizeY / 2 + collReduction < v.x + blockSize)) {
-
-                    if ((missile.y - baseSizeY / 2 <= v.y && missile.y + baseSizeY / 2 >= v.y) 
-                    || (missile.y - baseSizeY / 2 <= v.y + blockSize && missile.y + baseSizeY / 2 >= v.y)) {
-
-                        isColl = 'yColl';
-
-                    }
-                }
-                
-                /* else if ((missile.x + collReduction >= blockCoord.x && missile.x + collReduction <= blockCoord.x + blockSize)
-                || (missile.x - collReduction >= blockCoord.x && missile.x - collReduction <= blockCoord.x + blockSize)) {
-                    
-                    if ((missile.y + collReduction <= blockCoord.y && missile.y - collReduction >= blockCoord.y) 
-                    || (missile.y + collReduction <= blockCoord.y + blockSize && missile.y - collReduction >= blockCoord.y)) {
-
-                        isColl = 'yColl';
-
-                    } 
-                } */
             })
 
         return isColl;
