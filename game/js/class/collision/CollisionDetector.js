@@ -75,7 +75,7 @@ export class CollisionDetector {
         let collReduction = 3;
         let baseSizeY = 6;
 
-        let isColl = [];
+        let isColl = "";
 
         this.map.coords.forEach((v) => {
                 
@@ -85,7 +85,7 @@ export class CollisionDetector {
                     if ((missile.x - baseSizeY / 2 <= v.x && missile.x + baseSizeY / 2 >= v.x) 
                     || (missile.x - baseSizeY / 2 <= v.x + blockSize && missile.x + baseSizeY / 2 >= v.x)) {
 
-                        isColl.push('xColl');
+                        isColl = 'xColl';
 
                     }
                 }
@@ -96,7 +96,7 @@ export class CollisionDetector {
                     if ((missile.y - baseSizeY / 2 <= v.y && missile.y + baseSizeY / 2 >= v.y) 
                     || (missile.y - baseSizeY / 2 <= v.y + blockSize && missile.y + baseSizeY / 2 >= v.y)) {
 
-                        isColl.push('yColl');
+                        isColl = 'yColl';
 
                     }
                 }

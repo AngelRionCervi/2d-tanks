@@ -25,16 +25,14 @@ export class Missile {
     draw(coll) {
 
         
-        coll.forEach((v) => {
-            if (v === "xColl") {
-                console.log(coll);
-                this.vx = -this.vx;
-            } else if (v === "yColl") {
-                console.log(coll);
-                this.vy = -this.vy;
-            }
-        })
         
+        if (coll === "xColl") {
+            console.log(coll);
+            this.vx = -this.vx;
+        } else if (coll === "yColl") {
+            console.log(coll);
+            this.vy = -this.vy;
+        }
 
         if (this.y + this.vy > this.canvas.height || this.y + this.vy < 0) {
             this.vy = -this.vy;
