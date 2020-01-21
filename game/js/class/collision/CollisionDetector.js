@@ -83,25 +83,27 @@ export class CollisionDetector {
             let y = this.map.coords[u].y;
             let x = this.map.coords[u].x;
 
-            if (missile.y > y +1 && missile.y < y + blockSize -1) {
-
-                if (missile.x < x + blockSize+1 && missile.x > x-1) {
-
-                    isColl = 'xColl';
-                    break;
-
-                }
-            } else 
-
             if (missile.x > x +1 && missile.x < x + blockSize -1) {
 
                 if (missile.y < y + blockSize+1 && missile.y > y-1) {
-
+                    console.log('yColl')
                     isColl = 'yColl';
                     break;
 
                 }
             }
+
+            if (missile.y > y +1 && missile.y < y + blockSize -1) {
+
+                if (missile.x < x + blockSize+1 && missile.x > x-1) {
+                    console.log('xColl')
+                    isColl = 'xColl';
+                    break;
+
+                }
+            } 
+
+            
         }
 
         return isColl;
