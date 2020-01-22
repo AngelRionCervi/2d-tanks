@@ -11,6 +11,8 @@ export class Missile {
         this.speed = 5;
         this.shotPos = curPos;
         this.playerPos = playerPos;
+        this.lastColl = [];
+        this.freeFrame = 0;
     }
 
     initDir() {
@@ -26,10 +28,10 @@ export class Missile {
 
         
         if (coll === "xColl") {
-            console.log(coll);
+            
             this.vx = -this.vx;
         } else if (coll === "yColl") {
-            console.log(coll);
+            
             this.vy = -this.vy;
         }
 
