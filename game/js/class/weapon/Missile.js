@@ -8,9 +8,10 @@ export class Missile {
         this.vy;
         this.radius = 6;
         this.color = "blue";
-        this.speed = 5;
+        this.speed = 3;
         this.shotPos = curPos;
         this.playerPos = playerPos;
+        this.lastColl = [];
     }
 
     initDir() {
@@ -26,10 +27,10 @@ export class Missile {
 
         
         if (coll === "xColl") {
-            console.log(coll);
+            //console.log(coll);
             this.vx = -this.vx;
         } else if (coll === "yColl") {
-            console.log(coll);
+            //console.log(coll);
             this.vy = -this.vy;
         }
 

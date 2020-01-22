@@ -62,11 +62,13 @@ function render() {
         let missileMapColl = collisionDetector.mapMissileCollision(missile);
         missile.draw(missileMapColl);
     })
+
+    requestAnimationFrame(render);
 }
 
-setInterval(() => {
-  render()
-}, frameRate)
+
+render()
+
 
 
 

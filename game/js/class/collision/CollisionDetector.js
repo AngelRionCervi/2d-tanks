@@ -71,64 +71,53 @@ export class CollisionDetector {
 
     mapMissileCollision(missile) {
 
-        let blockSize = this.map.blockSize;
+        let blockSize = this.map.blockSize + 5;
         let collReduction = 5;
         let baseSizeY = 6;
         let colliderW = 3;
         let isColl = "";
 
         this.map.coords.forEach((collider) => {
-            //coord.blockColliders.forEach((collider) => {
 
-
-
-            let missileLeft = missile.x - baseSizeY, missileRight = missile.x + baseSizeY, missileTop = missile.y - baseSizeY, missileBottom = missile.y + baseSizeY;
-            let colliderLeft = collider.x, colliderRight = collider.x + blockSize, colliderTop = collider.y, colliderBottom = collider.y + blockSize;
+            let colliderLeft = collider.x - baseSizeY, colliderRight = collider.x + blockSize, colliderTop = collider.y - baseSizeY, colliderBottom = collider.y + blockSize;
             //check if missile is either touching or within the collider-bounds
-            if (missileRight >= colliderLeft && missileLeft <= colliderRight && missileBottom >= colliderTop && missileTop <= colliderBottom) {
-                if (missile.y + baseSizeY == colliderTop || missile.y - baseSizeY == colliderBottom) {
-                    isColl = "";
-                } //missile is already colliding with top or bottom side of collider
-                else if (missile.x + baseSizeY == colliderLeft || missile.x - baseSizeY == colliderRight) {
-                    isColl = "";
-                } //missile is already colliding with left or right side of collider
-                else if (missileRight > colliderLeft && missileLeft < colliderRight && missileBottom > colliderTop && missileTop < colliderBottom) {
-                    //check on which side the missile collides with the collider
-                    var sides = { left: Math.abs(missileRight - colliderLeft), right: Math.abs(missileLeft - colliderRight), top: Math.abs(missileBottom - colliderTop), bottom: Math.abs(missileTop - colliderBottom) };
-                    var side = Math.min(sides.left, sides.right, sides.top, sides.bottom); //returns the side with the smallest distance between missile and collider
+            if (missile.x >= colliderLeft && missile.x <= colliderRight && missile.y >= colliderTop && missile.y <= colliderBottom) {
 
-                    if (side == sides.top) {
-                        console.log('top coll')
-                        isColl = "yColl";
-                    } else if (side == sides.left) {
-                        console.log('left coll')
-                        isColl = "xColl";
-                    }
-
-                    //first check top, than left
-                    else if (side == sides.bottom) {
-                        console.log('bottom coll')
-                        isColl = "yColl";
-                    } else if (side == sides.right) {
-                        console.log('right coll')
-                        isColl = "xColl";
-                    } //first check bottom, than right
-
+                //check on which side the missile collides with the collider
+                let sides = { left: Math.abs(missile.x - colliderLeft), right: Math.abs(missile.x - colliderRight), top: Math.abs(missile.y - colliderTop), bottom: Math.abs(missile.y - colliderBottom) };
+                let side = Math.min(sides.left, sides.right, sides.top, sides.bottom); //returns the side with the smallest distance between missile and collider
+                console.log(sides, side);
+                if (side == sides.top) {
+                    isColl = "yColl";
+                } if (side == sides.left) {
+                    isColl = "xColl";
                 }
+
+                if (side == sides.bottom) {
+                    isColl = "yColl";
+                }
+                if (side == sides.right) {
+                    isColl = "xColl";
+                }
+
+                if (missile.lastColl.length > 2) {
+                    missile.lastColl.splice(0, 1);
+                } else if (missile.lastColl.length === 2) {
+                    if (missile.lastColl[0] === missile.lastColl[1]) {
+                        isColl = "";
+                    }
+                }
+
+                missile.lastColl.push(isColl);
+
+            } else if (missile.lastColl.length !== 0) {
+                missile.lastColl = [];
             }
-            /*
-                                    if (missile.x > collider.x && missile.x < collider.x + colliderW) {
-                                        isColl = "yColl";
-                                    } else {
-                                        isColl = "xColl";
-                                    }*/
-
-
-
-
-            //})
+            
         })
-
+        if (missile.lastColl.length !== 0) {
+            console.log(missile.lastColl)
+        }
         return isColl;
     }
 

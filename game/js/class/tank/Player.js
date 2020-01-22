@@ -4,7 +4,7 @@ export class Player {
         this.canvas = canvas;
         this.x = 200;
         this.y = 100;
-        this.speed = 3;
+        this.speed = 1.5;
         this.baseSizeX = 20;
         this.baseSizeY = 25;
         this.canonSizeX = 8;

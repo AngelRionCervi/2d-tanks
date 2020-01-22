@@ -2,8 +2,8 @@ export class Grid {
     constructor(canvas, ctx) {
         this.canvas = canvas;
         this.ctx = ctx;
-        this.gridWidth = 500;
-        this.gridHeight = 500;
+        this.gridWidth = 1000;
+        this.gridHeight = 800;
         this.gridCoords = [];
         this.blockSize = 50;
         this.lineWidth = 1;
@@ -43,9 +43,10 @@ export class Grid {
                 this.gridCoords.push(cellObj);
             }
 
-            idStart += this.gridWidth/this.blockSize-1;
+            let minSide = Math.min(this.gridWidth, this.gridHeight)
+            idStart += minSide/this.blockSize-1;
         }
-
+ 
         this.ctx.strokeStyle = "black";
         this.ctx.stroke();
     }
@@ -53,6 +54,8 @@ export class Grid {
     fillCell(cursorPos) {
         let roundX = this.roundToPrevMult(cursorPos.x);
         let roundY = this.roundToPrevMult(cursorPos.y);
+
+        console.log(roundX)
 
         let targetCell = this.gridCoords.filter(n => n.x === roundX && n.y === roundY)[0];
         this.gridCoords[targetCell.id].block = true;
