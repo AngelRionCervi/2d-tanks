@@ -72,7 +72,7 @@ export class CollisionDetector {
     mapMissileCollision(missile) {
 
         let blockSize = this.map.blockSize;
-        let collReduction = 5;
+        let collReduction = 6;
         let baseSizeY = 6;
         let colliderW = 3;
         let isColl = "";
