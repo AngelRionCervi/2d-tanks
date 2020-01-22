@@ -7,6 +7,7 @@ export class Grid {
         this.gridCoords = [];
         this.blockSize = 50;
         this.lineWidth = 1;
+        this.colliderW = 3;
         this.cellFillStyle = "black";
 
         this.roundToPrevMult = (n) => Math.ceil((n-this.blockSize)/this.blockSize)*this.blockSize
@@ -31,7 +32,15 @@ export class Grid {
                     this.ctx.moveTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y);
                     this.ctx.lineTo(this.lineWidth/2 + x + this.blockSize, this.lineWidth/2 + y + this.blockSize); 
                 }
-                this.gridCoords.push({id: (x+y) / this.blockSize + idStart, x: x, y: y, block: false});
+
+                let colliders = [{type: 'yWall', x: x+this.colliderW, y: y, w: this.blockSize-this.colliderW, h: this.colliderW}, //top
+                {type: 'yWall', x: x+this.colliderW, y: y+this.blockSize-this.colliderW, w: this.blockSize-this.colliderW, h: this.colliderW}, //bottom
+                {type: 'xWall', x: x, y: y, w: this.colliderW, h: this.blockSize}, //left
+                {type: 'xWall', x: x+this.blockSize-this.colliderW, y: y, w: this.colliderW, h: this.blockSize}]; //right
+
+                let cellObj = {id: (x+y) / this.blockSize + idStart, x: x, y: y, blockColliders: colliders, block: false}
+
+                this.gridCoords.push(cellObj);
             }
 
             idStart += this.gridWidth/this.blockSize-1;
@@ -39,7 +48,6 @@ export class Grid {
 
         this.ctx.strokeStyle = "black";
         this.ctx.stroke();
-        console.log(this.gridCoords)
     }
 
     fillCell(cursorPos) {

@@ -25,7 +25,6 @@ export class Missile {
     draw(coll) {
 
         
-        
         if (coll === "xColl") {
             console.log(coll);
             this.vx = -this.vx;

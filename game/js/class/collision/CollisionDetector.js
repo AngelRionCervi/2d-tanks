@@ -72,19 +72,32 @@ export class CollisionDetector {
     mapMissileCollision(missile) {
 
         let blockSize = this.map.blockSize;
-        let collReduction = 3;
+        let collReduction = 5;
         let baseSizeY = 6;
-
+        let colliderW = 3;
         let isColl = "";
 
-        this.map.coords.forEach((v) => {
+        this.map.coords.forEach((coord) => {
+            coord.blockColliders.forEach((collider) => {
 
-            let tx = missile.x - v.x;
-            let ty = missile.y - v.y;
-            let dist = Math.sqrt(tx * tx + ty * ty);
-              
-                
+                if (missile.x - collReduction < collider.x + collider.w &&
+                    missile.x + collReduction > collider.x &&
+                    missile.y - collReduction < collider.y + collider.h &&
+                    collReduction + missile.y > collider.y) {
+                     
+                        if (collider.type === "yWall") {
+                            isColl = "yColl";
+                        } else if (collider.type === "xWall") {
+
+                           
+                            isColl = "xColl";
+                            
+                                
+                        }
+                 }
+
             })
+        })
 
         return isColl;
     }
