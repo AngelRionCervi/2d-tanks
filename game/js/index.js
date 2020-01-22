@@ -62,7 +62,6 @@ function render() {
         let missileMapColl = collisionDetector.mapMissileCollision(missile);
         missile.draw(missileMapColl);
     })
-
 }
 
 setInterval(() => {
