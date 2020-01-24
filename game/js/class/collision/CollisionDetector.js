@@ -77,7 +77,10 @@ export class CollisionDetector {
         let colliderW = 3;
         let isColl = "";
 
-        this.map.coords.forEach((collider) => {
+     
+        for (let u = 0; u < this.map.coords.length; u++) {
+
+            let collider = this.map.coords[u];
 
             let colliderLeft = collider.x - baseSizeY, colliderRight = collider.x + blockSize, colliderTop = collider.y - baseSizeY, colliderBottom = collider.y + blockSize;
             //check if missile is either touching or within the collider-bounds
@@ -86,13 +89,14 @@ export class CollisionDetector {
                 //check on which side the missile collides with the collider
                 let sides = { left: Math.abs(missile.x - colliderLeft), right: Math.abs(missile.x - colliderRight), top: Math.abs(missile.y - colliderTop), bottom: Math.abs(missile.y - colliderBottom) };
                 let side = Math.min(sides.left, sides.right, sides.top, sides.bottom); //returns the side with the smallest distance between missile and collider
-                console.log(sides, side);
+                
+                //console.log(sides, side)
                 if (side == sides.top) {
                     isColl = "yColl";
-                } if (side == sides.left) {
+                } 
+                if (side == sides.left) {
                     isColl = "xColl";
                 }
-
                 if (side == sides.bottom) {
                     isColl = "yColl";
                 }
@@ -100,24 +104,18 @@ export class CollisionDetector {
                     isColl = "xColl";
                 }
 
-                if (missile.lastColl.length > 2) {
-                    missile.lastColl.splice(0, 1);
-                } else if (missile.lastColl.length === 2) {
-                    if (missile.lastColl[0] === missile.lastColl[1]) {
-                        isColl = "";
-                    }
-                }
+               
+                
+                break;
 
-                missile.lastColl.push(isColl);
-
-            } else if (missile.lastColl.length !== 0) {
-                missile.lastColl = [];
-            }
+            } 
             
-        })
-        if (missile.lastColl.length !== 0) {
-            console.log(missile.lastColl)
         }
+
+       
+        
+       
+        
         return isColl;
     }
 
