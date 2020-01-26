@@ -83,38 +83,57 @@ export class Grid {
     }
 
     normalize() {
-        let grid = this.gridCoords;
+        let yGrid = this.gridCoords;
         let rows = { x: [], y: [] };
 
-        for (let u = 0; u < grid.length; u++) {
+        let xGrid = [];
 
-            let fGrid = grid[u].filter(n => n.block === true);
-            let rowLength = 0;
+        for (let u = 0; u < yGrid[0].length; u++) {
+            xGrid.push([]);
+        }
 
-            if (fGrid.length > 0) {
-                for (let k = 0; k < fGrid.length; k++) {
+        for (let n = 0; n < yGrid.length; n++) {
+            for (let u = 0; u < yGrid[n].length; u++) {
+                xGrid[u].push(yGrid[n][u]);
+            }
+        }
 
-                    let nextY;
-                    if (k < fGrid.length - 1) {
-                        nextY = fGrid[k + 1].y;
-                    }
+        Object.keys(rows).forEach((key, index) => {
 
-                    rowLength++;
+            let grid = index === 0 ? xGrid : yGrid;
 
-                    if (nextY - fGrid[k].y !== this.blockSize) {
-                        let x = fGrid[k - rowLength + 1].x;
-                        let y = fGrid[k - rowLength + 1].y;
+            let invKey = key === 'x' ? 'y' : 'x';
+            
+            for (let u = 0; u < grid.length; u++) {
 
-                        if (rowLength > 0) {
-                            let blockObj = { x: x, y: y, l: rowLength };
-                            rows.y.push(blockObj);
+                let fGrid = grid[u].filter(n => n.block === true);
+                let rowLength = 0;
+
+                if (fGrid.length > 0) {
+                    for (let k = 0; k < fGrid.length; k++) {
+
+                        let next;
+                        if (k < fGrid.length - 1) {
+                            next = fGrid[k + 1][key];
                         }
 
-                        rowLength = 0;
+                        rowLength++;
+
+                        if (next - fGrid[k][key] !== this.blockSize) {
+                            let x = fGrid[k - rowLength + 1][invKey];
+                            let y = fGrid[k - rowLength + 1][key];
+
+                            if (rowLength > 0) {
+                                let blockObj = { [invKey]: x, [key]: y, l: rowLength * this.blockSize};
+                                rows[key].push(blockObj);
+                            }
+
+                            rowLength = 0;
+                        }
                     }
                 }
             }
-        }
+        })
 
         console.log('rows', rows);
     }
