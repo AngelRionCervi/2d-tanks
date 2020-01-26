@@ -13,24 +13,22 @@ export class CollisionDetector {
 
         let playerX = playerPos.x;
         let playerY = playerPos.y;
-        let baseSizeX = playerSpecs.baseSizeX;
         let baseSizeY = playerSpecs.baseSizeY;
         let collReduction = this.mapCollisionReduction;
-        let blockSize = this.map.blockSize;
 
         let isColl = new Set();
 
         this.map.coords.forEach((v) => {
 
             //x
-            if ((playerY + baseSizeY / 2 - collReduction > v.y && playerY + baseSizeY / 2 - collReduction < v.y + blockSize)
-                || (playerY - baseSizeY / 2 + collReduction > v.y && playerY - baseSizeY / 2 + collReduction < v.y + blockSize)) {
+            if ((playerY + baseSizeY / 2 - collReduction > v.y && playerY + baseSizeY / 2 - collReduction < v.y + v.h)
+                || (playerY - baseSizeY / 2 + collReduction > v.y && playerY - baseSizeY / 2 + collReduction < v.y + v.h)) {
 
                 if (playerX - baseSizeY / 2 <= v.x && playerX + baseSizeY / 2 >= v.x) {
 
                     isColl.add('left');
 
-                } else if (playerX - baseSizeY / 2 <= v.x + blockSize && playerX + baseSizeY / 2 >= v.x) {
+                } else if (playerX - baseSizeY / 2 <= v.x + v.w && playerX + baseSizeY / 2 >= v.x) {
 
                     isColl.add('right');
 
@@ -38,14 +36,14 @@ export class CollisionDetector {
             }
 
             //y
-            if ((playerX + baseSizeY / 2 - collReduction > v.x && playerX + baseSizeY / 2 - collReduction < v.x + blockSize)
-                || (playerX - baseSizeY / 2 + collReduction > v.x && playerX - baseSizeY / 2 + collReduction < v.x + blockSize)) {
+            if ((playerX + baseSizeY / 2 - collReduction > v.x && playerX + baseSizeY / 2 - collReduction < v.x + v.w)
+                || (playerX - baseSizeY / 2 + collReduction > v.x && playerX - baseSizeY / 2 + collReduction < v.x + v.w)) {
 
                 if (playerY - baseSizeY / 2 <= v.y && playerY + baseSizeY / 2 >= v.y) {
 
                     isColl.add('top');
 
-                } else if (playerY - baseSizeY / 2 <= v.y + blockSize && playerY + baseSizeY / 2 >= v.y) {
+                } else if (playerY - baseSizeY / 2 <= v.y + v.h && playerY + baseSizeY / 2 >= v.y) {
 
                     isColl.add('bottom');
 
@@ -65,24 +63,18 @@ export class CollisionDetector {
             isColl.add('bottom');
         }
 
-
         return isColl;
     }
 
     mapMissileCollision(missile) {
 
-        let blockSize = this.map.blockSize + 5;
-        let collReduction = 5;
-        let baseSizeY = 6;
-        let colliderW = 3;
         let isColl = "";
-
      
         for (let u = 0; u < this.map.coords.length; u++) {
 
             let collider = this.map.coords[u];
 
-            let colliderLeft = collider.x - baseSizeY, colliderRight = collider.x + blockSize, colliderTop = collider.y - baseSizeY, colliderBottom = collider.y + blockSize;
+            let colliderLeft = collider.x - 6, colliderRight = collider.x + collider.w + 6, colliderTop = collider.y - 6, colliderBottom = collider.y + collider.h + 6;
             //check if missile is either touching or within the collider-bounds
             if (missile.x >= colliderLeft && missile.x <= colliderRight && missile.y >= colliderTop && missile.y <= colliderBottom) {
 
@@ -105,18 +97,11 @@ export class CollisionDetector {
                 }
 
                
-                
                 break;
 
             } 
-            
         }
-
        
-        
-       
-        
         return isColl;
     }
-
 }
