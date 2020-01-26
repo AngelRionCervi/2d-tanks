@@ -98,12 +98,16 @@ export class Grid {
             }
         }
 
+        let id = 0;
+
         Object.keys(rows).forEach((key, index) => {
 
+            let idInc = index === 0 ? 0 : 1;
             let grid = index === 0 ? xGrid : yGrid;
-
             let invKey = key === 'x' ? 'y' : 'x';
-            
+
+            id += idInc;
+
             for (let u = 0; u < grid.length; u++) {
 
                 let fGrid = grid[u].filter(n => n.block === true);
@@ -124,17 +128,62 @@ export class Grid {
                             let y = fGrid[k - rowLength + 1][key];
 
                             if (rowLength > 0) {
-                                let blockObj = { [invKey]: x, [key]: y, l: rowLength * this.blockSize};
+                                let blockObj = { id: id, [invKey]: x, [key]: y, l: rowLength * this.blockSize };
                                 rows[key].push(blockObj);
                             }
 
                             rowLength = 0;
+                            id++;
                         }
+
                     }
                 }
             }
         })
 
+        let xRows = rows.x;
+
+        let stackedX = [];
+
+        let doneX = [];
+
+        for (let i = 0; i < xRows.length; i++) {
+
+            let yCount = 0;
+            let doBreak = false;
+
+            if (doneX.includes(xRows[i].x)) {
+                doBreak = true;
+            } else {
+                doneX.push(xRows[i].x);
+            }
+
+            let curXrow = xRows.filter(el => el.x === xRows[i].x);
+
+            for (let j = 0; j < curXrow.length; j++) {
+
+                if (doBreak) break;
+
+                if (i !== j) {
+                    if (Math.abs(xRows[i].y - curXrow[j].y) === this.blockSize * j && xRows[i].l === curXrow[j].l) {
+                        yCount++;
+
+                    } else {
+                        yCount = 0;
+                    }
+                    console.log('yCount', yCount)
+
+                    if (yCount !== 0) {
+                        let block = { x: xRows[i].x, y: xRows[i].y, w: xRows[i].l, h: (yCount + 1) * this.blockSize };
+
+                        stackedX.push(block);
+                    }
+                }
+            }
+
+        }
+
         console.log('rows', rows);
+        console.log('stack', stackedX);
     }
 }
