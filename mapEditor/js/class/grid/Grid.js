@@ -82,7 +82,7 @@ export class Grid {
         return nMap;
     }
 
-    normalize() {
+    normalize() { // it couldn't get worse rly
         let yGrid = this.gridCoords;
         let xGrid = [];
 
@@ -125,7 +125,7 @@ export class Grid {
 
                     rowLength++;
 
-                    if (next - fGrid[k].x !== this.blockSize) {
+                    if (Math.abs(next - fGrid[k].x) !== this.blockSize) {
                         let x = fGrid[k - rowLength + 1].x;
                         let y = fGrid[k - rowLength + 1].y;
 
