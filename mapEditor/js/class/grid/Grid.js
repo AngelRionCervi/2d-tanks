@@ -40,12 +40,7 @@ export class Grid {
                     this.ctx.lineTo(this.lineWidth / 2 + x + this.blockSize, this.lineWidth / 2 + y + this.blockSize);
                 }
 
-                let colliders = [{ type: 'yWall', x: x + this.colliderW, y: y, w: this.blockSize - this.colliderW, h: this.colliderW }, //top
-                { type: 'yWall', x: x + this.colliderW, y: y + this.blockSize - this.colliderW, w: this.blockSize - this.colliderW, h: this.colliderW }, //bottom
-                { type: 'xWall', x: x, y: y, w: this.colliderW, h: this.blockSize }, //left
-                { type: 'xWall', x: x + this.blockSize - this.colliderW, y: y, w: this.colliderW, h: this.blockSize }]; //right
-
-                let cellObj = { id: (x + y) / this.blockSize + idStart, x: x, y: y, blockColliders: colliders, block: false }
+                let cellObj = { id: (x + y) / this.blockSize + idStart, x: x, y: y, block: false }
 
                 this.gridCoords[x / this.blockSize][y / this.blockSize] = cellObj;
             }
@@ -76,8 +71,9 @@ export class Grid {
 
     getMap() {
         let nMap = this.normalize();
+        let debugBlocks = this.debugBlocks(nMap);
 
-        return { width: this.gridWidth, height: this.gridHeight, coords: nMap };
+        return { width: this.gridWidth, height: this.gridHeight, coords: nMap, debugColliders: debugBlocks};
     }
 
     normalize() { // this couldn't get worse rly;
@@ -181,5 +177,20 @@ export class Grid {
         }
 
         return stacked;
+    }
+
+    debugBlocks(nMap) {
+        console.log('nMap', nMap)
+
+        let colliders = [];
+
+        nMap.forEach((v) => {
+            colliders.push([{ type: 'yWall', x: v.x + this.colliderW, y: v.y, w: v.w - this.colliderW, h: this.colliderW }, //top
+                { type: 'yWall', x: v.x + this.colliderW, y: v.y + v.h - this.colliderW, w: v.w - this.colliderW, h: this.colliderW }, //bottom
+                { type: 'xWall', x: v.x, y: v.y, w: this.colliderW, h: v.h }, //left
+                { type: 'xWall', x: v.x + v.w - this.colliderW, y: v.y, w: this.colliderW, h: v.h }]); //right
+        })
+
+        return colliders;
     }
 }
