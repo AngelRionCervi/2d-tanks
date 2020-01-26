@@ -142,46 +142,60 @@ export class Grid {
         })
 
         let xRows = rows.x;
-
         let stackedX = [];
+        
+        let sortedX = [];
+        let sortedXY = [];
 
+        let doneL = [];
         let doneX = [];
 
         for (let i = 0; i < xRows.length; i++) {
-
-            let yCount = 0;
-            let doBreak = false;
-
-            if (doneX.includes(xRows[i].x)) {
-                doBreak = true;
-            } else {
+            if (!doneL.includes(xRows[i].l) || !doneX.includes(xRows[i].x)) {
+                doneL.push(xRows[i].l);
                 doneX.push(xRows[i].x);
+                sortedX.push(xRows.filter(el => el.x === xRows[i].x && el.l === xRows[i].l));
             }
+        }
 
-            let curXrow = xRows.filter(el => el.x === xRows[i].x);
 
-            for (let j = 0; j < curXrow.length; j++) {
+        for (let i = 0; i < sortedX.length; i++) {
 
-                if (doBreak) break;
+            let subArrLen = sortedX[i].length;
 
-                if (i !== j) {
-                    if (Math.abs(xRows[i].y - curXrow[j].y) === this.blockSize * j && xRows[i].l === curXrow[j].l) {
-                        yCount++;
+            for (let j = sortedX[i].length - 1; j > 0; j--) {
+                if (Math.abs(sortedX[i][j].y - sortedX[i][j - 1].y) !== this.blockSize) {
 
-                    } else {
-                        yCount = 0;
-                    }
-                    console.log('yCount', yCount)
+                    sortedXY.unshift(sortedX[i].slice(j, subArrLen));
+                    subArrLen = j;
+                }
 
-                    if (yCount !== 0) {
-                        let block = { x: xRows[i].x, y: xRows[i].y, w: xRows[i].l, h: (yCount + 1) * this.blockSize };
-
-                        stackedX.push(block);
-                    }
+                if (j === 1) {
+                    sortedXY.unshift(sortedX[i].slice(j - 1, subArrLen));
                 }
             }
 
+            if (subArrLen === 1) {
+                sortedXY.push([sortedX[i][0]]);
+            }
         }
+   
+
+        let yCount = 0;
+        for (let i = 0; i < sortedXY.length; i++) {
+
+            for (let j = 0; j < sortedXY[i].length; j++) {
+                yCount++;
+
+                if (j === sortedXY[i].length-1) {
+                    let block = { x: sortedXY[i][0].x, y: sortedXY[i][0].y, w: sortedXY[i][0].l, h: yCount * this.blockSize };
+                    stackedX.push(block);
+                    yCount = 0;
+                }
+            }
+        }
+
+
 
         console.log('rows', rows);
         console.log('stack', stackedX);
