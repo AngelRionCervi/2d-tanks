@@ -73,8 +73,9 @@ export class CollisionDetector {
         for (let u = 0; u < this.map.coords.length; u++) {
 
             let collider = this.map.coords[u];
+            let size = missile.radius;
 
-            let colliderLeft = collider.x - 6, colliderRight = collider.x + collider.w + 6, colliderTop = collider.y - 6, colliderBottom = collider.y + collider.h + 6;
+            let colliderLeft = collider.x - size, colliderRight = collider.x + collider.w + size, colliderTop = collider.y - size, colliderBottom = collider.y + collider.h + size;
             //check if missile is either touching or within the collider-bounds
             if (missile.x >= colliderLeft && missile.x <= colliderRight && missile.y >= colliderTop && missile.y <= colliderBottom) {
 
