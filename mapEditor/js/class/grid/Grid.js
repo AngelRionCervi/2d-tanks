@@ -19,7 +19,6 @@ export class Grid {
     }
 
     create() {
-
         this.initCoords();
 
         this.canvas.width = this.gridWidth;
@@ -76,13 +75,12 @@ export class Grid {
     }
 
     getMap() {
-
         let nMap = this.normalize();
 
-        return nMap;
+        return { width: this.gridWidth, height: this.gridHeight, coords: nMap };
     }
 
-    normalize() { // it couldn't get worse rly
+    normalize() { // this couldn't get worse rly;
         let yGrid = this.gridCoords;
         let xGrid = [];
 
@@ -98,7 +96,7 @@ export class Grid {
         let yCount = 0;
         let id = 0;
 
-        // "invert yGrid to make a grid based on X"
+        // "invert" yGrid to make a grid based on X;
         for (let u = 0; u < yGrid[0].length; u++) {
             xGrid.push([]);
         }
@@ -122,7 +120,6 @@ export class Grid {
                     if (k < fGrid.length - 1) {
                         next = fGrid[k + 1].x;
                     }
-
                     rowLength++;
 
                     if (Math.abs(next - fGrid[k].x) !== this.blockSize) {
@@ -133,7 +130,6 @@ export class Grid {
                             let blockObj = { id: id, y: y, x: x, l: rowLength * this.blockSize };
                             xRows.push(blockObj);
                         }
-
                         rowLength = 0;
                         id++;
                     }
@@ -161,7 +157,6 @@ export class Grid {
                     sortedXY.unshift(sortedX[i].slice(j, subArrLen));
                     subArrLen = j;
                 }
-
                 if (j === 1) {
                     sortedXY.unshift(sortedX[i].slice(j - 1, subArrLen));
                 }
@@ -172,7 +167,7 @@ export class Grid {
             }
         }
 
-        // assemble the blocks
+        // assemble the blocks;
         for (let i = 0; i < sortedXY.length; i++) {
             for (let j = 0; j < sortedXY[i].length; j++) {
                 yCount++;
@@ -184,9 +179,6 @@ export class Grid {
                 }
             }
         }
-
-
-        console.log('stacked cheese : ', stacked);
 
         return stacked;
     }

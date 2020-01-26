@@ -16,8 +16,8 @@ const dlButton = document.getElementById('dlMapBtn');
 dlButton.addEventListener('click', () => {
     let rndmName = Date.now() + Math.random();
     let map = grid.getMap();
-    console.log(map);
-    //mapDownloader.downloadMap(map, rndmName);
+ 
+    mapDownloader.downloadMap(map, rndmName);
 })
 
 canvas.addEventListener('mousedown', (evt) => {
