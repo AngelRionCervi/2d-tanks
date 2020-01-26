@@ -77,17 +77,28 @@ export class Grid {
 
     getMap() {
 
-        this.normalize();
+        let nMap = this.normalize();
 
-        return { width: this.gridWidth, height: this.gridHeight, blockSize: this.blockSize, coords: this.gridCoords.filter(n => n.block === true) };
+        return nMap;
     }
 
     normalize() {
         let yGrid = this.gridCoords;
-        let rows = { x: [], y: [] };
-
         let xGrid = [];
 
+        let xRows = [];
+        
+        let sortedX = [];
+        let sortedXY = [];
+
+        let doneL = [];
+        let doneX = [];
+
+        let stacked = [];
+        let yCount = 0;
+        let id = 0;
+
+        // "invert yGrid to make a grid based on X"
         for (let u = 0; u < yGrid[0].length; u++) {
             xGrid.push([]);
         }
@@ -98,58 +109,39 @@ export class Grid {
             }
         }
 
-        let id = 0;
+        // identify if there is a block and make rows of X blocks;
+        for (let u = 0; u < xGrid.length; u++) {
 
-        Object.keys(rows).forEach((key, index) => {
+            let fGrid = xGrid[u].filter(n => n.block === true);
+            let rowLength = 0;
 
-            let idInc = index === 0 ? 0 : 1;
-            let grid = index === 0 ? xGrid : yGrid;
-            let invKey = key === 'x' ? 'y' : 'x';
+            if (fGrid.length > 0) {
+                for (let k = 0; k < fGrid.length; k++) {
 
-            id += idInc;
+                    let next;
+                    if (k < fGrid.length - 1) {
+                        next = fGrid[k + 1].x;
+                    }
 
-            for (let u = 0; u < grid.length; u++) {
+                    rowLength++;
 
-                let fGrid = grid[u].filter(n => n.block === true);
-                let rowLength = 0;
+                    if (next - fGrid[k].x !== this.blockSize) {
+                        let x = fGrid[k - rowLength + 1].x;
+                        let y = fGrid[k - rowLength + 1].y;
 
-                if (fGrid.length > 0) {
-                    for (let k = 0; k < fGrid.length; k++) {
-
-                        let next;
-                        if (k < fGrid.length - 1) {
-                            next = fGrid[k + 1][key];
+                        if (rowLength > 0) {
+                            let blockObj = { id: id, y: y, x: x, l: rowLength * this.blockSize };
+                            xRows.push(blockObj);
                         }
 
-                        rowLength++;
-
-                        if (next - fGrid[k][key] !== this.blockSize) {
-                            let x = fGrid[k - rowLength + 1][invKey];
-                            let y = fGrid[k - rowLength + 1][key];
-
-                            if (rowLength > 0) {
-                                let blockObj = { id: id, [invKey]: x, [key]: y, l: rowLength * this.blockSize };
-                                rows[key].push(blockObj);
-                            }
-
-                            rowLength = 0;
-                            id++;
-                        }
-
+                        rowLength = 0;
+                        id++;
                     }
                 }
             }
-        })
+        }
 
-        let xRows = rows.x;
-        let stackedX = [];
-        
-        let sortedX = [];
-        let sortedXY = [];
-
-        let doneL = [];
-        let doneX = [];
-
+        // filter the rows by length xStart;
         for (let i = 0; i < xRows.length; i++) {
             if (!doneL.includes(xRows[i].l) || !doneX.includes(xRows[i].x)) {
                 doneL.push(xRows[i].l);
@@ -158,7 +150,7 @@ export class Grid {
             }
         }
 
-
+        // filter the rows by Y gaps;
         for (let i = 0; i < sortedX.length; i++) {
 
             let subArrLen = sortedX[i].length;
@@ -179,25 +171,23 @@ export class Grid {
                 sortedXY.push([sortedX[i][0]]);
             }
         }
-   
 
-        let yCount = 0;
+        // assemble the blocks
         for (let i = 0; i < sortedXY.length; i++) {
-
             for (let j = 0; j < sortedXY[i].length; j++) {
                 yCount++;
-
-                if (j === sortedXY[i].length-1) {
+                
+                if (j === sortedXY[i].length - 1) {
                     let block = { x: sortedXY[i][0].x, y: sortedXY[i][0].y, w: sortedXY[i][0].l, h: yCount * this.blockSize };
-                    stackedX.push(block);
+                    stacked.push(block);
                     yCount = 0;
                 }
             }
         }
 
 
+        console.log('stacked cheese : ', stacked);
 
-        console.log('rows', rows);
-        console.log('stack', stackedX);
+        return stacked;
     }
 }
