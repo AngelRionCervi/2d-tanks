@@ -85,16 +85,16 @@ export class CollisionDetector {
                 
                 //console.log(sides, side)
                 if (side == sides.top) {
-                    isColl = "yColl";
+                    isColl = "top";
                 } 
                 if (side == sides.left) {
-                    isColl = "xColl";
+                    isColl = "left";
                 }
                 if (side == sides.bottom) {
-                    isColl = "yColl";
+                    isColl = "bottom";
                 }
                 if (side == sides.right) {
-                    isColl = "xColl";
+                    isColl = "right";
                 }
 
                

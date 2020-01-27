@@ -26,11 +26,20 @@ export class Missile {
     draw(coll) {
 
         
-        if (coll === "xColl") {
-            //console.log(coll);
+        if (coll === "left") {
+            this.x--;
             this.vx = -this.vx;
-        } else if (coll === "yColl") {
-            //console.log(coll);
+        } 
+        if (coll === "right") {
+            this.x++;
+            this.vx = -this.vx;
+        }  
+        if (coll === "top") {
+            this.y--;
+            this.vy = -this.vy;
+        }
+        if (coll === "bottom") {
+            this.y++;
             this.vy = -this.vy;
         }
 
