@@ -96,18 +96,7 @@ export class Player {
         this.ctx.fill();
         this.ctx.restore();
 
-        //draw aim
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate(this.centerX, this.centerY)
-        this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)))
-        this.ctx.rect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, totalAimSize);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.aimColor;
-        this.ctx.fill();
-        this.ctx.restore();
-
+        // tank center
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.rect(this.centerX - 1, this.centerY - 1, 2, 2);
@@ -119,39 +108,10 @@ export class Player {
         let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
-        //right
-        if (this.centerX + xEndAim > this.canvas.width) {
-            let xInWall = (this.canvas.width - (this.centerX + xEndAim)) * -1;
-            let yWallOffset = xInWall / Math.tan(angle);
-
-            this.aimProjection(this.centerX + xEndAim - xInWall, this.centerY + yEndAim - yWallOffset, angle, "right");
-        }
-        //left
-        if (this.centerX + xEndAim < 0) {
-            let xInWall = (this.centerX + xEndAim) * -1;
-            let yWallOffset = xInWall / Math.tan(angle);
-
-            this.aimProjection(this.centerX + xEndAim + xInWall, this.centerY + yEndAim + yWallOffset, angle, "left");
-        }
-        //bottom
-        if (this.centerY + yEndAim > this.canvas.height) {
-            let yInWall = (this.canvas.height - (this.centerY + yEndAim)) * -1;
-            let xWallOffset = yInWall * Math.tan(angle);
-
-            this.aimProjection(this.centerX + xEndAim - xWallOffset, this.centerY + yEndAim - yInWall, angle, "bottom");
-        }
-        //top
-        if (this.centerY + yEndAim < 0) {
-            let yInWall = (this.centerY + yEndAim) * -1;
-            let xWallOffset = yInWall * Math.tan(angle);
-
-            this.aimProjection(this.centerX + xEndAim + xWallOffset, this.centerY + yEndAim + yInWall, angle, "top");
-        }
-
         let isAimColl = this.checkAimColl(map, xEndAim, yEndAim);
 
         if (isAimColl) {
-            this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type);
+            this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type, isAimColl.dist);
         }
     }
 
@@ -197,6 +157,7 @@ export class Player {
 
         if (isColl.length > 0) {
             
+            /* debug line/line coll
             isColl.forEach((v) => {
                 this.ctx.save();
                 this.ctx.beginPath();
@@ -205,7 +166,7 @@ export class Player {
                 this.ctx.fillStyle = 'purple';
                 this.ctx.fill();
                 this.ctx.restore();
-            })
+            }) */
 
             let distances = isColl.map(el => el.dist);
             let minDist = Math.min(...distances);
@@ -219,22 +180,31 @@ export class Player {
         }
     }
 
-    aimProjection(x, y, angle, wallType) {
+    aimProjection(x, y, angle, wallType, length) {
 
         let size = this.projectionSize
         if (wallType === "top" || wallType === "bottom") {
             size = -size
         }
 
+        //draw aim
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.translate(this.centerX, this.centerY)
+        this.ctx.rotate(-angle);
+        this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)))
+        this.ctx.rect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14);
+        this.ctx.closePath();
+        this.ctx.fillStyle = this.aimColor;
+        this.ctx.fill();
+        this.ctx.restore();
 
+        this.ctx.save();
+        this.ctx.beginPath();
         this.ctx.translate( x, y)
         this.ctx.rotate(angle);
         this.ctx.translate(-(x), -(y))
-
         this.ctx.rect(x, y, this.aimWidth, size);
-
         this.ctx.closePath();
         this.ctx.fillStyle = this.projectionColor;
         this.ctx.fill();

@@ -176,6 +176,14 @@ export class Grid {
             }
         }
 
+        // adds map limits;
+        stacked.push(
+            { x: 0, y: 0, w: this.canvas.width, h: 1}, //top
+            { x: 0, y: this.canvas.height, w: this.canvas.width, h: 1}, //bottom
+            { x: 0, y: 0, w: 1, h: this.canvas.height}, //left
+            { x: this.canvas.width, y: 0, w: 0, h: this.canvas.height} //right
+        )
+
         return stacked;
     }
 
