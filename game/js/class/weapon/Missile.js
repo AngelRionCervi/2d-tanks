@@ -25,7 +25,6 @@ export class Missile {
 
     draw(coll) {
 
-        
         if (coll === "left") {
             this.x--;
             this.vx = -this.vx;

@@ -73,7 +73,7 @@ export class Player {
         }
     }
 
-    drawAim(curPos) {
+    drawAim(curPos, map) {
 
         this.curOnCanvas = true;
 
@@ -108,6 +108,14 @@ export class Player {
         this.ctx.fill();
         this.ctx.restore();
 
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.rect(this.centerX - 1, this.centerY - 1, 2, 2);
+        this.ctx.closePath();
+        this.ctx.fillStyle = this.aimColor;
+        this.ctx.fill();
+        this.ctx.restore();
+
         let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
@@ -116,46 +124,116 @@ export class Player {
             let xInWall = (this.canvas.width - (this.centerX + xEndAim)) * -1;
             let yWallOffset = xInWall / Math.tan(angle);
 
-            this.aimProjection(xEndAim - xInWall, yEndAim - yWallOffset, angle, "xWall");
+            this.aimProjection(this.centerX + xEndAim - xInWall, this.centerY + yEndAim - yWallOffset, angle, "right");
         }
         //left
         if (this.centerX + xEndAim < 0) {
             let xInWall = (this.centerX + xEndAim) * -1;
             let yWallOffset = xInWall / Math.tan(angle);
 
-            this.aimProjection(xEndAim + xInWall, yEndAim + yWallOffset, angle, "xWall");
+            this.aimProjection(this.centerX + xEndAim + xInWall, this.centerY + yEndAim + yWallOffset, angle, "left");
         }
         //bottom
         if (this.centerY + yEndAim > this.canvas.height) {
             let yInWall = (this.canvas.height - (this.centerY + yEndAim)) * -1;
             let xWallOffset = yInWall * Math.tan(angle);
 
-            this.aimProjection(xEndAim - xWallOffset, yEndAim - yInWall, angle, "yWall");
+            this.aimProjection(this.centerX + xEndAim - xWallOffset, this.centerY + yEndAim - yInWall, angle, "bottom");
         }
         //top
         if (this.centerY + yEndAim < 0) {
             let yInWall = (this.centerY + yEndAim) * -1;
             let xWallOffset = yInWall * Math.tan(angle);
 
-            this.aimProjection(xEndAim + xWallOffset, yEndAim + yInWall, angle, "yWall");
+            this.aimProjection(this.centerX + xEndAim + xWallOffset, this.centerY + yEndAim + yInWall, angle, "top");
+        }
+
+        let isAimColl = this.checkAimColl(map, xEndAim, yEndAim);
+
+        if (isAimColl) {
+            this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type);
+        }
+    }
+
+    checkAimColl(map, xEndAim, yEndAim) {
+
+        let px0 = this.centerX, py0 = this.centerY, px1 = xEndAim + this.centerX, py1 = yEndAim + this.centerY;
+
+        let isColl = [];
+
+        for (let u = 0; u < map.coords.length; u++) {
+
+            let rectLines = [
+                { x0: map.coords[u].x, y0: map.coords[u].y, x1: map.coords[u].x + map.coords[u].w, y1: map.coords[u].y, type: 'top' }, //top
+                { x0: map.coords[u].x, y0: map.coords[u].y + map.coords[u].h, x1: map.coords[u].x + map.coords[u].w, y1: map.coords[u].y + map.coords[u].h, type: 'bottom' }, //bottom
+                { x0: map.coords[u].x, y0: map.coords[u].y, x1: map.coords[u].x, y1: map.coords[u].y + map.coords[u].h, type: 'left' }, //left
+                { x0: map.coords[u].x + map.coords[u].w, y0: map.coords[u].y, x1: map.coords[u].x + map.coords[u].w, y1: map.coords[u].y + map.coords[u].h, type: 'right' }, //right
+            ]
+
+            for (let n = 0; n < rectLines.length; n++) {
+
+                let px2 = rectLines[n].x0, py2 = rectLines[n].y0, px3 = rectLines[n].x1, py3 = rectLines[n].y1;
+
+                let s1_x, s1_y, s2_x, s2_y;
+                s1_x = px1 - px0;
+                s1_y = py1 - py0;
+                s2_x = px3 - px2;
+                s2_y = py3 - py2;
+
+                let s, t;
+                s = (-s1_y * (px0 - px2) + s1_x * (py0 - py2)) / (-s2_x * s1_y + s1_x * s2_y);
+                t = (s2_x * (py0 - py2) - s2_y * (px0 - px2)) / (-s2_x * s1_y + s1_x * s2_y);
+
+                let interX = px0 + (t * (px1 - px0));
+                let interY = py0 + (t * (py1 - py0));
+
+                if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+                    isColl.push({ type: rectLines[n].type, x: interX, y: interY, dist: Math.hypot(interX - this.centerX, interY - this.centerY) });
+                }
+
+            }
+
+        }
+
+        if (isColl.length > 0) {
+            
+            isColl.forEach((v) => {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.arc(v.x, v.y, 8, 0, Math.PI * 2);
+                this.ctx.closePath();
+                this.ctx.fillStyle = 'purple';
+                this.ctx.fill();
+                this.ctx.restore();
+            })
+
+            let distances = isColl.map(el => el.dist);
+            let minDist = Math.min(...distances);
+            let minDistIndex = distances.indexOf(minDist);
+
+            return isColl[minDistIndex];
+            
+        } else {
+
+            return false;
         }
     }
 
     aimProjection(x, y, angle, wallType) {
 
         let size = this.projectionSize
-        if (wallType === "yWall") {
-            size = -this.projectionSize
+        if (wallType === "top" || wallType === "bottom") {
+            size = -size
         }
 
         this.ctx.save();
         this.ctx.beginPath();
 
-        this.ctx.translate(this.centerX + x, this.centerY + y)
+        this.ctx.translate( x, y)
         this.ctx.rotate(angle);
-        this.ctx.translate(-(this.centerX + x), -(this.centerY + y))
+        this.ctx.translate(-(x), -(y))
 
-        this.ctx.rect(this.centerX + x, this.centerY + y, this.aimWidth, size);
+        this.ctx.rect(x, y, this.aimWidth, size);
 
         this.ctx.closePath();
         this.ctx.fillStyle = this.projectionColor;
@@ -201,7 +279,7 @@ export class Player {
     }
 
     mapPlayerColl(vel, isColl) {
-   
+
         let velX = 0;
         let velY = 0;
 
@@ -263,7 +341,7 @@ export class Player {
             velY -= vel[0] * this.speed;
             velX += vel[1] * this.speed;
         }
-        
+
         return { velX: velX, velY: velY };
     }
 

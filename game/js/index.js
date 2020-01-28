@@ -51,7 +51,7 @@ function render() {
     player.draw(vel, playerMapColl);
 
     if (curPos) {
-      player.drawAim(curPos);
+      player.drawAim(curPos, map);
     } 
     
 
