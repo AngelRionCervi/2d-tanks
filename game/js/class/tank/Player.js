@@ -1,8 +1,9 @@
 export class Player {
-    constructor(canvas, ctx, drawingTools) {
+    constructor(canvas, ctx, drawingTools, collisionDetector) {
         this.ctx = ctx;
         this.canvas = canvas;
         this.drawingTools = drawingTools;
+        this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
         this.speed = 1.5;
@@ -33,12 +34,14 @@ export class Player {
         }
 
         this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
-        this.radToDeg = (rad) => rad * 180 / Math.PI
+        this.radToDeg = (rad) => rad * 180 / Math.PI;
     }
 
-    draw(vel, isColl) {
+    draw(vel) {
 
-        let collVel = this.mapPlayerColl(vel, isColl);
+        let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.baseSizeY);
+
+        let collVel = this.mapCollHandler(vel, isColl);
 
         this.x += collVel.velX;
         this.y += collVel.velY;
@@ -79,7 +82,7 @@ export class Player {
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
         let isAimColl = this.checkAimColl(map, xEndAim, yEndAim);
-
+    
         if (isAimColl) {
             this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type, isAimColl.dist);
         }
@@ -103,42 +106,27 @@ export class Player {
             for (let n = 0; n < rectLines.length; n++) {
 
                 let px2 = rectLines[n].x0, py2 = rectLines[n].y0, px3 = rectLines[n].x1, py3 = rectLines[n].y1;
+                
+                let coll = this.collisionDetector.segSegCollision(px0, py0, px1, py1, px2, py2, px3, py3);
 
-                let s1_x, s1_y, s2_x, s2_y;
-                s1_x = px1 - px0;
-                s1_y = py1 - py0;
-                s2_x = px3 - px2;
-                s2_y = py3 - py2;
-
-                let s, t;
-                s = (-s1_y * (px0 - px2) + s1_x * (py0 - py2)) / (-s2_x * s1_y + s1_x * s2_y);
-                t = (s2_x * (py0 - py2) - s2_y * (px0 - px2)) / (-s2_x * s1_y + s1_x * s2_y);
-
-                let interX = px0 + (t * (px1 - px0));
-                let interY = py0 + (t * (py1 - py0));
-
-                if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-                    isColl.push({ type: rectLines[n].type, x: interX, y: interY, dist: Math.hypot(interX - this.centerX, interY - this.centerY) });
-                }
+                if (coll) {
+                    coll.type = rectLines[n].type;
+                    isColl.push(coll);
+                } 
             }
         }
 
         if (isColl.length > 0) {
             
-            /* debug line/line coll
-            isColl.forEach((v) => {
-                this.ctx.save();
-                this.ctx.beginPath();
-                this.ctx.arc(v.x, v.y, 8, 0, Math.PI * 2);
-                this.ctx.closePath();
-                this.ctx.fillStyle = 'purple';
-                this.ctx.fill();
-                this.ctx.restore();
-            }) */
+            let distances = [];
 
-            let distances = isColl.map(el => el.dist);
+            isColl.forEach((v) => {
+                distances.push(this.collisionDetector.pointDistance(this.centerX, this.centerY, v.x, v.y));
+            });
+
             let minDist = Math.min(...distances);
             let minDistIndex = distances.indexOf(minDist);
+            isColl[minDistIndex].dist = minDist;
 
             return isColl[minDistIndex];
             
@@ -154,7 +142,7 @@ export class Player {
         if (wallType === "top" || wallType === "bottom") {
             rev = true;
         }
-
+        
         // draw aim
         this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14, 
         this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)), 
@@ -202,7 +190,7 @@ export class Player {
         }
     }
 
-    mapPlayerColl(vel, isColl) {
+    mapCollHandler(vel, isColl) {
 
         let velX = 0;
         let velY = 0;

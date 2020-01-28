@@ -1,8 +1,9 @@
 export class Missile {
-    constructor(canvas, ctx, curPos, playerPos, drawingTools) {
+    constructor(canvas, ctx, curPos, playerPos, drawingTools, collisionDetector) {
         this.ctx = ctx;
         this.canvas = canvas;
-        this.drawingTools = drawingTools
+        this.drawingTools = drawingTools;
+        this.collisionDetector = collisionDetector;
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.vx;
@@ -24,7 +25,9 @@ export class Missile {
         this.vy = (ty / dist) * this.speed;
     }
 
-    draw(coll) {
+    draw() {
+
+        let coll = this.collisionDetector.mapMissileCollision(this.x, this.y, this.radius);
 
         if (coll === "left") {
             this.x--;

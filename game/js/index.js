@@ -10,20 +10,20 @@ import {Mouse} from "/js/class/mouseHandling/Mouse.js";
 import {Keyboard} from "/js/class/keyboardHandling/Keyboard.js";
 import {CollisionDetector} from "/js/class/collision/CollisionDetector.js";
 
+
 let drawingTools = new DrawingTools(gameCanvas, ctx);
 let mapManager = new MapManager(gameCanvas, ctx);
-let player = new Player(gameCanvas, ctx, drawingTools);
+let map = mapManager.getMap();
+let collisionDetector = new CollisionDetector(map)
+let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector);
 let mouse = new Mouse(gameCanvas);
 let keyboard = new Keyboard(gameCanvas);
 
 
-let map = mapManager.getMap();
 
 let curPos;
 let vel = [0, 0];
 let playerShots = [];
-
-let collisionDetector = new CollisionDetector(player, map, playerShots)
 
 
 gameCanvas.addEventListener('mousemove', (evt) => {
@@ -32,7 +32,7 @@ gameCanvas.addEventListener('mousemove', (evt) => {
 
 gameCanvas.addEventListener('mousedown', () => {
     let playerPos = player.getPlayerPos()
-    let missile = new Missile(gameCanvas, ctx, curPos, playerPos, drawingTools);
+    let missile = new Missile(gameCanvas, ctx, curPos, playerPos, drawingTools, collisionDetector);
     playerShots.push(missile);
 });
 
@@ -48,21 +48,18 @@ function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     mapManager.renderMap(map);
-    let playerMapColl = collisionDetector.mapPlayerCollision();
 
-    player.draw(vel, playerMapColl);
+    player.draw(vel);
 
     if (curPos) {
       player.drawAim(curPos, map);
     } 
-    
 
     playerShots.forEach((missile) => {
         if (!missile.vx && !missile.vy) {
           missile.initDir();
         } 
-        let missileMapColl = collisionDetector.mapMissileCollision(missile);
-        missile.draw(missileMapColl);
+        missile.draw();
     })
     
     requestAnimationFrame(render);
