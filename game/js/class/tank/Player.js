@@ -1,7 +1,8 @@
 export class Player {
-    constructor(canvas, ctx) {
+    constructor(canvas, ctx, drawingTools) {
         this.ctx = ctx;
         this.canvas = canvas;
+        this.drawingTools = drawingTools;
         this.x = 200;
         this.y = 100;
         this.speed = 1.5;
@@ -10,7 +11,7 @@ export class Player {
         this.canonSizeX = 8;
         this.canonSizeY = 18;
         this.aimWidth = 1;
-        this.aimSize = 1000;
+        this.aimSize = 0;
         this.projectionSize = 100;
         this.baseColor = "purple";
         this.canonColor = "red";
@@ -47,34 +48,20 @@ export class Player {
         this.turnAnimation(vel);
 
         // draw base
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate(this.centerX, this.centerY)
-        this.ctx.rotate(this.playerAngle * Math.PI / 180);
-        this.ctx.translate(-(this.centerX), -(this.centerY))
-        this.ctx.rect(this.x, this.y, this.baseSizeX, this.baseSizeY);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.baseColor;
-        this.ctx.fill();
-        this.ctx.restore();
+        this.drawingTools.rect(this.x, this.y, this.baseSizeX, this.baseSizeY, this.centerX, 
+        this.centerY, -this.centerX, -this.centerY, this.playerAngle * Math.PI / 180, this.baseColor);
 
         // initiate canon at angle if cursor not on canvas
         if (!this.curOnCanvas) {
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.translate(this.centerX, this.centerY)
-            this.ctx.rotate(0);
-            this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter))
-            this.ctx.rect(this.x, this.y, this.canonSizeX, this.canonSizeY);
-            this.ctx.closePath();
-            this.ctx.fillStyle = this.canonColor;
-            this.ctx.fill();
-            this.ctx.restore();
+
+            this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY, 
+            this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), 0, this.canonColor);
         }
     }
 
     drawAim(curPos, map) {
 
+        this.aimSize = Math.hypot(map.width, map.height);
         this.curOnCanvas = true;
 
         let angle = this.getAngle(curPos);
@@ -85,25 +72,8 @@ export class Player {
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
 
         // draw canon
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate(this.centerX, this.centerY)
-        this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter))
-        this.ctx.rect(this.x, this.y, this.canonSizeX, this.canonSizeY);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.canonColor;
-        this.ctx.fill();
-        this.ctx.restore();
-
-        // tank center
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.rect(this.centerX - 1, this.centerY - 1, 2, 2);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.aimColor;
-        this.ctx.fill();
-        this.ctx.restore();
+        this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY, 
+        this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
 
         let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
@@ -150,9 +120,7 @@ export class Player {
                 if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
                     isColl.push({ type: rectLines[n].type, x: interX, y: interY, dist: Math.hypot(interX - this.centerX, interY - this.centerY) });
                 }
-
             }
-
         }
 
         if (isColl.length > 0) {
@@ -182,33 +150,19 @@ export class Player {
 
     aimProjection(x, y, angle, wallType, length) {
 
-        let size = this.projectionSize
+        let rev = false;
         if (wallType === "top" || wallType === "bottom") {
-            size = -size
+            rev = true;
         }
 
-        //draw aim
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate(this.centerX, this.centerY)
-        this.ctx.rotate(-angle);
-        this.ctx.translate(-(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)))
-        this.ctx.rect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.aimColor;
-        this.ctx.fill();
-        this.ctx.restore();
+        // draw aim
+        this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14, 
+        this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)), 
+        -angle, this.aimColor, 5, 10);
 
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate( x, y)
-        this.ctx.rotate(angle);
-        this.ctx.translate(-(x), -(y))
-        this.ctx.rect(x, y, this.aimWidth, size);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.projectionColor;
-        this.ctx.fill();
-        this.ctx.restore();
+        // aim projection
+        this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
+        x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
     }
 
     turnAnimation(vel) {

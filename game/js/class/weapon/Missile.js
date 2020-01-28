@@ -1,7 +1,8 @@
 export class Missile {
-    constructor(canvas, ctx, curPos, playerPos) {
+    constructor(canvas, ctx, curPos, playerPos, drawingTools) {
         this.ctx = ctx;
         this.canvas = canvas;
+        this.drawingTools = drawingTools
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.vx;
@@ -42,20 +43,9 @@ export class Missile {
             this.vy = -this.vy;
         }
 
-        if (this.y + this.vy > this.canvas.height || this.y + this.vy < 0) {
-            this.vy = -this.vy;
-        } 
-        if (this.x + this.vx > this.canvas.width || this.x + this.vx < 0) {
-            this.vx = -this.vx;
-        }
-
         this.x += this.vx;
         this.y += this.vy;
 
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-        this.ctx.closePath();
-        this.ctx.fillStyle = this.color;
-        this.ctx.fill();
+        this.drawingTools.circ(this.x, this.y, this.radius, 0, Math.PI*2, true, this.color);
     }
 }
