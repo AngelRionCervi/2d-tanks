@@ -132,16 +132,26 @@ export class Grid {
                 }
             }
         }
-
-        // filter the rows by length xStart;
+    
+        //makes unique arrays of x and l rows;
         for (let i = 0; i < xRows.length; i++) {
-            if (!doneL.includes(xRows[i].l) || !doneX.includes(xRows[i].x)) {
+            if (!doneL.includes(xRows[i].l) || !doneX.includes(xRows[i].x)) { 
                 doneL.push(xRows[i].l);
                 doneX.push(xRows[i].x);
-                sortedX.push(xRows.filter(el => el.x === xRows[i].x && el.l === xRows[i].l));
             }
         }
 
+        for (let i = 0; i < doneX.length; i++) {
+            for (let j = 0; j < doneL.length; j++) {
+
+                let row = xRows.filter(el => el.x === doneX[i] && el.l === doneL[j]);
+
+                if (row.length > 0) {
+                    sortedX.push(row);
+                }
+            }
+        }
+ 
         // filter the rows by Y gaps;
         for (let i = 0; i < sortedX.length; i++) {
 
@@ -183,6 +193,7 @@ export class Grid {
             { x: 0, y: 0, w: 1, h: this.canvas.height}, //left
             { x: this.canvas.width, y: 0, w: 0, h: this.canvas.height} //right
         )
+
 
         return stacked;
     }
