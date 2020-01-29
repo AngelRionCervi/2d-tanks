@@ -48,7 +48,7 @@ function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     mapManager.renderMap(map);
-
+    
     player.draw(vel);
 
     if (curPos) {

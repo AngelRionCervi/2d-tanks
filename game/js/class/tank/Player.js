@@ -13,7 +13,7 @@ export class Player {
         this.canonSizeY = 18;
         this.aimWidth = 1;
         this.aimSize = 0;
-        this.projectionSize = 100;
+        this.projectionSize = 200;
         this.baseColor = "purple";
         this.canonColor = "red";
         this.aimColor = "black";
@@ -27,6 +27,8 @@ export class Player {
         this.playerAngle = 0;
         this.turnSpeedMult = 0.1;
         this.curOnCanvas = false;
+        this.firstBounce = '';
+        this.secondBounce = '';
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -51,14 +53,14 @@ export class Player {
         this.turnAnimation(vel);
 
         // draw base
-        this.drawingTools.rect(this.x, this.y, this.baseSizeX, this.baseSizeY, this.centerX, 
-        this.centerY, -this.centerX, -this.centerY, this.playerAngle * Math.PI / 180, this.baseColor);
+        this.drawingTools.rect(this.x, this.y, this.baseSizeX, this.baseSizeY, this.centerX,
+            this.centerY, -this.centerX, -this.centerY, this.playerAngle * Math.PI / 180, this.baseColor);
 
         // initiate canon at angle if cursor not on canvas
         if (!this.curOnCanvas) {
 
-            this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY, 
-            this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), 0, this.canonColor);
+            this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
+                this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), 0, this.canonColor);
         }
     }
 
@@ -75,22 +77,102 @@ export class Player {
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
 
         // draw canon
-        this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY, 
-        this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
+        this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
+            this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
 
         let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
         let xEndAim = (totalAimSize + 15) * Math.sin(angle);
 
-        let isAimColl = this.checkAimColl(map, xEndAim, yEndAim);
-    
+        yEndAim = yEndAim + this.centerY;
+        xEndAim = xEndAim + this.centerX;
+
+        let isAimColl = this.checkAimColl(map, this.centerX, this.centerY, xEndAim, yEndAim, this.centerX, this.centerY, 1);
+
         if (isAimColl) {
-            this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type, isAimColl.dist);
+            this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type, isAimColl.dist, map);
         }
     }
 
-    checkAimColl(map, xEndAim, yEndAim) {
+    aimProjection(x, y, angle, wallType, length, map) {
 
-        let px0 = this.centerX, py0 = this.centerY, px1 = xEndAim + this.centerX, py1 = yEndAim + this.centerY;
+        let rev = false;
+        if (wallType === "top" || wallType === "bottom") {
+            rev = true;
+        }
+
+        // draw aim
+        this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14,
+            this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)),
+            -angle, this.aimColor, 5, 10);
+
+        let yEndProj = this.projectionSize * Math.cos(angle); // 15 ???
+        let xEndProj = this.projectionSize * Math.sin(angle);
+
+
+        if (rev) {
+            yEndProj = Math.abs(yEndProj - y);
+            xEndProj = xEndProj + x;
+        } else {
+            yEndProj = yEndProj + y;
+            xEndProj = Math.abs(xEndProj - x);
+        }
+
+        let secondBounce = this.checkAimColl(map, x, y, xEndProj, yEndProj, x, y, 2);
+
+        let distEndProj = this.collisionDetector.pointDistance(x, y, secondBounce.x, secondBounce.y);
+
+        // aim 1st bounce
+        if (secondBounce) {
+            this.drawingTools.dashRect(x, y, this.aimWidth, distEndProj,
+                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
+        } else {
+            this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
+                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
+        }
+
+
+        if (secondBounce) {
+
+            let srev = true;
+            if ((secondBounce.type === "left" || secondBounce.type === "right") && (wallType === "right" || wallType === "left")) {
+                srev = false;
+            }
+            if ((secondBounce.type === "top" || secondBounce.type === "bottom") && (wallType === "bottom" || wallType === "top")) {
+                srev = false;
+            }
+
+            let yEndProj2 = (this.projectionSize - distEndProj) * Math.cos(-angle);
+            let xEndProj2 = (this.projectionSize - distEndProj) * Math.sin(-angle);
+
+            if (srev) {
+                yEndProj2 = Math.abs(yEndProj2 - secondBounce.y);
+                xEndProj2 = xEndProj2 + secondBounce.x;
+            } else {
+                yEndProj2 = yEndProj2 + secondBounce.y;
+                xEndProj2 = Math.abs(xEndProj2 - secondBounce.x);
+            }
+
+            let thirdBounce = this.checkAimColl(map, secondBounce.x, secondBounce.y, xEndProj2, yEndProj2, secondBounce.x, secondBounce.y, 3);
+            
+            if (thirdBounce) {
+
+                let distEndProj2 = this.collisionDetector.pointDistance(secondBounce.x, secondBounce.y, thirdBounce.x, thirdBounce.y);
+                
+                // third proj doesnt go in wall
+                this.drawingTools.dashRect(secondBounce.x, secondBounce.y, this.aimWidth, distEndProj2,
+                    secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
+
+            } else {
+                
+                this.drawingTools.dashRect(secondBounce.x, secondBounce.y, this.aimWidth, this.projectionSize - distEndProj,
+                    secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
+            }
+        }
+    }
+
+    checkAimColl(map, x0, y0, x1, y1, objX, objY, bounceNbr) {
+
+        let px0 = x0, py0 = y0, px1 = x1, py1 = y1;
 
         let isColl = [];
 
@@ -106,51 +188,47 @@ export class Player {
             for (let n = 0; n < rectLines.length; n++) {
 
                 let px2 = rectLines[n].x0, py2 = rectLines[n].y0, px3 = rectLines[n].x1, py3 = rectLines[n].y1;
-                
+
                 let coll = this.collisionDetector.segSegCollision(px0, py0, px1, py1, px2, py2, px3, py3);
 
                 if (coll) {
                     coll.type = rectLines[n].type;
                     isColl.push(coll);
-                } 
+                }
             }
         }
 
+        if (bounceNbr === 2) {
+            isColl = isColl.filter((el) => el.type !== this.firstBounce);
+        }
+        if (bounceNbr === 3) {
+            isColl = isColl.filter((el) => el.type !== this.secondBounce);
+        }
+
         if (isColl.length > 0) {
-            
+
             let distances = [];
 
             isColl.forEach((v) => {
-                distances.push(this.collisionDetector.pointDistance(this.centerX, this.centerY, v.x, v.y));
+                distances.push(this.collisionDetector.pointDistance(objX, objY, v.x, v.y));
             });
 
             let minDist = Math.min(...distances);
             let minDistIndex = distances.indexOf(minDist);
             isColl[minDistIndex].dist = minDist;
 
+            if (bounceNbr === 1) {
+                this.firstBounce = isColl[minDistIndex].type;
+            } else if (bounceNbr === 2) {
+                this.secondBounce = isColl[minDistIndex].type;
+            }
+
             return isColl[minDistIndex];
-            
+
         } else {
 
             return false;
         }
-    }
-
-    aimProjection(x, y, angle, wallType, length) {
-
-        let rev = false;
-        if (wallType === "top" || wallType === "bottom") {
-            rev = true;
-        }
-        
-        // draw aim
-        this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14, 
-        this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)), 
-        -angle, this.aimColor, 5, 10);
-
-        // aim projection
-        this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
-        x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
     }
 
     turnAnimation(vel) {

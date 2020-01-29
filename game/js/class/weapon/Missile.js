@@ -19,7 +19,8 @@ export class Missile {
     initDir() {
         let tx = this.shotPos.x - this.playerPos.x;
         let ty = this.shotPos.y - this.playerPos.y;
-        let dist = Math.sqrt(tx * tx + ty * ty);
+
+        let dist = this.collisionDetector.pointDistance(this.shotPos.x, this.shotPos.y, this.playerPos.x, this.playerPos.y);
 
         this.vx = (tx / dist) * this.speed;
         this.vy = (ty / dist) * this.speed;

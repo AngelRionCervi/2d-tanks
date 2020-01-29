@@ -92,7 +92,6 @@ export class CollisionDetector {
                     isColl = "right";
                 }
 
-
                 break;
 
             }
