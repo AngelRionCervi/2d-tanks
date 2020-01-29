@@ -71,11 +71,9 @@ export class Player {
 
         let angle = this.getAngle(curPos);
 
-        let tx = curPos.x - this.centerX;
-        let ty = curPos.y - this.centerY;
-        let dist = Math.sqrt(tx * tx + ty * ty);
+        let dist = this.collisionDetector.pointDistance(curPos.x, this.centerX, curPos.y, this.centerY);
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
-
+       
         // draw canon
         this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
             this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
@@ -105,9 +103,8 @@ export class Player {
             this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)),
             -angle, this.aimColor, 5, 10);
 
-        let yEndProj = this.projectionSize * Math.cos(angle); // 15 ???
+        let yEndProj = this.projectionSize * Math.cos(angle);
         let xEndProj = this.projectionSize * Math.sin(angle);
-
 
         if (rev) {
             yEndProj = Math.abs(yEndProj - y);
@@ -116,22 +113,18 @@ export class Player {
             yEndProj = yEndProj + y;
             xEndProj = Math.abs(xEndProj - x);
         }
-
+        
         let secondBounce = this.checkAimColl(map, x, y, xEndProj, yEndProj, x, y, 2);
-
+       
+        this.drawingTools.circ(secondBounce.x, secondBounce.y, 6, 0, Math.PI*2, false, "grey");
+        this.drawingTools.circ(xEndProj, yEndProj, 6, 0, Math.PI*2, false, "red");
+        console.log(xEndProj, yEndProj)
         let distEndProj = this.collisionDetector.pointDistance(x, y, secondBounce.x, secondBounce.y);
 
-        // aim 1st bounce
+
         if (secondBounce) {
             this.drawingTools.dashRect(x, y, this.aimWidth, distEndProj,
                 x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
-        } else {
-            this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
-                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
-        }
-
-
-        if (secondBounce) {
 
             let srev = true;
             if ((secondBounce.type === "left" || secondBounce.type === "right") && (wallType === "right" || wallType === "left")) {
@@ -163,10 +156,14 @@ export class Player {
                     secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
 
             } else {
-                
+
                 this.drawingTools.dashRect(secondBounce.x, secondBounce.y, this.aimWidth, this.projectionSize - distEndProj,
                     secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
             }
+
+        } else {
+            this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
+                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
         }
     }
 
