@@ -78,8 +78,8 @@ export class Player {
         this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
             this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
 
-        let yEndAim = (totalAimSize + 15) * Math.cos(angle); // 15 ???
-        let xEndAim = (totalAimSize + 15) * Math.sin(angle);
+        let yEndAim = totalAimSize * Math.cos(angle);
+        let xEndAim = totalAimSize * Math.sin(angle);
 
         yEndAim = yEndAim + this.centerY;
         xEndAim = xEndAim + this.centerX;
@@ -116,13 +116,14 @@ export class Player {
         
         let secondBounce = this.checkAimColl(map, x, y, xEndProj, yEndProj, x, y, 2);
        
-        this.drawingTools.circ(secondBounce.x, secondBounce.y, 6, 0, Math.PI*2, false, "grey");
-        this.drawingTools.circ(xEndProj, yEndProj, 6, 0, Math.PI*2, false, "red");
-        console.log(xEndProj, yEndProj)
         let distEndProj = this.collisionDetector.pointDistance(x, y, secondBounce.x, secondBounce.y);
 
-
+        this.drawingTools.circ(secondBounce.x, secondBounce.y, 6, 0, Math.PI*2, false, "grey");
+        this.drawingTools.circ(xEndProj, yEndProj, 6, 0, Math.PI*2, false, "red");
+    
+        console.log(secondBounce.x, secondBounce.y, wallType, secondBounce.type)
         if (secondBounce) {
+            
             this.drawingTools.dashRect(x, y, this.aimWidth, distEndProj,
                 x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
 
@@ -134,8 +135,8 @@ export class Player {
                 srev = false;
             }
 
-            let yEndProj2 = (this.projectionSize - distEndProj) * Math.cos(-angle);
-            let xEndProj2 = (this.projectionSize - distEndProj) * Math.sin(-angle);
+            let yEndProj2 = (this.projectionSize - distEndProj) * Math.cos(angle);
+            let xEndProj2 = (this.projectionSize - distEndProj) * Math.sin(angle);
 
             if (srev) {
                 yEndProj2 = Math.abs(yEndProj2 - secondBounce.y);
@@ -194,7 +195,7 @@ export class Player {
                 }
             }
         }
-
+    
         if (bounceNbr === 2) {
             isColl = isColl.filter((el) => el.type !== this.firstBounce);
         }
