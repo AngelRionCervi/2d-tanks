@@ -73,7 +73,7 @@ export class Player {
 
         let dist = this.collisionDetector.pointDistance(curPos.x, this.centerX, curPos.y, this.centerY);
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
-       
+
         // draw canon
         this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
             this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
@@ -107,65 +107,23 @@ export class Player {
         let xEndProj = this.projectionSize * Math.sin(angle);
 
         if (rev) {
-            yEndProj = Math.abs(yEndProj - y);
+            yEndProj = -(yEndProj - y);
             xEndProj = xEndProj + x;
         } else {
             yEndProj = yEndProj + y;
-            xEndProj = Math.abs(xEndProj - x);
+            xEndProj = -(xEndProj - x);
         }
-        
+
         let secondBounce = this.checkAimColl(map, x, y, xEndProj, yEndProj, x, y, 2);
-       
+
         let distEndProj = this.collisionDetector.pointDistance(x, y, secondBounce.x, secondBounce.y);
 
-        this.drawingTools.circ(secondBounce.x, secondBounce.y, 6, 0, Math.PI*2, false, "grey");
-        this.drawingTools.circ(xEndProj, yEndProj, 6, 0, Math.PI*2, false, "red");
-    
-        console.log(secondBounce.x, secondBounce.y, wallType, secondBounce.type)
-        if (secondBounce) {
-            
-            this.drawingTools.dashRect(x, y, this.aimWidth, distEndProj,
-                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
+        let projSize = secondBounce ? distEndProj : this.projectionSize;
 
-            let srev = true;
-            if ((secondBounce.type === "left" || secondBounce.type === "right") && (wallType === "right" || wallType === "left")) {
-                srev = false;
-            }
-            if ((secondBounce.type === "top" || secondBounce.type === "bottom") && (wallType === "bottom" || wallType === "top")) {
-                srev = false;
-            }
+        // draw projection
+        this.drawingTools.dashRect(x, y, this.aimWidth, projSize,
+            x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
 
-            let yEndProj2 = (this.projectionSize - distEndProj) * Math.cos(angle);
-            let xEndProj2 = (this.projectionSize - distEndProj) * Math.sin(angle);
-
-            if (srev) {
-                yEndProj2 = Math.abs(yEndProj2 - secondBounce.y);
-                xEndProj2 = xEndProj2 + secondBounce.x;
-            } else {
-                yEndProj2 = yEndProj2 + secondBounce.y;
-                xEndProj2 = Math.abs(xEndProj2 - secondBounce.x);
-            }
-
-            let thirdBounce = this.checkAimColl(map, secondBounce.x, secondBounce.y, xEndProj2, yEndProj2, secondBounce.x, secondBounce.y, 3);
-            
-            if (thirdBounce) {
-
-                let distEndProj2 = this.collisionDetector.pointDistance(secondBounce.x, secondBounce.y, thirdBounce.x, thirdBounce.y);
-                
-                // third proj doesnt go in wall
-                this.drawingTools.dashRect(secondBounce.x, secondBounce.y, this.aimWidth, distEndProj2,
-                    secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
-
-            } else {
-
-                this.drawingTools.dashRect(secondBounce.x, secondBounce.y, this.aimWidth, this.projectionSize - distEndProj,
-                    secondBounce.x, secondBounce.y, -secondBounce.x, -secondBounce.y, -angle, this.projectionColor, 4, 12, srev);
-            }
-
-        } else {
-            this.drawingTools.dashRect(x, y, this.aimWidth, this.projectionSize,
-                x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
-        }
     }
 
     checkAimColl(map, x0, y0, x1, y1, objX, objY, bounceNbr) {
@@ -195,12 +153,9 @@ export class Player {
                 }
             }
         }
-    
+
         if (bounceNbr === 2) {
             isColl = isColl.filter((el) => el.type !== this.firstBounce);
-        }
-        if (bounceNbr === 3) {
-            isColl = isColl.filter((el) => el.type !== this.secondBounce);
         }
 
         if (isColl.length > 0) {
