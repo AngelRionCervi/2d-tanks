@@ -1,0 +1,14 @@
+map el dark/light
+#5d5b6a
+#758184
+
+ground dark/light
+#cfb495
+#f5cdaa
+
+tanks
+#409E48
+#39709E
+#89399E
+#9E8E46
+#9E4E3A
