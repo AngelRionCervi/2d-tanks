@@ -7,8 +7,8 @@ export class Player {
         this.x = 200;
         this.y = 100;
         this.speed = 1.5;
-        this.baseSizeX = 20;
-        this.baseSizeY = 25;
+        this.baseSizeX = 32;
+        this.baseSizeY = 36;
         this.canonSizeX = 8;
         this.canonSizeY = 18;
         this.aimWidth = 1;
@@ -51,17 +51,17 @@ export class Player {
         this.updCenters();
 
         this.turnAnimation(vel);
-
+        
         // draw base
-        this.drawingTools.rect(this.x, this.y, this.baseSizeX, this.baseSizeY, this.centerX,
-            this.centerY, -this.centerX, -this.centerY, this.playerAngle * Math.PI / 180, this.baseColor);
+
+        this.drawingTools.drawSprite('tankBase', this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, this.playerAngle * Math.PI / 180);
 
         // initiate canon at angle if cursor not on canvas
         if (!this.curOnCanvas) {
 
-            this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
-                this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), 0, this.canonColor);
+            this.drawingTools.drawSprite('canon', this.x, this.y, this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), Math.PI/180);
         }
+       
     }
 
     drawAim(curPos, map) {
@@ -75,8 +75,7 @@ export class Player {
         let totalAimSize = dist - (this.canonOffsetCenter + this.canonSizeY) + this.aimSize;
 
         // draw canon
-        this.drawingTools.rect(this.x, this.y, this.canonSizeX, this.canonSizeY,
-            this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle, this.canonColor);
+        this.drawingTools.drawSprite('canon', this.x, this.y, this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -angle);
 
         let yEndAim = totalAimSize * Math.cos(angle);
         let xEndAim = totalAimSize * Math.sin(angle);
@@ -290,6 +289,10 @@ export class Player {
 
     getPlayerPos() {
         return { x: this.centerX, y: this.centerY }
+    }
+
+    getPlayerAngle(curPos) {
+        return this.getAngle(curPos);
     }
 
     getPlayerSpecs() {

@@ -2,9 +2,9 @@ export class Grid {
     constructor(canvas, ctx) {
         this.canvas = canvas;
         this.ctx = ctx;
-        this.gridWidth = 1000;
-        this.gridHeight = 800;
-        this.blockSize = 50;
+        this.gridWidth = 1280;
+        this.gridHeight = 768;
+        this.blockSize = 64;
         this.gridCoords = new Array(this.gridWidth / this.blockSize);
         this.lineWidth = 1;
         this.colliderW = 3;

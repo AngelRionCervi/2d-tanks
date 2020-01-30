@@ -12,7 +12,7 @@ import {CollisionDetector} from "/js/class/collision/CollisionDetector.js";
 
 
 let drawingTools = new DrawingTools(gameCanvas, ctx);
-let mapManager = new MapManager(gameCanvas, ctx);
+let mapManager = new MapManager(gameCanvas, ctx, drawingTools);
 let map = mapManager.getMap();
 let collisionDetector = new CollisionDetector(map)
 let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector);
@@ -31,8 +31,9 @@ gameCanvas.addEventListener('mousemove', (evt) => {
 });
 
 gameCanvas.addEventListener('mousedown', () => {
-    let playerPos = player.getPlayerPos()
-    let missile = new Missile(gameCanvas, ctx, curPos, playerPos, drawingTools, collisionDetector);
+    let playerPos = player.getPlayerPos();
+    let playerAngle = player.getPlayerAngle(curPos);
+    let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
     playerShots.push(missile);
 });
 
