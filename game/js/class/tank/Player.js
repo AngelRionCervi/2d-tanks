@@ -8,9 +8,9 @@ export class Player {
         this.y = 100;
         this.speed = 1.5;
         this.baseSizeX = 32;
-        this.baseSizeY = 36;
-        this.canonSizeX = 8;
-        this.canonSizeY = 18;
+        this.baseSizeY = 32;
+        this.canonSizeX = 28;
+        this.canonSizeY = 32;
         this.aimWidth = 1;
         this.aimSize = 0;
         this.projectionSize = 200;

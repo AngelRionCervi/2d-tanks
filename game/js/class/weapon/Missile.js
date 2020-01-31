@@ -13,7 +13,7 @@ export class Missile {
         this.y = playerPos.y;
         this.radius = 6;
         this.color = "blue";
-        this.speed = 1;
+        this.speed = 2.2;
         this.shotPos = curPos;
         this.playerPos = playerPos;
         this.lastColl = [];

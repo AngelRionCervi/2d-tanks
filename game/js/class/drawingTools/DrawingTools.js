@@ -6,7 +6,7 @@ export class DrawingTools {
         this.tankBaseGreen = new Image();
         this.tankBaseGreen.src = "/assets/sprites/tankBase.png";
         this.canonGreen = new Image();
-        this.canonGreen.src = "/assets/sprites/canonGreen.png";
+        this.canonGreen.src = "/assets/sprites/canon.png";
         this.ground = new Image();
         this.ground.src = "/assets/sprites/groundTile.jpg";
         this.wall = new Image();
