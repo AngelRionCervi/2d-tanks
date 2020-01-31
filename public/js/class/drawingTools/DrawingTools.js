@@ -4,15 +4,15 @@ export class DrawingTools {
         this.ctx = ctx;
 
         this.tankBaseGreen = new Image();
-        this.tankBaseGreen.src = "/assets/sprites/tankBase.png";
+        this.tankBaseGreen.src = "/public/assets/sprites/tankBase.png";
         this.canonGreen = new Image();
-        this.canonGreen.src = "/assets/sprites/canon.png";
+        this.canonGreen.src = "/public/assets/sprites/canon.png";
         this.ground = new Image();
-        this.ground.src = "/assets/sprites/groundTile.jpg";
+        this.ground.src = "/public/assets/sprites/groundTile.jpg";
         this.wall = new Image();
-        this.wall.src = "/assets/sprites/wall1.png";
+        this.wall.src = "/public/assets/sprites/wall1.png";
         this.bullet = new Image();
-        this.bullet.src = "/assets/sprites/bullet5.png";
+        this.bullet.src = "/public/assets/sprites/bullet5.png";
     }
 
     rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null) {
