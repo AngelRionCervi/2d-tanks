@@ -8,7 +8,6 @@ export class CollisionDetector {
 
         let playerX = x;
         let playerY = y;
-        let baseSizeY = size;
         let collReduction = this.mapCollisionReduction;
 
         let isColl = new Set();
@@ -16,14 +15,14 @@ export class CollisionDetector {
         this.map.coords.forEach((v) => {
 
             //x
-            if ((playerY + baseSizeY / 2 - collReduction > v.y && playerY + baseSizeY / 2 - collReduction < v.y + v.h)
-                || (playerY - baseSizeY / 2 + collReduction > v.y && playerY - baseSizeY / 2 + collReduction < v.y + v.h)) {
+            if ((playerY + size / 2 - collReduction > v.y && playerY + size / 2 - collReduction < v.y + v.h)
+                || (playerY - size / 2 + collReduction > v.y && playerY - size / 2 + collReduction < v.y + v.h)) {
 
-                if (playerX - baseSizeY / 2 <= v.x && playerX + baseSizeY / 2 >= v.x) {
+                if (playerX - size / 2 <= v.x && playerX + size / 2 >= v.x) {
 
                     isColl.add('left');
 
-                } else if (playerX - baseSizeY / 2 <= v.x + v.w && playerX + baseSizeY / 2 >= v.x) {
+                } else if (playerX - size / 2 <= v.x + v.w && playerX + size / 2 >= v.x) {
 
                     isColl.add('right');
 
@@ -31,14 +30,14 @@ export class CollisionDetector {
             }
 
             //y
-            if ((playerX + baseSizeY / 2 - collReduction > v.x && playerX + baseSizeY / 2 - collReduction < v.x + v.w)
-                || (playerX - baseSizeY / 2 + collReduction > v.x && playerX - baseSizeY / 2 + collReduction < v.x + v.w)) {
+            if ((playerX + size / 2 - collReduction > v.x && playerX + size / 2 - collReduction < v.x + v.w)
+                || (playerX - size / 2 + collReduction > v.x && playerX - size / 2 + collReduction < v.x + v.w)) {
 
-                if (playerY - baseSizeY / 2 <= v.y && playerY + baseSizeY / 2 >= v.y) {
+                if (playerY - size / 2 <= v.y && playerY + size / 2 >= v.y) {
 
                     isColl.add('top');
 
-                } else if (playerY - baseSizeY / 2 <= v.y + v.h && playerY + baseSizeY / 2 >= v.y) {
+                } else if (playerY - size / 2 <= v.y + v.h && playerY + size / 2 >= v.y) {
 
                     isColl.add('bottom');
 
@@ -46,15 +45,15 @@ export class CollisionDetector {
             }
         })
 
-        if (playerX + baseSizeY / 2 > this.map.width) {
+        if (playerX + size / 2 > this.map.width) {
             isColl.add('left');
-        } else if (playerX - baseSizeY / 2 < 0) {
+        } else if (playerX - size / 2 < 0) {
             isColl.add('right');
         }
 
-        if (playerY + baseSizeY / 2 > this.map.height) {
+        if (playerY + size / 2 > this.map.height) {
             isColl.add('top');
-        } else if (playerY - baseSizeY / 2 < 0) {
+        } else if (playerY - size / 2 < 0) {
             isColl.add('bottom');
         }
 

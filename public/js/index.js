@@ -1,6 +1,7 @@
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
 const frameRate = 1000/60;
+const posPingRate = 200;
 const socket = io('http://localhost:5000');
 
 import {DrawingTools} from "/public/js/class/drawingTools/DrawingTools.js";
@@ -76,6 +77,10 @@ setInterval(() => {
     render()
 }, frameRate)
 
+// ping player position
+setInterval(() => {
+    sender.pingPos(player.id, player.x, player.y);
+}, posPingRate)
 
 
 

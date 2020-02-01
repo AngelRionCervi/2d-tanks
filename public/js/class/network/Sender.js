@@ -14,4 +14,9 @@ export class Sender {
 
         this.socket.emit('keys', {keys: keys, id: id});
     }
+
+    pingPos(id, x, y) {
+
+        this.socket.emit('playerPos', id, x, y);
+    }
 }

@@ -6,7 +6,7 @@ export class Player {
         this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.5;
+        this.speed = 3;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.canonSizeX = 28;
@@ -29,6 +29,7 @@ export class Player {
         this.curOnCanvas = false;
         this.firstBounce = '';
         this.secondBounce = '';
+        this.diagonalSpeedDiviser = 1.3;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -58,14 +59,14 @@ export class Player {
         //let walkAnimation = this.walkAnimation();
 
         if (collVel.velX && collVel.velY) {
-            collVel.velX = collVel.velX/1.3;
-            collVel.velY = collVel.velY/1.3;
+            collVel.velX = collVel.velX/this.diagonalSpeedDiviser;
+            collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
         }
 
-        this.x += (vel[1] * this.speed);
-            this.y -= (vel[0] * this.speed);
+        this.x += collVel.velX;
+        this.y += collVel.velY;
 
-/*
+        /*
         if (collVel.velX || collVel.velY) {
             this.y += walkAnimation;
         }*/
@@ -202,60 +203,60 @@ export class Player {
 
                 if (v === 'left') {
                     if (vel[1] < 0) {
-                        velY -= vel[0] * this.speed;
-                        velX += vel[1] * this.speed;
+                        velY -= vel[0];
+                        velX += vel[1];
                     } else {
-                        velY -= vel[0] * this.speed;
+                        velY -= vel[0];
                         if (a.size === 1) {
                             velX = velX;
                         } else {
-                            velX -= vel[1] * this.speed;
+                            velX -= vel[1];
                         }
                     }
                 } else if (v === 'right') {
                     if (vel[1] > 0) {
-                        velY -= vel[0] * this.speed;
-                        velX += vel[1] * this.speed;
+                        velY -= vel[0];
+                        velX += vel[1];
                     } else {
-                        velY -= vel[0] * this.speed;
+                        velY -= vel[0];
                         if (a.size === 1) {
                             velX = velX;
                         } else {
-                            velX -= vel[1] * this.speed;
+                            velX -= vel[1];
                         }
                     }
                 } else if (v === 'top') {
                     if (vel[0] > 0) {
-                        velY -= vel[0] * this.speed;
-                        velX += vel[1] * this.speed;
+                        velY -= vel[0];
+                        velX += vel[1];
                     } else {
-                        velX += vel[1] * this.speed;
+                        velX += vel[1];
                         if (a.size === 1) {
                             velY = velY;
                         } else {
-                            velY += vel[0] * this.speed;
+                            velY += vel[0];
                         }
                     }
                 } else if (v === 'bottom') {
                     if (vel[0] < 0) {
-                        velY -= vel[0] * this.speed;
-                        velX += vel[1] * this.speed;
+                        velY -= vel[0];
+                        velX += vel[1];
                     } else {
-                        velX += vel[1] * this.speed;
+                        velX += vel[1];
                         if (a.size === 1) {
                             velY = velY;
                         } else {
-                            velY += vel[0] * this.speed;
+                            velY += vel[0];
                         }
                     }
                 }
             })
         } else {
-            velY -= vel[0] * this.speed;
-            velX += vel[1] * this.speed;
+            velY -= vel[0];
+            velX += vel[1];
         }
 
-        return { velX: velX, velY: velY };
+        return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
     walkAnimation() {
