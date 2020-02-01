@@ -37,6 +37,14 @@ export class Player {
             this.centerY = this.y + this.baseSizeY / 2;
         }
 
+        this.uuidv4 = () => {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+              (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+          }
+
+        this.id = this.uuidv4();
+
         this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
         this.radToDeg = (rad) => rad * 180 / Math.PI;
     }
@@ -47,19 +55,20 @@ export class Player {
 
         let collVel = this.mapCollHandler(vel, isColl);
 
-        let walkAnimation = this.walkAnimation();
+        //let walkAnimation = this.walkAnimation();
 
         if (collVel.velX && collVel.velY) {
             collVel.velX = collVel.velX/1.3;
             collVel.velY = collVel.velY/1.3;
         }
 
-        this.x += collVel.velX;
-        this.y += collVel.velY;
+        this.x += (vel[1] * this.speed);
+            this.y -= (vel[0] * this.speed);
 
+/*
         if (collVel.velX || collVel.velY) {
             this.y += walkAnimation;
-        }
+        }*/
 
         this.updCenters();
 
