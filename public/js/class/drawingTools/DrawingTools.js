@@ -3,16 +3,25 @@ export class DrawingTools {
         this.canvas = canvas;
         this.ctx = ctx;
 
-        this.tankBaseGreen = new Image();
-        this.tankBaseGreen.src = "/public/assets/sprites/tankBase.png";
-        this.canonGreen = new Image();
-        this.canonGreen.src = "/public/assets/sprites/canon.png";
-        this.ground = new Image();
-        this.ground.src = "/public/assets/sprites/groundTile.jpg";
-        this.wall = new Image();
-        this.wall.src = "/public/assets/sprites/wall1.png";
-        this.bullet = new Image();
-        this.bullet.src = "/public/assets/sprites/bullet5.png";
+        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/baseFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/baseFrontLeft.png"),
+        back: this.setSrc("/public/assets/sprites/player/baseBack.png")};
+
+        this.RLSprite = {base: this.setSrc("/public/assets/sprites/rocketLauncher/base.png"), fireAn1: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1.png"),
+        fireAn2: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2.png"), fireAn3: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3.png"), 
+        baseInv: this.setSrc("/public/assets/sprites/rocketLauncher/baseInv.png"), fireAn1Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1Inv.png"),
+        fireAn2Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2Inv.png"), fireAn3Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3Inv.png")};
+
+        this.groundSprite = {base: this.setSrc("/public/assets/sprites/groundTile.jpg")};
+
+        this.wallSprite = {base: this.setSrc("/public/assets/sprites/wall1.png")};
+
+        this.bulletSprite = {base: this.setSrc("/public/assets/sprites/bullet5.png")};
+    }
+
+    setSrc(src) {
+        let image = new Image();
+        image.src = src;
+        return image;
     }
 
     rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null) {
@@ -76,20 +85,29 @@ export class DrawingTools {
         let image;
 
         switch (sprite) {
-            case 'tankBase':
-                image = this.tankBaseGreen;
+            case 'playerFrontRight':
+                image = this.playerSprite.frontRight;
                 break;
-            case 'canon':
-                image = this.canonGreen;
+            case 'playerFrontLeft':
+                image = this.playerSprite.frontLeft;
+                break;
+            case 'playerBack':
+                image = this.playerSprite.back;
+                break;
+            case 'RL':
+                image = this.RLSprite.base;
+                break;
+            case 'RLinv':
+                image = this.RLSprite.baseInv;
                 break;
             case 'ground':
-                image = this.ground;
+                image = this.groundSprite.base;
                 break;
             case 'wall':
-                image = this.wall;
+                image = this.wallSprite.base;
                 break;
             case 'bullet':
-                image = this.bullet;
+                image = this.bulletSprite.base;
                 break;
         }
 

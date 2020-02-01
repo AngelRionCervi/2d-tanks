@@ -17,6 +17,8 @@ export class MapManager {
         this.canvas.width = width;
         this.canvas.height = height;
 
+        this.ctx.imageSmoothingEnabled = false;
+
         for (let i = 0; i < width; i += this.groundTileSize) {
             for (let j = 0; j < height; j += this.groundTileSize) {
                 this.drawingTools.drawSprite('ground', i, j);
