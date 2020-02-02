@@ -1,10 +1,10 @@
-export class Missile {
-    constructor(canvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) {
-        this.ctx = ctx;
-        this.canvas = canvas;
-        this.drawingTools = drawingTools;
-        this.collisionDetector = collisionDetector;
+module.exports = class Missile {
+    constructor(curPos, playerPos, playerAngle, id, collisionDetector) {
         this.missileAngle = playerAngle;
+        this.shotPos = curPos;
+        this.playerPos = playerPos;
+        this.id = id;
+        this.collisionDetector = collisionDetector;
         this.vx;
         this.vy;
         this.width = 4*2;
@@ -12,26 +12,13 @@ export class Missile {
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.radius = 6;
-        this.color = "blue";
         this.speed = 2.2;
-        this.shotPos = curPos;
-        this.playerPos = playerPos;
         this.lastColl = [];
-
-        this.uuidv4 = () => {
-            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-              (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-          }
-
-        this.id = this.uuidv4();
     }
 
     initDir() {
         let tx = this.shotPos.x - this.playerPos.x;
         let ty = this.shotPos.y - this.playerPos.y;
-
-        this.drawingTools.circ(tx, ty, 3, 0, Math.PI*180, false, 'blue');
 
         let dist = this.collisionDetector.pointDistance(this.shotPos.x, this.shotPos.y, this.playerPos.x, this.playerPos.y);
 
@@ -39,7 +26,7 @@ export class Missile {
         this.vy = (ty / dist) * this.speed;
     }
 
-    draw() {
+    updatePos() {
 
         let hitX = this.x-this.width/2;
         let hitY = this.y-this.height/2+9;
@@ -69,15 +56,12 @@ export class Missile {
 
         this.x += this.vx;
         this.y += this.vy;
-        
-        this.drawingTools.drawSprite('bullet', this.x-this.width/2-1, this.y-this.height/2, 
-        this.x, this.y, -this.x, -this.y, -this.missileAngle);
 
         console.log(this.x, this.y);
+    }
 
-        /* missile hitbox
-        this.drawingTools.rect(this.x-this.width/2, this.y-this.height/2+9, this.width, this.height, 
-        this.x, this.y, -this.x, -this.y, -this.missileAngle, 'blue', true);
-        */
+    correctPos(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }

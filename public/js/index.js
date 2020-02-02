@@ -40,6 +40,7 @@ gameCanvas.addEventListener('mousedown', () => {
     let playerAngle = player.getPlayerAngle(curPos);
     let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
     playerShots.push(missile);
+    sender.sendMissileInit(player.id, {curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id});
 });
 
 document.addEventListener('keydown', (evt) => {
@@ -70,7 +71,6 @@ function render() {
         missile.draw();
     })
     
-    console.log(player.x, player.y)
 }
 
 setInterval(() => {
@@ -79,7 +79,14 @@ setInterval(() => {
 
 // ping player position
 setInterval(() => {
-    sender.pingPos(player.id, player.x, player.y);
+    sender.pingPlayerPos(player.id, player.x, player.y);
+
+    let missiles = [];
+    playerShots.forEach((v)=>{
+        let missileCoord = {x: v.x, y: v.y, id: v.id};
+        missiles.push(missileCoord);
+    })
+    sender.pingMissilesPos(player.id, missiles);
 }, posPingRate)
 
 

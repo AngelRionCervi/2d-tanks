@@ -10,13 +10,23 @@ export class Sender {
         this.socket.emit('initPlayer', id, spawnPos);
     }
 
-    sendKeys(keys, id) {
+    sendKeys(id, keys) {
 
         this.socket.emit('keys', {keys: keys, id: id});
     }
 
-    pingPos(id, x, y) {
+    sendMissileInit(id, missile) {
+
+        this.socket.emit('missileInit', id, missile);
+    }
+
+    pingPlayerPos(id, x, y) {
 
         this.socket.emit('playerPos', id, x, y);
+    }
+
+    pingMissilesPos(id, missiles)  {
+        
+        this.socket.emit('missilesPos', id, missiles);
     }
 }
