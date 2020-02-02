@@ -44,7 +44,7 @@ module.exports = class PlayerEntity {
 
     }
 
-    setPos(x, y) {
+    correctPos(x, y) {
         this.x = x;
         this.y = y;
     }

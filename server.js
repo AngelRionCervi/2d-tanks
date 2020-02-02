@@ -13,7 +13,6 @@ const Missile = require('./server/missileTracking/MissileEntity');
 
 const tickrate = 1000 / 60;
 
-
 const mapManager = new MapMg();
 const map = mapManager.getMap();
 const CollisionDetector = new Collision(map);
@@ -55,7 +54,7 @@ io.on('connection', (socket) => {
         let player = getPlayer(id);
 
         if (player) {
-            player.entity.setPos(x, y);
+            player.entity.correctPos(x, y);
         }
     })
 
@@ -69,21 +68,20 @@ io.on('connection', (socket) => {
             let missile = getMissile(id, v.id);
             missile.correctPos(v.x, v.y);
         })
-        
     })
 });
 
 setInterval(() => {
-    players.forEach((v) => {
-
+    players.forEach((v, i) => {
+        
         let playerNewKeys = getPlayerKeysBuffer(v.id);
-
+        
         if (playerNewKeys) {
             v.entity.updateKeys(playerNewKeys);
+            console.log('player :' + i, playerNewKeys);
         }
 
         if (v.missiles.length > 0) {
-
             v.missiles.forEach((missile) => {
                 if (!missile.vx && !missile.vy) {
                     missile.initDir();

@@ -45,12 +45,12 @@ gameCanvas.addEventListener('mousedown', () => {
 
 document.addEventListener('keydown', (evt) => {
     vel = keyboard.getDirection(evt);
-    sender.sendKeys(vel, player.id);
+    sender.sendKeys(player.id, vel);
 });
 
 document.addEventListener('keyup', (evt) => {
     vel = keyboard.getDirection(evt);
-    sender.sendKeys(vel, player.id);
+    sender.sendKeys(player.id, vel);
 });
 
 function render() {
