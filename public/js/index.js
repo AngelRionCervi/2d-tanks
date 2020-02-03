@@ -12,6 +12,7 @@ import {Player} from "/public/js/class/tank/Player.js";
 import {Mouse} from "/public/js/class/mouseHandling/Mouse.js";
 import {Keyboard} from "/public/js/class/keyboardHandling/Keyboard.js";
 import {CollisionDetector} from "/public/js/class/collision/CollisionDetector.js";
+import {GhostPlayer} from "/public/js/class/ghostPlayer/GhostPlayer.js";
 
 
 let drawingTools = new DrawingTools(gameCanvas, ctx);
@@ -23,6 +24,7 @@ let mouse = new Mouse(gameCanvas);
 let keyboard = new Keyboard(gameCanvas);
 let sender = new Sender(socket, keyboard, mouse);
 
+let ghostPlayers = [];
 
 let curPos;
 let vel = [0, 0];
@@ -53,6 +55,20 @@ document.addEventListener('keyup', (evt) => {
     sender.sendKeys(player.id, vel);
 });
 
+socket.on('playersData', (playersData) => {
+    playersData.forEach((v)=>{
+        console.log(playersData)
+        if (!ghostPlayers.map(el => el.id).includes(v.id)) {
+            ghostPlayers.push({ id: v.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, v.id), coords: {x: v.entity.x, y: v.entity.y} });
+        } else {
+            let ghost = ghostPlayers.filter(el => el.id === v.id)[0];
+            ghost.coords.x = v.entity.x;
+            ghost.coords.y = v.entity.y;
+        }
+    })
+})
+
+
 function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
@@ -70,7 +86,12 @@ function render() {
         } 
         missile.draw();
     })
-    
+
+    ghostPlayers.forEach((ghostPlayer) => {
+        if (ghostPlayer.id !== player.id) {
+            ghostPlayer.entity.updatePos(ghostPlayer.coords.x, ghostPlayer.coords.y);
+        }
+    })
 }
 
 setInterval(() => {

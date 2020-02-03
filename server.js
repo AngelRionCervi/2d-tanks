@@ -2,9 +2,9 @@ const express = require('express');
 const http = require('http');
 const app = express();
 const path = require('path');
-const socketIO = require('socket.io');
+const socket = require('socket.io');
 const server = http.Server(app);
-const io = socketIO(server);
+const io = socket(server);
 
 const PlayerEntity = require('./server/playerTracking/PlayerEntity');
 const Collision = require('./server/collision/BackCollisionDetecor');
@@ -32,7 +32,6 @@ let playerKeysBuffer = [];
 let getPlayer = (id) => players.filter(el => el.id === id)[0];
 let getMissile = (idPlayer, idMissile) => getPlayer(idPlayer).missiles.filter(el => el.id === idMissile)[0];
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.filter(el => el.id === id)[0];
-
 
 
 
@@ -78,7 +77,6 @@ setInterval(() => {
         
         if (playerNewKeys) {
             v.entity.updateKeys(playerNewKeys);
-            console.log('player :' + i, playerNewKeys);
         }
 
         if (v.missiles.length > 0) {
@@ -92,7 +90,9 @@ setInterval(() => {
 
         v.entity.updatePos();
     })
-    playerKeysBuffer = [];
 
+    playerKeysBuffer = [];                               
+   
+    io.emit('playersData', players);
 }, tickrate)
 

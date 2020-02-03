@@ -73,8 +73,6 @@ export class Missile {
         this.drawingTools.drawSprite('bullet', this.x-this.width/2-1, this.y-this.height/2, 
         this.x, this.y, -this.x, -this.y, -this.missileAngle);
 
-        console.log(this.x, this.y);
-
         /* missile hitbox
         this.drawingTools.rect(this.x-this.width/2, this.y-this.height/2+9, this.width, this.height, 
         this.x, this.y, -this.x, -this.y, -this.missileAngle, 'blue', true);
