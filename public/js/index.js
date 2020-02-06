@@ -35,6 +35,8 @@ sender.initPlayer(player.id, {x: player.x, y: player.y});
 
 gameCanvas.addEventListener('mousemove', (evt) => {
     curPos = mouse.getMousePos(evt);
+    let playerAngle = player.getPlayerAngle(curPos);
+    sender.sendMouseMove(player.id, playerAngle);
 });
 
 gameCanvas.addEventListener('mousedown', () => {
@@ -55,15 +57,16 @@ document.addEventListener('keyup', (evt) => {
     sender.sendKeys(player.id, vel);
 });
 
-socket.on('playersData', (playersData) => {
+socket.on('ghostsData', (playersData) => {
     playersData.forEach((v)=>{
-        console.log(playersData)
+        
         if (!ghostPlayers.map(el => el.id).includes(v.id)) {
-            ghostPlayers.push({ id: v.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, v.id), coords: {x: v.entity.x, y: v.entity.y} });
+            ghostPlayers.push({ id: v.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, v.id), coords: {x: v.entity.x, y: v.entity.y}, playerAngle: v.entity.playerAngle });
         } else {
             let ghost = ghostPlayers.filter(el => el.id === v.id)[0];
             ghost.coords.x = v.entity.x;
             ghost.coords.y = v.entity.y;
+            ghost.playerAngle = v.entity.playerAngle;
         }
     })
 })
@@ -89,7 +92,7 @@ function render() {
 
     ghostPlayers.forEach((ghostPlayer) => {
         if (ghostPlayer.id !== player.id) {
-            ghostPlayer.entity.updatePos(ghostPlayer.coords.x, ghostPlayer.coords.y);
+            ghostPlayer.entity.update(ghostPlayer);
         }
     })
 }
@@ -100,7 +103,7 @@ setInterval(() => {
 
 // ping player position
 setInterval(() => {
-    sender.pingPlayerPos(player.id, player.x, player.y);
+    //sender.pingPlayerPos(player.id, player.x, player.y);
 
     let missiles = [];
     playerShots.forEach((v)=>{

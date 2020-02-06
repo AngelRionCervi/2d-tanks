@@ -11,6 +11,7 @@ module.exports = class PlayerEntity {
         this.y = spawnPos.y;
         this.lastKeys = {x: 0, y: 0};
         this.diagonalSpeedDiviser = 1.3;
+        this.playerAngle = 0;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -22,6 +23,11 @@ module.exports = class PlayerEntity {
     updateKeys(playerKeys) {
 
         this.lastKeys = playerKeys.keys;
+    }
+
+    updatePlayerAngle(playerAngle) {
+        
+        this.playerAngle = playerAngle;
     }
 
     updatePos() {

@@ -43,12 +43,14 @@ export class GhostPlayer {
         this.radToDeg = (rad) => rad * 180 / Math.PI;
     }
 
-    updatePos(x, y) {
+    update(ghost) {
 
         //let walkAnimation = this.walkAnimation();
 
-        this.x = x;
-        this.y = y;
+        this.x = ghost.coords.x;
+        this.y = ghost.coords.y;
+
+        this.playerAngle = ghost.playerAngle;
 
         /*
         if (collVel.velX || collVel.velY) {
@@ -81,8 +83,8 @@ export class GhostPlayer {
         // draw base
         if (!this.playerAngle) {
             // draw canon
-            drawPlayer();
-            drawRL();
+            this.drawPlayer();
+            this.drawRL();
 
         } else {
 

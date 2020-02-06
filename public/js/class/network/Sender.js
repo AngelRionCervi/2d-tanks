@@ -20,6 +20,11 @@ export class Sender {
         this.socket.emit('missileInit', id, missile);
     }
 
+    sendMouseMove(id, curPos) {
+
+        this.socket.emit('mouseMove', id, curPos);
+    }
+
     pingPlayerPos(id, x, y) {
 
         this.socket.emit('playerPos', id, x, y);

@@ -68,6 +68,13 @@ io.on('connection', (socket) => {
             missile.correctPos(v.x, v.y);
         })
     })
+
+    socket.on('mouseMove', (id, playerAngle) => {
+        let player = getPlayer(id);
+        if (player) {
+            player.entity.updatePlayerAngle(playerAngle);
+        }
+    })
 });
 
 setInterval(() => {
@@ -93,6 +100,6 @@ setInterval(() => {
 
     playerKeysBuffer = [];                               
    
-    io.emit('playersData', players);
+    io.emit('ghostsData', players);
 }, tickrate)
 
