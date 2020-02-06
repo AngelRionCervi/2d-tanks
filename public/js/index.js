@@ -1,7 +1,7 @@
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
 const frameRate = 1000/60;
-const posPingRate = 200;
+const posPingRate = 100;
 const socket = io('http://localhost:5000');
 
 import {DrawingTools} from "/public/js/class/drawingTools/DrawingTools.js";
@@ -30,6 +30,8 @@ let curPos;
 let vel = [0, 0];
 let playerShots = [];
 
+let lastKey = {type: "", key: ""};
+
 
 sender.initPlayer(player.id, {x: player.x, y: player.y});
 
@@ -48,13 +50,21 @@ gameCanvas.addEventListener('mousedown', () => {
 });
 
 document.addEventListener('keydown', (evt) => {
-    vel = keyboard.getDirection(evt);
-    sender.sendKeys(player.id, vel);
+    if (lastKey.type !== evt.type || lastKey.key !== evt.key) {
+        vel = keyboard.getDirection(evt);
+        sender.sendKeys(player.id, vel);
+        lastKey.type = evt.type;
+        lastKey.key = evt.key;
+    }
 });
 
 document.addEventListener('keyup', (evt) => {
-    vel = keyboard.getDirection(evt);
-    sender.sendKeys(player.id, vel);
+    if (lastKey.type !== evt.type || lastKey.key !== evt.key) {
+        vel = keyboard.getDirection(evt);
+        sender.sendKeys(player.id, vel);
+        lastKey.type = evt.type;
+        lastKey.key = evt.key;
+    }
 });
 
 socket.on('ghostsData', (playersData) => {
@@ -103,7 +113,7 @@ setInterval(() => {
 
 // ping player position
 setInterval(() => {
-    //sender.pingPlayerPos(player.id, player.x, player.y);
+    sender.pingPlayerPos(player.id, player.x, player.y);
 
     let missiles = [];
     playerShots.forEach((v)=>{
