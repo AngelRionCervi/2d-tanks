@@ -65,7 +65,9 @@ io.on('connection', (socket) => {
     socket.on('missilesPos', (id, missiles) => {
         missiles.forEach((v) => {
             let missile = getMissile(id, v.id);
-            missile.correctPos(v.x, v.y);
+            if (missile) {
+                missile.correctPos(v.x, v.y);
+            }
         })
     })
 

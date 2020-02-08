@@ -4,15 +4,16 @@ const frameRate = 1000/60;
 const posPingRate = 100;
 const socket = io('http://localhost:5000');
 
-import {DrawingTools} from "/public/js/class/drawingTools/DrawingTools.js";
-import {Sender} from "/public/js/class/network/Sender.js";
-import {MapManager} from "/public/js/class/mapManager/MapManager.js";
-import {Missile} from "/public/js/class/weapon/Missile.js"; 
-import {Player} from "/public/js/class/tank/Player.js"; 
-import {Mouse} from "/public/js/class/mouseHandling/Mouse.js";
-import {Keyboard} from "/public/js/class/keyboardHandling/Keyboard.js";
-import {CollisionDetector} from "/public/js/class/collision/CollisionDetector.js";
-import {GhostPlayer} from "/public/js/class/ghostPlayer/GhostPlayer.js";
+import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
+import { Sender } from "/public/js/class/network/Sender.js";
+import { MapManager } from "/public/js/class/mapManager/MapManager.js";
+import { Missile } from "/public/js/class/weapon/Missile.js"; 
+import { Player } from "/public/js/class/tank/Player.js"; 
+import { Mouse } from "/public/js/class/mouseHandling/Mouse.js";
+import { Keyboard } from "/public/js/class/keyboardHandling/Keyboard.js";
+import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.js";
+import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
+import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
 
 
 let drawingTools = new DrawingTools(gameCanvas, ctx);
@@ -69,14 +70,31 @@ document.addEventListener('keyup', (evt) => {
 
 socket.on('ghostsData', (playersData) => {
     playersData.forEach((v)=>{
-        
+   
         if (!ghostPlayers.map(el => el.id).includes(v.id)) {
-            ghostPlayers.push({ id: v.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, v.id), coords: {x: v.entity.x, y: v.entity.y}, playerAngle: v.entity.playerAngle });
+            let ghostObj = { id: v.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, v.id), coords: {x: v.entity.x, y: v.entity.y}, playerAngle: v.entity.playerAngle, missiles: [] };
+            ghostPlayers.push(ghostObj);
+
         } else {
             let ghost = ghostPlayers.filter(el => el.id === v.id)[0];
+        
+            if (v.missiles.length !== ghost.missiles.length) {
+                
+                let newMissile = v.missiles.filter(el => !ghost.missiles.map(e => e.id).includes(el.id))[0];
+
+                let missileObj = {id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id), coords: {x: newMissile.x, y: newMissile.y}, angle: newMissile.missileAngle };
+                ghost.missiles.push(missileObj);
+            }
+            
             ghost.coords.x = v.entity.x;
             ghost.coords.y = v.entity.y;
             ghost.playerAngle = v.entity.playerAngle;
+
+            ghost.missiles.forEach((missile, i) => {
+                missile.coords.x = v.missiles[i].x;
+                missile.coords.y = v.missiles[i].y;
+                missile.angle = v.missiles[i].missileAngle;
+            })
         }
     })
 })
@@ -103,6 +121,10 @@ function render() {
     ghostPlayers.forEach((ghostPlayer) => {
         if (ghostPlayer.id !== player.id) {
             ghostPlayer.entity.update(ghostPlayer);
+            ghostPlayer.missiles.forEach((missile) => {
+                //console.log(missile)
+                missile.entity.updatePos(missile.coords.x, missile.coords.y, missile.angle);
+            })
         }
     })
 }
