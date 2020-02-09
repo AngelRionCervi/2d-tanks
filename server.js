@@ -9,9 +9,9 @@ const io = socket(server);
 const PlayerEntity = require('./server/playerTracking/PlayerEntity');
 const Collision = require('./server/collision/BackCollisionDetecor');
 const MapMg = require('./server/map/BackMapManager');
-const Missile = require('./server/missileTracking/MissileEntity');
+const MissileEntity = require('./server/missileTracking/MissileEntity');
 
-const tickrate = 1000 / 60;
+const tickrate = 1000 / 120;
 
 const mapManager = new MapMg();
 const map = mapManager.getMap();
@@ -30,8 +30,14 @@ let players = [];
 let playerKeysBuffer = [];
 
 let getPlayer = (id) => players.filter(el => el.id === id)[0];
-let getMissile = (idPlayer, idMissile) => getPlayer(idPlayer).missiles.filter(el => el.id === idMissile)[0];
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.filter(el => el.id === id)[0];
+
+let getMissile = (idPlayer, idMissile) => {
+    let player = getPlayer(idPlayer)
+    if (player) {
+        return player.missiles.filter(el => el.id === idMissile)[0];
+    }
+}
 
 
 
@@ -39,7 +45,7 @@ io.on('connection', (socket) => {
 
     socket.on('initPlayer', (id, spawnPos) => {
         console.log('a user connected');
-        let newPlayer = { id: id, entity: new PlayerEntity(id, spawnPos, CollisionDetector), missiles: [] };
+        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, entity: new PlayerEntity(id, spawnPos, CollisionDetector), missiles: [] };
         players.push(newPlayer);
     })
 
@@ -59,14 +65,17 @@ io.on('connection', (socket) => {
 
     socket.on('missileInit', (id, missile) => {
         let player = getPlayer(id);
-        player.missiles.push(new Missile(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, CollisionDetector));
+        player.missiles.push({
+            id: missile.id, angle: missile.playerAngle, coords: { x: missile.playerPos.x, y: missile.playerPos.y },
+            entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, CollisionDetector)
+        });
     })
 
     socket.on('missilesPos', (id, missiles) => {
-        missiles.forEach((v) => {
-            let missile = getMissile(id, v.id);
+        missiles.forEach((m) => {
+            let missile = getMissile(id, m.id);
             if (missile) {
-                missile.correctPos(v.x, v.y);
+                missile.entity.correctPos(m.x, m.y, m.angle);
             }
         })
     })
@@ -80,28 +89,47 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
-    players.forEach((v, i) => {
-        
-        let playerNewKeys = getPlayerKeysBuffer(v.id);
-        
+    players.forEach((player, i) => {
+
+        let playerNewKeys = getPlayerKeysBuffer(player.id);
+
         if (playerNewKeys) {
-            v.entity.updateKeys(playerNewKeys);
+            player.entity.updateKeys(playerNewKeys);
         }
 
-        if (v.missiles.length > 0) {
-            v.missiles.forEach((missile) => {
-                if (!missile.vx && !missile.vy) {
-                    missile.initDir();
+        if (player.missiles.length > 0) {
+            player.missiles.forEach((missile) => {
+
+                if (!missile.entity.vx && !missile.entity.vy) {
+                    missile.entity.initDir();
                 }
-                missile.updatePos();
+                missile.entity.updatePos();
+
+                missile.coords.x = missile.entity.x;
+                missile.coords.y = missile.entity.y;
+                missile.angle = missile.entity.missileAngle;
             })
         }
 
-        v.entity.updatePos();
+        player.entity.updatePos();
+
+        player.coords.x = player.entity.x;
+        player.coords.y = player.entity.y;
+        player.angle = player.entity.playerAngle;
     })
 
-    playerKeysBuffer = [];                               
-   
-    io.emit('ghostsData', players);
+    playerKeysBuffer = [];
+
+    // filters entity object for lighter payload
+    let packet = JSON.parse(JSON.stringify(players));
+
+    packet.forEach((pack) => {
+        delete pack.entity;
+        pack.missiles.forEach((missile) => {
+            delete missile.entity;
+        })
+    })
+
+    io.emit('ghostsData', packet);
 }, tickrate)
 

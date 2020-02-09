@@ -56,11 +56,11 @@ module.exports = class Missile {
 
         this.x += this.vx;
         this.y += this.vy;
-
     }
 
-    correctPos(x, y) {
+    correctPos(x, y, angle) {
         this.x = x;
         this.y = y;
+        this.missileAngle = angle;
     }
 }

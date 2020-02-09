@@ -5,7 +5,7 @@ export class GhostPlayer {
         this.drawingTools = drawingTools;
         this.x = 200;
         this.y = 100;
-        this.speed = 3;
+        this.speed = 1.5;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.canonSizeX = 28;
@@ -29,8 +29,7 @@ export class GhostPlayer {
         this.firstBounce = '';
         this.secondBounce = '';
         this.diagonalSpeedDiviser = 1.3;
-        this.walkAnimationStep = 0;
-        this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -82,7 +81,6 @@ export class GhostPlayer {
     drawSprites() {
         // draw base
         if (!this.playerAngle) {
-            // draw canon
             this.drawPlayer();
             this.drawRL();
 

@@ -6,13 +6,9 @@ export class GhostMissile {
         this.id = id;
         this.width = 4*2;
         this.height = 6*2;
-        this.radius = 6;;
-        this.speed = 2.2;
         this.x = 0;
         this.y = 0;
     }
-
- 
 
     updatePos(x, y, angle) {
 

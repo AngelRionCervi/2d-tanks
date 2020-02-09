@@ -2,7 +2,7 @@ module.exports = class PlayerEntity {
     constructor(id, spawnPos, collisionDetector) {
         this.id = id;
         this.collisionDetector = collisionDetector;
-        this.speed = 3;
+        this.speed = 1.5;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.centerX = this.x + this.baseSizeX / 2;
