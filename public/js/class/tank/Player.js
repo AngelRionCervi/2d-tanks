@@ -25,6 +25,7 @@ export class Player {
         this.playerAngle = -90 * Math.PI / 180;
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
+        this.maxConcurringMissiles = 3;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -51,8 +52,6 @@ export class Player {
 
         let collVel = this.mapCollHandler(vel, isColl);
 
-        //let walkAnimation = this.walkAnimation();
-
         if (collVel.velX && collVel.velY) {
             collVel.velX = collVel.velX/this.diagonalSpeedDiviser;
             collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
@@ -60,11 +59,6 @@ export class Player {
 
         this.x += collVel.velX;
         this.y += collVel.velY;
-
-        /*
-        if (collVel.velX || collVel.velY) {
-            this.y += walkAnimation;
-        }*/
 
         this.updCenters();
 

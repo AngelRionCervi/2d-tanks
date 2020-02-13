@@ -46,8 +46,10 @@ gameCanvas.addEventListener('mousedown', () => {
     let playerPos = player.getPlayerPos();
     let playerAngle = player.getPlayerAngle(curPos);
     let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
-    playerShots.push(missile);
-    sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
+    if (playerShots.length < player.maxConcurringMissiles) {
+        playerShots.push(missile);
+        sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
+    }
 });
 
 document.addEventListener('keydown', (evt) => {
