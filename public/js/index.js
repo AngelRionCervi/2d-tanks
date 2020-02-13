@@ -1,14 +1,14 @@
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
-const frameRate = 1000/120;
-const posPingRate = 1000/30;
+const frameRate = 1000 / 100;
+const posPingRate = 1000 / 10;
 const socket = io('http://localhost:5000');
 
 import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
 import { Sender } from "/public/js/class/network/Sender.js";
 import { MapManager } from "/public/js/class/mapManager/MapManager.js";
-import { Missile } from "/public/js/class/weapon/Missile.js"; 
-import { Player } from "/public/js/class/tank/Player.js"; 
+import { Missile } from "/public/js/class/weapon/Missile.js";
+import { Player } from "/public/js/class/tank/Player.js";
 import { Mouse } from "/public/js/class/mouseHandling/Mouse.js";
 import { Keyboard } from "/public/js/class/keyboardHandling/Keyboard.js";
 import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.js";
@@ -31,10 +31,10 @@ let curPos;
 let vel = [0, 0];
 let playerShots = [];
 
-let lastKey = {type: "", key: ""};
+let lastKey = { type: "", key: "" };
 
 
-sender.initPlayer(player.id, {x: player.x, y: player.y});
+sender.initPlayer(player.id, { x: player.x, y: player.y });
 
 gameCanvas.addEventListener('mousemove', (evt) => {
     curPos = mouse.getMousePos(evt);
@@ -47,7 +47,7 @@ gameCanvas.addEventListener('mousedown', () => {
     let playerAngle = player.getPlayerAngle(curPos);
     let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
     playerShots.push(missile);
-    sender.sendMissileInit(player.id, {curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id});
+    sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
 });
 
 document.addEventListener('keydown', (evt) => {
@@ -69,23 +69,28 @@ document.addEventListener('keyup', (evt) => {
 });
 
 socket.on('ghostsData', (playersData) => {
-    playersData.forEach((player)=>{
-   
+    playersData.forEach((player) => {
+
         if (!ghostPlayers.map(el => el.id).includes(player.id)) {
-            let ghostObj = { id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id), coords: {x: player.coords.x, y: player.coords.y}, playerAngle: player.coords.playerAngle, missiles: [] };
+            let ghostObj = { id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id), coords: { x: player.coords.x, y: player.coords.y }, playerAngle: player.coords.playerAngle, missiles: [] };
             ghostPlayers.push(ghostObj);
 
         } else {
             let ghost = ghostPlayers.filter(el => el.id === player.id)[0];
-        
+
             if (player.missiles.length !== ghost.missiles.length) {
-                
+
                 let newMissile = player.missiles.filter(el => !ghost.missiles.map(e => e.id).includes(el.id))[0];
 
-                let missileObj = {id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id), coords: {x: newMissile.x, y: newMissile.y}, angle: newMissile.missileAngle };
-                ghost.missiles.push(missileObj);
+                if (newMissile) {
+                    let missileObj = { id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id), coords: { x: newMissile.x, y: newMissile.y }, angle: newMissile.missileAngle };
+                    ghost.missiles.push(missileObj);
+                } else {
+                    ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); // syncs ghost missiles and player missiles
+                }
+
             }
-            
+
             ghost.coords.x = player.coords.x;
             ghost.coords.y = player.coords.y;
             ghost.playerAngle = player.angle;
@@ -104,18 +109,22 @@ function render() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     mapManager.renderMap(map);
-    
+
     player.draw(vel);
 
     if (curPos) {
-      player.drawAim(curPos, map);
-    } 
+        player.drawAim(curPos, map);
+    }
 
-    playerShots.forEach((missile) => {
+    playerShots.forEach((missile, i, a) => {
         if (!missile.vx && !missile.vy) {
-          missile.initDir();
-        } 
+            missile.initDir();
+        }
         missile.draw();
+
+        if (missile.bounceCount > missile.maxBounce) {
+            a.splice(i, 1);
+        }
     })
 
     ghostPlayers.forEach((ghostPlayer) => {
@@ -138,8 +147,8 @@ setInterval(() => {
     sender.pingPlayerPos(player.id, player.x, player.y);
 
     let missiles = [];
-    playerShots.forEach((m)=>{
-        let missileCoord = {x: m.x, y: m.y, angle: m.missileAngle, id: m.id};
+    playerShots.forEach((m) => {
+        let missileCoord = { x: m.x, y: m.y, angle: m.missileAngle, id: m.id };
         missiles.push(missileCoord);
     })
     sender.pingMissilesPos(player.id, missiles);

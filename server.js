@@ -11,7 +11,7 @@ const Collision = require('./server/collision/BackCollisionDetecor');
 const MapMg = require('./server/map/BackMapManager');
 const MissileEntity = require('./server/missileTracking/MissileEntity');
 
-const tickrate = 1000 / 120;
+const tickrate = 1000 / 100;
 
 const mapManager = new MapMg();
 const map = mapManager.getMap();
@@ -98,12 +98,16 @@ setInterval(() => {
         }
 
         if (player.missiles.length > 0) {
-            player.missiles.forEach((missile) => {
+            player.missiles.forEach((missile, i, a) => {
 
                 if (!missile.entity.vx && !missile.entity.vy) {
                     missile.entity.initDir();
                 }
                 missile.entity.updatePos();
+
+                if (missile.entity.bounceCount > missile.entity.maxBounce) {
+                    a.splice(i, 1);
+                }
 
                 missile.coords.x = missile.entity.x;
                 missile.coords.y = missile.entity.y;

@@ -14,6 +14,8 @@ module.exports = class Missile {
         this.radius = 6;
         this.speed = 2.2;
         this.lastColl = [];
+        this.bounceCount = 0;
+        this.maxBounce = 1;
     }
 
     initDir() {
@@ -33,29 +35,34 @@ module.exports = class Missile {
 
         let coll = this.collisionDetector.mapMissileCollision(hitX, hitY, 6);
 
-        if (coll === "left") {
-            this.x--;
-            this.vx = -this.vx;
-            this.missileAngle = -this.missileAngle;
-        } 
-        if (coll === "right") {
-            this.x++;
-            this.vx = -this.vx;
-            this.missileAngle = -this.missileAngle;
-        }  
-        if (coll === "top") {
-            this.y--;
-            this.vy = -this.vy;
-            this.missileAngle = -this.missileAngle + 180*Math.PI/180;
-        }
-        if (coll === "bottom") {
-            this.y++;
-            this.vy = -this.vy;
-            this.missileAngle = -this.missileAngle + 180*Math.PI/180;
-        }
+        if (coll) this.bounceCount++;
 
-        this.x += this.vx;
-        this.y += this.vy;
+        if (this.bounceCount <= 1) {
+            
+            if (coll === "left") {
+                this.x--;
+                this.vx = -this.vx;
+                this.missileAngle = -this.missileAngle;
+            }
+            if (coll === "right") {
+                this.x++;
+                this.vx = -this.vx;
+                this.missileAngle = -this.missileAngle;
+            }
+            if (coll === "top") {
+                this.y--;
+                this.vy = -this.vy;
+                this.missileAngle = -this.missileAngle + 180 * Math.PI / 180;
+            }
+            if (coll === "bottom") {
+                this.y++;
+                this.vy = -this.vy;
+                this.missileAngle = -this.missileAngle + 180 * Math.PI / 180;
+            }
+
+            this.x += this.vx;
+            this.y += this.vy;
+        }
     }
 
     correctPos(x, y, angle) {
