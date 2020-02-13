@@ -76,11 +76,11 @@ socket.on('ghostsData', (playersData) => {
             ghostPlayers.push(ghostObj);
 
         } else {
-            let ghost = ghostPlayers.filter(el => el.id === player.id)[0];
+            let ghost = ghostPlayers.find(el => el.id === player.id);
 
             if (player.missiles.length !== ghost.missiles.length) {
 
-                let newMissile = player.missiles.filter(el => !ghost.missiles.map(e => e.id).includes(el.id))[0];
+                let newMissile = player.missiles.find(el => !ghost.missiles.map(e => e.id).includes(el.id));
 
                 if (newMissile) {
                     let missileObj = { id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id), coords: { x: newMissile.x, y: newMissile.y }, angle: newMissile.missileAngle };

@@ -14,8 +14,6 @@ export class Player {
         this.aimWidth = 1;
         this.aimSize = 0;
         this.projectionSize = 200;
-        this.baseColor = "purple";
-        this.canonColor = "red";
         this.aimColor = "black";
         this.projectionColor = "red";
         this.centerX = this.x + this.baseSizeX / 2;
@@ -25,10 +23,7 @@ export class Player {
         this.turnVelY = 0;
         this.turnAngle = 0;
         this.playerAngle = -90 * Math.PI / 180;
-        this.turnSpeedMult = 0.1;
         this.curOnCanvas = false;
-        this.firstBounce = '';
-        this.secondBounce = '';
         this.diagonalSpeedDiviser = 1.3;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

@@ -1,8 +1,6 @@
 export class Sender {
-    constructor(socket, keyboard, mouse) {
+    constructor(socket) {
         this.socket = socket;
-        this.keyboard = keyboard;
-        this.mouse = mouse;
     }
 
     initPlayer(id, spawnPos) {

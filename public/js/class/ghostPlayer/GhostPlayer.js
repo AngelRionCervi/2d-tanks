@@ -10,24 +10,11 @@ export class GhostPlayer {
         this.baseSizeY = 32;
         this.canonSizeX = 28;
         this.canonSizeY = 32;
-        this.aimWidth = 1;
-        this.aimSize = 0;
-        this.projectionSize = 200;
-        this.baseColor = "purple";
-        this.canonColor = "red";
-        this.aimColor = "black";
-        this.projectionColor = "red";
         this.centerX = this.x + this.baseSizeX / 2;
         this.centerY = this.y + this.baseSizeY / 2;
         this.canonOffsetCenter = 5;
-        this.turnVelX = 0;
-        this.turnVelY = 0;
-        this.turnAngle = 0;
         this.playerAngle = -90 * Math.PI / 180;
-        this.turnSpeedMult = 0.1;
         this.curOnCanvas = false;
-        this.firstBounce = '';
-        this.secondBounce = '';
         this.diagonalSpeedDiviser = 1.3;
 
 
@@ -44,17 +31,10 @@ export class GhostPlayer {
 
     update(ghost) {
 
-        //let walkAnimation = this.walkAnimation();
-
         this.x = ghost.coords.x;
         this.y = ghost.coords.y;
 
         this.playerAngle = ghost.playerAngle;
-
-        /*
-        if (collVel.velX || collVel.velY) {
-            this.y += walkAnimation;
-        }*/
 
         this.updCenters();
         this.drawSprites();
