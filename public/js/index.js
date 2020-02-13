@@ -46,7 +46,7 @@ gameCanvas.addEventListener('mousedown', () => {
     let playerPos = player.getPlayerPos();
     let playerAngle = player.getPlayerAngle(curPos);
     let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
-    if (playerShots.length < player.maxConcurringMissiles) {
+    if (playerShots.length < 99) {
         playerShots.push(missile);
         sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
     }
@@ -126,6 +126,13 @@ function render() {
 
         if (missile.bounceCount > missile.maxBounce) {
             a.splice(i, 1);
+        }
+
+        let playerMissileColl = collisionDetector.playerMissileCollision({x: player.x, y: player.y, width: player.baseSizeY, height: player.baseSizeY}, 
+            {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
+
+        if (playerMissileColl) {
+            console.log("player missile coll")
         }
     })
 

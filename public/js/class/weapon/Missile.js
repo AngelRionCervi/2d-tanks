@@ -9,8 +9,6 @@ export class Missile {
         this.vy;
         this.width = 4 * 2;
         this.height = 6 * 2;
-        this.x = playerPos.x;
-        this.y = playerPos.y;
         this.radius = 6;
         this.color = "blue";
         this.speed = 2.2;
@@ -19,6 +17,10 @@ export class Missile {
         this.lastColl = [];
         this.bounceCount = 0;
         this.maxBounce = 1;
+        this.missileLaunchOffset = 30;
+  
+        this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
+        this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;
 
         this.uuidv4 = () => {
             return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -33,8 +35,6 @@ export class Missile {
         let tx = this.shotPos.x - this.playerPos.x;
         let ty = this.shotPos.y - this.playerPos.y;
 
-        this.drawingTools.circ(tx, ty, 3, 0, Math.PI * 180, false, 'blue');
-
         let dist = this.collisionDetector.pointDistance(this.shotPos.x, this.shotPos.y, this.playerPos.x, this.playerPos.y);
 
         this.vx = (tx / dist) * this.speed;
@@ -43,6 +43,8 @@ export class Missile {
 
     draw() {
 
+        this.drawingTools.circ(this.playerPos.x + this.x, this.playerPos.y + this.y, 5, 0, Math.PI*180, false, "blue")
+
         let hitX = this.x - this.width / 2;
         let hitY = this.y - this.height / 2 + 9;
 
@@ -50,7 +52,7 @@ export class Missile {
 
         if (coll) this.bounceCount++;
 
-        if (this.bounceCount <= 1) {
+        if (this.bounceCount <= this.maxBounce) {
             
             if (coll === "left") {
                 this.x--;
@@ -76,10 +78,9 @@ export class Missile {
             this.x += this.vx;
             this.y += this.vy;
 
-            this.drawingTools.drawSprite('bullet', this.x - this.width / 2 - 1, this.y - this.height / 2,
-                this.x, this.y, -this.x, -this.y, -this.missileAngle);
+            this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
+            this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
         }
-
 
         /* missile hitbox
         this.drawingTools.rect(this.x-this.width/2, this.y-this.height/2+9, this.width, this.height, 
