@@ -2,7 +2,7 @@ module.exports = class PlayerEntity {
     constructor(id, spawnPos, collisionDetector) {
         this.id = id;
         this.collisionDetector = collisionDetector;
-        this.speed = 1.5;
+        this.speed = 3;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.centerX = this.x + this.baseSizeX / 2;
@@ -12,6 +12,8 @@ module.exports = class PlayerEntity {
         this.lastKeys = {x: 0, y: 0};
         this.diagonalSpeedDiviser = 1.3;
         this.playerAngle = 0;
+        this.vx = 0;
+        this.vy = 0;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -42,6 +44,8 @@ module.exports = class PlayerEntity {
             collVel.velX = collVel.velX/this.diagonalSpeedDiviser;
             collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
         }
+        this.vx = collVel.velX;
+        this.vy = collVel.velY;
         
         this.x += collVel.velX;
         this.y += collVel.velY;

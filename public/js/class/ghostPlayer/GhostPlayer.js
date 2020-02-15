@@ -5,7 +5,7 @@ export class GhostPlayer {
         this.drawingTools = drawingTools;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.5;
+        this.speed = 3;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.canonSizeX = 28;
@@ -29,10 +29,19 @@ export class GhostPlayer {
         this.radToDeg = (rad) => rad * 180 / Math.PI;
     }
 
+
     update(ghost) {
 
-        this.x = ghost.coords.x;
-        this.y = ghost.coords.y;
+        if (this.vx !== ghost.vx && this.vy !== ghost.vx) {
+            this.x = ghost.coords.x;
+            this.y = ghost.coords.y;
+        }
+
+        this.vx = ghost.vx;
+        this.vy = ghost.vy;
+        
+        this.x += this.vx;
+        this.y += this.vy;
 
         this.playerAngle = ghost.playerAngle;
 

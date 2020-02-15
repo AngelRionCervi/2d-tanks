@@ -6,7 +6,7 @@ export class Player {
         this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.5;
+        this.speed = 3;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.canonSizeX = 28;
@@ -25,7 +25,7 @@ export class Player {
         this.playerAngle = -90 * Math.PI / 180;
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
-        this.maxConcurringMissiles = 3;
+        this.maxConcurringMissiles = 99;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 

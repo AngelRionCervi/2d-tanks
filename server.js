@@ -11,7 +11,7 @@ const Collision = require('./server/collision/BackCollisionDetecor');
 const MapMg = require('./server/map/BackMapManager');
 const MissileEntity = require('./server/missileTracking/MissileEntity');
 
-const tickrate = 1000 / 100;
+const tickrate = 1000 / 60;
 
 const mapManager = new MapMg();
 const map = mapManager.getMap();
@@ -29,13 +29,13 @@ server.listen(5000, () => {
 let players = [];
 let playerKeysBuffer = [];
 
-let getPlayer = (id) => players.filter(el => el.id === id)[0];
-let getPlayerKeysBuffer = (id) => playerKeysBuffer.filter(el => el.id === id)[0];
+let getPlayer = (id) => players.find(el => el.id === id);
+let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
 
 let getMissile = (idPlayer, idMissile) => {
     let player = getPlayer(idPlayer)
     if (player) {
-        return player.missiles.filter(el => el.id === idMissile)[0];
+        return player.missiles.find(el => el.id === idMissile);
     }
 }
 
@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
 
     socket.on('initPlayer', (id, spawnPos) => {
         console.log('a user connected');
-        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, entity: new PlayerEntity(id, spawnPos, CollisionDetector), missiles: [] };
+        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, entity: new PlayerEntity(id, spawnPos, CollisionDetector), missiles: [] };
         players.push(newPlayer);
     })
 
@@ -111,6 +111,8 @@ setInterval(() => {
 
                 missile.coords.x = missile.entity.x;
                 missile.coords.y = missile.entity.y;
+                missile.vx = missile.entity.vx;
+                missile.vy = missile.entity.vy;
                 missile.angle = missile.entity.missileAngle;
             })
         }
@@ -119,6 +121,8 @@ setInterval(() => {
 
         player.coords.x = player.entity.x;
         player.coords.y = player.entity.y;
+        player.vx = player.entity.vx;
+        player.vy = player.entity.vy;
         player.angle = player.entity.playerAngle;
     })
 

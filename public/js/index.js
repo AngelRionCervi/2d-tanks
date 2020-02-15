@@ -1,6 +1,5 @@
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
-const frameRate = 1000 / 100;
 const posPingRate = 1000 / 10;
 const socket = io('http://localhost:5000');
 
@@ -46,7 +45,7 @@ gameCanvas.addEventListener('mousedown', () => {
     let playerPos = player.getPlayerPos();
     let playerAngle = player.getPlayerAngle(curPos);
     let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
-    if (playerShots.length < 99) {
+    if (playerShots.length < player.maxConcurringMissiles) {
         playerShots.push(missile);
         sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
     }
@@ -71,10 +70,12 @@ document.addEventListener('keyup', (evt) => {
 });
 
 socket.on('ghostsData', (playersData) => {
+    
     playersData.forEach((player) => {
 
         if (!ghostPlayers.map(el => el.id).includes(player.id)) {
-            let ghostObj = { id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id), coords: { x: player.coords.x, y: player.coords.y }, playerAngle: player.coords.playerAngle, missiles: [] };
+            let ghostObj = { id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id), 
+                coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle, missiles: [] };
             ghostPlayers.push(ghostObj);
 
         } else {
@@ -85,7 +86,8 @@ socket.on('ghostsData', (playersData) => {
                 let newMissile = player.missiles.find(el => !ghost.missiles.map(e => e.id).includes(el.id));
 
                 if (newMissile) {
-                    let missileObj = { id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id), coords: { x: newMissile.x, y: newMissile.y }, angle: newMissile.missileAngle };
+                    let missileObj = { id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id, collisionDetector), 
+                        coords: { x: newMissile.x, y: newMissile.y }, vx: 0, vy: 0, angle: newMissile.missileAngle, set: false };
                     ghost.missiles.push(missileObj);
                 } else {
                     ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); // syncs ghost missiles and player missiles
@@ -95,11 +97,15 @@ socket.on('ghostsData', (playersData) => {
 
             ghost.coords.x = player.coords.x;
             ghost.coords.y = player.coords.y;
+            ghost.vx = player.vx;
+            ghost.vy = player.vy;
             ghost.playerAngle = player.angle;
 
             ghost.missiles.forEach((missile, i) => {
                 missile.coords.x = player.missiles[i].coords.x;
                 missile.coords.y = player.missiles[i].coords.y;
+                missile.vx = player.missiles[i].vx;
+                missile.vy = player.missiles[i].vy;
                 missile.angle = player.missiles[i].angle;
             })
         }
@@ -128,28 +134,41 @@ function render() {
             a.splice(i, 1);
         }
 
+        ghostPlayers.forEach((ghost) => {
+            let ghostMissileColl = collisionDetector.playerMissileCollision({x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.baseSizeY, height: ghost.entity.baseSizeY}, 
+                {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
+
+            if (ghostMissileColl) {
+                console.log("you hit : " + ghost.id, "or did ya haxor ? Let's ask the server");
+            }
+        })
+
         let playerMissileColl = collisionDetector.playerMissileCollision({x: player.x, y: player.y, width: player.baseSizeY, height: player.baseSizeY}, 
             {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
 
         if (playerMissileColl) {
-            console.log("player missile coll")
+            console.log("rekt by your own shot lmao n@@b")
         }
+
     })
 
     ghostPlayers.forEach((ghostPlayer) => {
-
         if (ghostPlayer.id !== player.id) {
             ghostPlayer.entity.update(ghostPlayer);
             ghostPlayer.missiles.forEach((missile) => {
-                missile.entity.updatePos(missile.coords.x, missile.coords.y, missile.angle);
+                if (!missile.set) { // once a initial pos and missile vels are set, its all front end, except if collision with player (server authority)
+                    missile.entity.set(missile);
+                    missile.set = true;
+                } else {
+                    missile.entity.update();
+                }
             })
         }
     })
+    requestAnimationFrame(render);
 }
 
-setInterval(() => {
-    render()
-}, frameRate)
+render();
 
 // ping player position
 setInterval(() => {
@@ -160,6 +179,7 @@ setInterval(() => {
         let missileCoord = { x: m.x, y: m.y, angle: m.missileAngle, id: m.id };
         missiles.push(missileCoord);
     })
+
     sender.pingMissilesPos(player.id, missiles);
 }, posPingRate)
 
