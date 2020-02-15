@@ -43,8 +43,6 @@ export class Missile {
 
     draw() {
 
-        this.drawingTools.circ(this.playerPos.x + this.x, this.playerPos.y + this.y, 5, 0, Math.PI*180, false, "blue")
-
         let hitX = this.x - this.width / 2;
         let hitY = this.y - this.height / 2 + 9;
 
