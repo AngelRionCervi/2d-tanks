@@ -124,6 +124,8 @@ function render() {
         player.drawAim(curPos, map);
     }
 
+    let clientHits = [];
+
     playerShots.forEach((missile, i, a) => {
         if (!missile.vx && !missile.vy) {
             missile.initDir();
@@ -139,6 +141,7 @@ function render() {
                 {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
 
             if (ghostMissileColl) {
+                clientHits.push({ shooterID: player.id, targetID: ghost.id, time: new Date().getTime()})
                 console.log("you hit : " + ghost.id, "or did ya haxor ? Let's ask the server");
             }
         })
@@ -147,10 +150,14 @@ function render() {
             {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
 
         if (playerMissileColl) {
-            console.log("rekt by your own shot lmao n@@b")
+            clientHits.push({ shooterID: player.id, targetID: player.id, time: new Date().getTime() })
+            console.log("rekt by your own shot lmao n@@b");
         }
-
     })
+
+    if (clientHits.length > 0) {
+        sender.sendClientHits(clientHits);
+    }
 
     ghostPlayers.forEach((ghostPlayer) => {
         if (ghostPlayer.id !== player.id) {

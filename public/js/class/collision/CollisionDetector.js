@@ -4,6 +4,7 @@ export class CollisionDetector {
         this.mapCollisionReduction = 5;
     }
 
+
     mapPlayerCollision(x, y, size) {
 
         let playerX = x;
@@ -60,6 +61,7 @@ export class CollisionDetector {
         return isColl;
     }
 
+
     mapMissileCollision(x, y, radius) {
 
         let isColl = "";
@@ -97,15 +99,21 @@ export class CollisionDetector {
         return isColl;
     }
 
+
     playerMissileCollision(rect1, rect2) {
         if (rect1.x < rect2.x + rect2.width &&
             rect1.x + rect1.width > rect2.x &&
             rect1.y < rect2.y + rect2.height &&
             rect1.height + rect1.y > rect2.y) {
                 
-                return true;
+            return true;
+
+         } else {
+             
+            return false
          }
     }
+
 
     segSegCollision(px0, py0, px1, py1, px2, py2, px3, py3) {
 
@@ -128,6 +136,7 @@ export class CollisionDetector {
             return false;
         }
     }
+
 
     pointDistance(x0, y0, x1, y1) {
         return Math.hypot(x0 - x1, y0 - y1);

@@ -12,10 +12,11 @@ const MapMg = require('./server/map/BackMapManager');
 const MissileEntity = require('./server/missileTracking/MissileEntity');
 
 const tickrate = 1000 / 60;
+const snapshotsLength = 10;
 
 const mapManager = new MapMg();
 const map = mapManager.getMap();
-const CollisionDetector = new Collision(map);
+const collisionDetector = new Collision(map);
 
 app.set('port', 5000);
 app.use("/public", express.static(__dirname + "/public"));
@@ -28,6 +29,9 @@ server.listen(5000, () => {
 
 let players = [];
 let playerKeysBuffer = [];
+let stateSnapshots = [];
+let clientHitsBuffer = [];
+let serverHitsBuffer = [];
 
 let getPlayer = (id) => players.find(el => el.id === id);
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
@@ -45,7 +49,7 @@ io.on('connection', (socket) => {
 
     socket.on('initPlayer', (id, spawnPos) => {
         console.log('a user connected');
-        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, entity: new PlayerEntity(id, spawnPos, CollisionDetector), missiles: [] };
+        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [] };
         players.push(newPlayer);
     })
 
@@ -67,7 +71,7 @@ io.on('connection', (socket) => {
         let player = getPlayer(id);
         player.missiles.push({
             id: missile.id, angle: missile.playerAngle, coords: { x: missile.playerPos.x, y: missile.playerPos.y },
-            entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, CollisionDetector)
+            entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, collisionDetector)
         });
     })
 
@@ -86,16 +90,28 @@ io.on('connection', (socket) => {
             player.entity.updatePlayerAngle(playerAngle);
         }
     })
+
+    socket.on('clientHits', (hits) => {
+        clientHitsBuffer.push(hits);
+    })
 });
 
 setInterval(() => {
-    players.forEach((player, i) => {
+    players.forEach((player) => {
 
         let playerNewKeys = getPlayerKeysBuffer(player.id);
 
         if (playerNewKeys) {
             player.entity.updateKeys(playerNewKeys);
         }
+
+        player.entity.updatePos();
+
+        player.coords.x = player.entity.x;
+        player.coords.y = player.entity.y;
+        player.vx = player.entity.vx;
+        player.vy = player.entity.vy;
+        player.angle = player.entity.playerAngle;
 
         if (player.missiles.length > 0) {
             player.missiles.forEach((missile, i, a) => {
@@ -114,21 +130,33 @@ setInterval(() => {
                 missile.vx = missile.entity.vx;
                 missile.vy = missile.entity.vy;
                 missile.angle = missile.entity.missileAngle;
+                
             })
         }
+        /*
+        players.map(el => el.missiles).forEach((missile) => {
 
-        player.entity.updatePos();
-
-        player.coords.x = player.entity.x;
-        player.coords.y = player.entity.y;
-        player.vx = player.entity.vx;
-        player.vy = player.entity.vy;
-        player.angle = player.entity.playerAngle;
+            let missilePlayerColl = collisionDetector.playerMissileCollision({ x: player.coords.x, y: player.coords.y, 
+                width: player.entity.baseSizeY, height: player.entity.baseSizeY }, 
+                { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height });
+            console.log(missilePlayerColl, missile.coords.x, missile.coords.y)
+            if (missilePlayerColl) {
+                serverHitsBuffer.push({ playerID: player.id, targetID: missile.id });
+            }
+        })*/
     })
 
-    playerKeysBuffer = [];
+    let missiles = [...players.map(el => el.missiles.filter(e => {
+        
+    }))]
 
-    // filters entity object for lighter payload
+    console.log(...players.map(el => el.missiles));
+    //console.log(serverHitsBuffer)
+    serverHitsBuffer = [];
+    playerKeysBuffer = [];
+    clientHitsBuffer = [];
+
+    // filters entity object for lighter payload, there's probably something better to do lol
     let packet = JSON.parse(JSON.stringify(players));
 
     packet.forEach((pack) => {
@@ -137,6 +165,12 @@ setInterval(() => {
             delete missile.entity;
         })
     })
+
+    stateSnapshots.unshift(packet);
+
+    if (stateSnapshots.length > snapshotsLength) {
+        stateSnapshots.splice(-1, 1);
+    }
 
     io.emit('ghostsData', packet);
 }, tickrate)

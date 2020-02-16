@@ -4,6 +4,7 @@ module.exports = class BackCollisionDetector {
         this.mapCollisionReduction = 5;
     }
 
+    
     mapPlayerCollision(x, y, size) {
 
         let playerX = x;
@@ -98,6 +99,18 @@ module.exports = class BackCollisionDetector {
 
         return isColl;
     }
+
+
+    playerMissileCollision(rect1, rect2) {
+        if (rect1.x < rect2.x + rect2.width &&
+            rect1.x + rect1.width > rect2.x &&
+            rect1.y < rect2.y + rect2.height &&
+            rect1.height + rect1.y > rect2.y) {
+                
+                return true;
+         }
+    }
+
 
     pointDistance(x0, y0, x1, y1) {
         return Math.hypot(x0 - x1, y0 - y1);

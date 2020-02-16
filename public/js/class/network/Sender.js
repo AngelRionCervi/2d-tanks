@@ -32,4 +32,9 @@ export class Sender {
         
         this.socket.emit('missilesPos', id, missiles);
     }
+
+    sendClientHits(hits) {
+
+        this.socket.emit('clientHits', hits);
+    }
 }
