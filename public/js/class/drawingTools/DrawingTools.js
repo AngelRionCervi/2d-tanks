@@ -3,12 +3,12 @@ export class DrawingTools {
         this.canvas = canvas;
         this.ctx = ctx;
 
-        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/baseFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/baseFrontLeft.png"),
-        back: this.setSrc("/public/assets/sprites/player/baseBack.png")};
+        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/playerGreenFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/playerGreenFrontLeft.png"),
+        backRight: this.setSrc("/public/assets/sprites/player/playerGreenBackRight.png"), backLeft: this.setSrc("/public/assets/sprites/player/playerGreenBackLeft.png")};
 
-        this.RLSprite = {base: this.setSrc("/public/assets/sprites/rocketLauncher/base.png"), fireAn1: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1.png"),
+        this.RLSprite = {base: this.setSrc("/public/assets/sprites/rocketLauncher/gunNormal.png"), fireAn1: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1.png"),
         fireAn2: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2.png"), fireAn3: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3.png"), 
-        baseInv: this.setSrc("/public/assets/sprites/rocketLauncher/baseInv.png"), fireAn1Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1Inv.png"),
+        baseInv: this.setSrc("/public/assets/sprites/rocketLauncher/gunInversed.png"), fireAn1Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1Inv.png"),
         fireAn2Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2Inv.png"), fireAn3Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3Inv.png")};
 
         this.groundSprite = {base: this.setSrc("/public/assets/sprites/groundTile.jpg")};
@@ -91,8 +91,11 @@ export class DrawingTools {
             case 'playerFrontLeft':
                 image = this.playerSprite.frontLeft;
                 break;
-            case 'playerBack':
-                image = this.playerSprite.back;
+            case 'playerBackRight':
+                image = this.playerSprite.backRight;
+                break;
+            case 'playerBackLeft':
+                image = this.playerSprite.backLeft;
                 break;
             case 'RL':
                 image = this.RLSprite.base;

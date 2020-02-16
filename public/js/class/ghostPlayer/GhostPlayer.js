@@ -16,6 +16,7 @@ export class GhostPlayer {
         this.playerAngle = -90 * Math.PI / 180;
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
+        this.rlPlayerDistance = 20;
 
 
         this.updCenters = () => {
@@ -70,6 +71,7 @@ export class GhostPlayer {
     drawSprites() {
         // draw base
         if (!this.playerAngle) {
+            // draw canon
             this.drawPlayer();
             this.drawRL();
 
@@ -77,7 +79,7 @@ export class GhostPlayer {
 
             let degAngle = this.radToDeg(this.playerAngle);
 
-            if (!(degAngle >= -110 && degAngle <= 110)) {
+            if (!(degAngle >= -120 && degAngle <= 120)) {
                 this.drawRL();
                 this.drawPlayer(true);
             } else {
@@ -91,7 +93,11 @@ export class GhostPlayer {
         let sprite;
 
         if (inv) {
-            sprite = 'playerBack';
+            if (this.playerAngle < 0) {
+                sprite = 'playerBackLeft';
+            } else {
+                sprite = 'playerBackRight';
+            }
         } else {
             if (this.playerAngle < 0) {
                 sprite = 'playerFrontLeft';
@@ -105,9 +111,9 @@ export class GhostPlayer {
 
     drawRL() {
         let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
-        let xInc = this.playerAngle < 0 ? 1 : -1;
 
-        this.drawingTools.drawSprite(sprite, this.x + xInc, this.y, this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
+        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX-1, this.centerY, 
+            -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
 
     getPlayerPos() {

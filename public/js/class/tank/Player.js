@@ -26,6 +26,7 @@ export class Player {
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
         this.maxConcurringMissiles = 3;
+        this.rlPlayerDistance = 20;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -96,7 +97,7 @@ export class Player {
         }
 
         // draw aim
-        this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y, this.aimWidth, length - 14,
+        this.drawingTools.dashRect(this.x + this.canonSizeX / 2 - this.aimWidth / 2, this.y + this.rlPlayerDistance, this.aimWidth, length - 14 - this.rlPlayerDistance,
             this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - (this.canonOffsetCenter + this.canonSizeY)),
             -angle, this.aimColor, 5, 10);
 
@@ -269,14 +270,14 @@ export class Player {
         // draw base
         if (!this.playerAngle) {
             // draw canon
-            drawPlayer();
-            drawRL();
+            this.drawPlayer();
+            this.drawRL();
 
         } else {
 
             let degAngle = this.radToDeg(this.playerAngle);
 
-            if (!(degAngle >= -110 && degAngle <= 110)) {
+            if (!(degAngle >= -120 && degAngle <= 120)) {
                 this.drawRL();
                 this.drawPlayer(true);
             } else {
@@ -290,7 +291,11 @@ export class Player {
         let sprite;
 
         if (inv) {
-            sprite = 'playerBack';
+            if (this.playerAngle < 0) {
+                sprite = 'playerBackLeft';
+            } else {
+                sprite = 'playerBackRight';
+            }
         } else {
             if (this.playerAngle < 0) {
                 sprite = 'playerFrontLeft';
@@ -304,9 +309,9 @@ export class Player {
 
     drawRL() {
         let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
-        let xInc = this.playerAngle < 0 ? 1 : -1;
 
-        this.drawingTools.drawSprite(sprite, this.x + xInc, this.y, this.centerX, this.centerY, -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
+        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX-1, this.centerY, 
+            -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
 
     getPlayerPos() {
