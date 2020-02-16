@@ -12,7 +12,7 @@ export class GhostMissile {
         this.vx;
         this.vy;
         this.angle;
-        this.missileLaunchOffset = 30;
+        this.missileLaunchOffset = 40;
         this.maxBounce = 1;
         this.bounceCount = 0;
     }

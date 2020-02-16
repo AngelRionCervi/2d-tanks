@@ -11,13 +11,13 @@ export class Missile {
         this.height = 6 * 2;
         this.radius = 6;
         this.color = "blue";
-        this.speed = 2.2;
+        this.speed = 4;
         this.shotPos = curPos;
         this.playerPos = playerPos;
         this.lastColl = [];
         this.bounceCount = 0;
         this.maxBounce = 1;
-        this.missileLaunchOffset = 30;
+        this.missileLaunchOffset = 40;
   
         this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
         this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;

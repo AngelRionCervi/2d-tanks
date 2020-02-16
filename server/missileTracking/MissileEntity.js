@@ -1,9 +1,10 @@
 module.exports = class Missile {
-    constructor(curPos, playerPos, playerAngle, id, collisionDetector) {
+    constructor(curPos, playerPos, playerAngle, id, playerID, collisionDetector) {
         this.missileAngle = playerAngle;
         this.shotPos = curPos;
         this.playerPos = playerPos;
         this.id = id;
+        this.playerID = playerID;
         this.collisionDetector = collisionDetector;
         this.vx;
         this.vy;
@@ -12,7 +13,7 @@ module.exports = class Missile {
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.radius = 6;
-        this.speed = 2.2;
+        this.speed = 4;
         this.lastColl = [];
         this.bounceCount = 0;
         this.maxBounce = 1;

@@ -69,9 +69,9 @@ document.addEventListener('keyup', (evt) => {
     }
 });
 
-socket.on('ghostsData', (playersData) => {
-    
-    playersData.forEach((player) => {
+socket.on('ghostsData', (ghosts) => {
+
+    ghosts.ghostsData.forEach((player) => {
 
         if (!ghostPlayers.map(el => el.id).includes(player.id)) {
             let ghostObj = { id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id), 
@@ -92,7 +92,6 @@ socket.on('ghostsData', (playersData) => {
                 } else {
                     ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); // syncs ghost missiles and player missiles
                 }
-
             }
 
             ghost.coords.x = player.coords.x;
@@ -110,7 +109,40 @@ socket.on('ghostsData', (playersData) => {
             })
         }
     })
+
+    ghosts.hits.forEach((hit) => {
+        if (hit.shooterID === player.id && hit.targetID === player.id) {
+            console.log("you suicided :<")
+        }
+        else if (hit.shooterID === player.id) {
+            console.log("killed : " + hit.targetID);
+        } 
+        else if (hit.targetID === player.id) {
+            console.log("killed by : " + hit.shooterID);
+        }
+
+        if (hit.shooterID === player.id) {
+            removeMissile(hit.missileID, 'player');
+        } 
+        else {
+            removeMissile(hit.missileID, 'ghost');
+        }
+        
+    })
 })
+
+function removeMissile(id, type) {
+    
+    if (type === 'player') {
+        playerShots = playerShots.filter(el => el.id !== id);
+    } else {
+        ghostPlayers.forEach((ghost) => {
+            if (ghost.missiles.map(el => el.id).includes(id)) {
+                ghost.missiles = ghost.missiles.filter(el => el.id !== id);
+            }
+        })
+    }
+}
 
 
 function render() {
@@ -142,17 +174,8 @@ function render() {
 
             if (ghostMissileColl) {
                 clientHits.push({ shooterID: player.id, targetID: ghost.id, time: new Date().getTime()})
-                console.log("you hit : " + ghost.id, "or did ya haxor ? Let's ask the server");
             }
         })
-
-        let playerMissileColl = collisionDetector.playerMissileCollision({x: player.x, y: player.y, width: player.baseSizeY, height: player.baseSizeY}, 
-            {x: missile.x, y: missile.y, width: missile.width, height: missile.height});
-
-        if (playerMissileColl) {
-            clientHits.push({ shooterID: player.id, targetID: player.id, time: new Date().getTime() })
-            console.log("rekt by your own shot lmao n@@b");
-        }
     })
 
     if (clientHits.length > 0) {
