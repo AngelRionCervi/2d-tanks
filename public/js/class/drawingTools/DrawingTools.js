@@ -3,8 +3,8 @@ export class DrawingTools {
         this.canvas = canvas;
         this.ctx = ctx;
 
-        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/playerGreenFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/playerGreenFrontLeft.png"),
-        backRight: this.setSrc("/public/assets/sprites/player/playerGreenBackRight.png"), backLeft: this.setSrc("/public/assets/sprites/player/playerGreenBackLeft.png")};
+        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/playerBenderFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/playerBenderFrontLeft.png"),
+        backRight: this.setSrc("/public/assets/sprites/player/playerBenderBackRight.png"), backLeft: this.setSrc("/public/assets/sprites/player/playerBenderBackLeft.png")};
 
         this.RLSprite = {base: this.setSrc("/public/assets/sprites/rocketLauncher/gunNormal.png"), fireAn1: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1.png"),
         fireAn2: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2.png"), fireAn3: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3.png"), 
