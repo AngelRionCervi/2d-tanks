@@ -1,21 +1,32 @@
 export class DrawingTools {
-    constructor(canvas, ctx) {
+    constructor(canvas, ctx, spritesJSON) {
         this.canvas = canvas;
         this.ctx = ctx;
+        this.spritesJSON = spritesJSON;
 
-        this.playerSprite = {frontRight: this.setSrc("/public/assets/sprites/player/playerBenderFrontRight.png"), frontLeft: this.setSrc("/public/assets/sprites/player/playerBenderFrontLeft.png"),
-        backRight: this.setSrc("/public/assets/sprites/player/playerBenderBackRight.png"), backLeft: this.setSrc("/public/assets/sprites/player/playerBenderBackLeft.png")};
+        this.sprites = { players: [], weapons: [], map: [] };
 
-        this.RLSprite = {base: this.setSrc("/public/assets/sprites/rocketLauncher/gunNormal.png"), fireAn1: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1.png"),
-        fireAn2: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2.png"), fireAn3: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3.png"), 
-        baseInv: this.setSrc("/public/assets/sprites/rocketLauncher/gunInversed.png"), fireAn1Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn1Inv.png"),
-        fireAn2Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn2Inv.png"), fireAn3Inv: this.setSrc("/public/assets/sprites/rocketLauncher/fireAn3Inv.png")};
+        this.parts = {
+            players: ['frontLeft', 'frontRight', 'backLeft', 'backRight'],
+            weapons: ['normal', 'inversed', 'bullet'],
+            map: ['ground', 'wall'],
+        }
 
-        this.groundSprite = {base: this.setSrc("/public/assets/sprites/groundTile.jpg")};
+        Object.keys(this.sprites).forEach(key => {
+            this.spritesJSON[key].forEach(type => {
+                let set = {};
+                set.name = type.name;
+                this.parts[key].forEach(part => {
+                    let ext = part === "ground" ? ".jpg" : ".png";
+                    set[part] = this.setSrc("/public/assets/sprites/" + type.root + part + ext);
+                })
+                this.sprites[key].push(set);
+            })
+        })
 
-        this.wallSprite = {base: this.setSrc("/public/assets/sprites/wall1.png")};
+        this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];
 
-        this.bulletSprite = {base: this.setSrc("/public/assets/sprites/bullet5.png")};
+        console.log('SPRITES', this.sprites, this.playerSprite);
     }
 
     setSrc(src) {
@@ -98,19 +109,19 @@ export class DrawingTools {
                 image = this.playerSprite.backLeft;
                 break;
             case 'RL':
-                image = this.RLSprite.base;
+                image = this.sprites.weapons.find(el => el.name === "gun").normal;
                 break;
             case 'RLinv':
-                image = this.RLSprite.baseInv;
-                break;
-            case 'ground':
-                image = this.groundSprite.base;
-                break;
-            case 'wall':
-                image = this.wallSprite.base;
+                image = this.sprites.weapons.find(el => el.name === "gun").inversed;
                 break;
             case 'bullet':
-                image = this.bulletSprite.base;
+                image = this.sprites.weapons.find(el => el.name === "gun").bullet;
+                break;
+            case 'ground':
+                image = this.sprites.map.find(el => el.name === "base").ground;
+                break;
+            case 'wall':
+                image = this.sprites.map.find(el => el.name === "base").wall;
                 break;
         }
 
@@ -120,6 +131,5 @@ export class DrawingTools {
         this.ctx.translate(trans2X, trans2Y)
         this.ctx.drawImage(image, x, y);
         this.ctx.restore();
-
     }
 }

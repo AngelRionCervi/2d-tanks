@@ -1,0 +1,18 @@
+{
+    "players": [
+        { "name": "green", "root": "player/green/" },
+        { "name": "blue", "root": "player/blue/" },
+        { "name": "purple", "root": "player/purple/" },
+        { "name": "red", "root": "player/red/" },
+        { "name": "spirited", "root": "player/spirited/" },
+        { "name": "ninja", "root": "player/ninja/" },
+        { "name": "solaire", "root": "player/solaire/" },
+        { "name": "bender", "root": "player/bender/" }
+    ],
+    "weapons": [
+        { "name": "gun", "root": "weapons/gun/" }
+    ],
+    "map": [
+        { "name": "base", "root": "map/base/" }
+    ]
+}
