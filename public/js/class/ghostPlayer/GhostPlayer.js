@@ -5,7 +5,7 @@ export class GhostPlayer {
         this.drawingTools = drawingTools;
         this.x = 200;
         this.y = 100;
-        this.speed = 3;
+        this.speed = 1.4;
         this.baseSizeX = 32;
         this.baseSizeY = 32;
         this.canonSizeX = 28;

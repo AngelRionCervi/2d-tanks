@@ -11,7 +11,7 @@ export class Missile {
         this.height = 6 * 2;
         this.radius = 6;
         this.color = "blue";
-        this.speed = 4;
+        this.speed = 2.2;
         this.shotPos = curPos;
         this.playerPos = playerPos;
         this.lastColl = [];

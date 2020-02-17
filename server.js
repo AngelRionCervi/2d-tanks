@@ -32,8 +32,8 @@ let players = [];
 let playerKeysBuffer = [];
 let stateSnapshots = [];
 let clientHitsBuffer = [];
-let serverHitsBuffer = [];
 let confirmedHits = [];
+let allClients = [];
 
 let getPlayer = (id) => players.find(el => el.id === id);
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
@@ -50,8 +50,9 @@ let closest = (arr, nbr) => arr.sort((a, b) => Math.abs(nbr - a) - Math.abs(nbr 
 io.on('connection', (socket) => {
 
     socket.on('initPlayer', (id, spawnPos) => {
-        console.log('a user connected');
-        let newPlayer = { id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [] };
+        console.log('a user connected', socket.id);
+        let newPlayer = { socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, 
+        entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [] };
         players.push(newPlayer);
     })
 
@@ -95,6 +96,13 @@ io.on('connection', (socket) => {
 
     socket.on('clientHits', (hits) => {
         clientHitsBuffer.push(hits);
+    })
+
+    socket.on('disconnect', () => {
+        let index = players.map(el => el.socketID).indexOf(socket.id);
+        if (players[index]) {
+            players.splice(index, 1);
+        }
     })
 });
 
@@ -162,8 +170,6 @@ setInterval(() => {
             }
         })
     })
-
-    //console.log(confirmedHits);
 
     // filters entity object for lighter payload, there's probably something better to do lol
     let packet = JSON.parse(JSON.stringify(players));

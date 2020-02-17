@@ -2,6 +2,7 @@ const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext('2d');
 const posPingRate = 1000 / 10;
 const socket = io('http://localhost:5000');
+const showFPS = true;
 
 import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
 import { Sender } from "/public/js/class/network/Sender.js";
@@ -23,6 +24,7 @@ let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector);
 let mouse = new Mouse(gameCanvas);
 let keyboard = new Keyboard(gameCanvas);
 let sender = new Sender(socket, keyboard, mouse);
+let lastRun;
 
 let ghostPlayers = [];
 
@@ -71,6 +73,13 @@ document.addEventListener('keyup', (evt) => {
 
 socket.on('ghostsData', (ghosts) => {
 
+    let disconnectDude = ghostPlayers.find(el => !ghosts.ghostsData.map(e => e.id).includes(el.id))
+    
+    if (disconnectDude) {
+        ghostPlayers = ghostPlayers.filter(el => el.id !== disconnectDude.id); //remove ghost if the id isnt in the session anymore
+        console.log(disconnectDude.id + " has disconnected")
+    }
+
     ghosts.ghostsData.forEach((player) => {
 
         if (!ghostPlayers.map(el => el.id).includes(player.id)) {
@@ -90,7 +99,7 @@ socket.on('ghostsData', (ghosts) => {
                         coords: { x: newMissile.x, y: newMissile.y }, vx: 0, vy: 0, angle: newMissile.missileAngle, set: false };
                     ghost.missiles.push(missileObj);
                 } else {
-                    ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); // syncs ghost missiles and player missiles
+                    ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); //remove missile if the missile isnt in the session
                 }
             }
 
@@ -146,6 +155,17 @@ function removeMissile(id, type) {
 
 
 function render() {
+
+    if(!lastRun) {
+        lastRun = performance.now();
+        render()
+        return;
+    }
+
+    let delta = (performance.now() - lastRun)/1000;
+    lastRun = performance.now();
+    let fps = 1/delta;
+
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     mapManager.renderMap(map);
@@ -195,6 +215,9 @@ function render() {
             })
         }
     })
+
+    if (showFPS) showFps(fps);
+
     requestAnimationFrame(render);
 }
 
@@ -213,6 +236,11 @@ setInterval(() => {
     sender.pingMissilesPos(player.id, missiles);
 }, posPingRate)
 
+function showFps(fps){
+    ctx.fillStyle = "black";
+    ctx.font      = "normal 16pt Arial";
 
+    ctx.fillText(fps.toFixed() + " fps", 10, 26);
+}
 
 
