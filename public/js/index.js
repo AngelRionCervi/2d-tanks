@@ -51,7 +51,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
     let lastKey = { type: "", key: "" };
 
 
-    sender.initPlayer(player.id, { x: player.x, y: player.y });
+    sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name);
 
     gameCanvas.addEventListener('mousemove', (evt) => {
         curPos = mouse.getMousePos(evt);
@@ -101,8 +101,9 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
             if (!ghostPlayers.map(el => el.id).includes(player.id)) {
                 let ghostObj = {
                     id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id),
-                    coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle, missiles: []
-                };
+                    coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
+                    ,missiles: [], sprite: player.sprite};
+
                 ghostPlayers.push(ghostObj);
 
             } else {
@@ -262,5 +263,5 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         ctx.fillText(fps.toFixed() + " fps", 10, 26);
     }
-
+    
 })

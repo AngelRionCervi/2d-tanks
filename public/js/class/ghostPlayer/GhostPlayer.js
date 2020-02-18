@@ -47,7 +47,7 @@ export class GhostPlayer {
         this.playerAngle = ghost.playerAngle;
 
         this.updCenters();
-        this.drawSprites();
+        this.drawSprites(ghost.sprite);
     }
 
 
@@ -68,11 +68,11 @@ export class GhostPlayer {
         return incY;
     }
 
-    drawSprites() {
+    drawSprites(ghostSprite) {
         // draw base
         if (!this.playerAngle) {
             // draw canon
-            this.drawPlayer();
+            this.drawPlayer(ghostSprite);
             this.drawRL();
 
         } else {
@@ -81,32 +81,33 @@ export class GhostPlayer {
 
             if (!(degAngle >= -120 && degAngle <= 120)) {
                 this.drawRL();
-                this.drawPlayer(true);
+                this.drawPlayer(ghostSprite, true);
             } else {
-                this.drawPlayer();
+                this.drawPlayer(ghostSprite);
                 this.drawRL();
             }
         }
     }
 
-    drawPlayer(inv = null) {
-        let sprite;
+    drawPlayer(ghostSprite, inv = null) {
+        let spriteType;
+        //console.log(ghostSprite)
 
         if (inv) {
             if (this.playerAngle < 0) {
-                sprite = 'playerBackLeft';
+                spriteType = 'playerBackLeft';
             } else {
-                sprite = 'playerBackRight';
+                spriteType = 'playerBackRight';
             }
         } else {
             if (this.playerAngle < 0) {
-                sprite = 'playerFrontLeft';
+                spriteType = 'playerFrontLeft';
             } else {
-                sprite = 'playerFrontRight';
+                spriteType = 'playerFrontRight';
             }
         }
 
-        this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0);
+        this.drawingTools.drawSprite(spriteType, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, ghostSprite);
     }
 
     drawRL() {

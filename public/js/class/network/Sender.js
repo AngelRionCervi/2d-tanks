@@ -3,9 +3,9 @@ export class Sender {
         this.socket = socket;
     }
 
-    initPlayer(id, spawnPos) {
+    initPlayer(id, spawnPos, playerSprite) {
 
-        this.socket.emit('initPlayer', id, spawnPos);
+        this.socket.emit('initPlayer', id, spawnPos, playerSprite);
     }
 
     sendKeys(id, keys) {

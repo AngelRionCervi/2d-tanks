@@ -43,16 +43,16 @@ let getMissile = (idPlayer, idMissile) => {
         return player.missiles.find(el => el.id === idMissile);
     }
 }
-let closest = (arr, nbr) => arr.sort((a, b) => Math.abs(nbr - a) - Math.abs(nbr - b))[0];
 
+let closest = (arr, nbr) => arr.sort((a, b) => Math.abs(nbr - a) - Math.abs(nbr - b))[0];
 
 
 io.on('connection', (socket) => {
 
-    socket.on('initPlayer', (id, spawnPos) => {
-        console.log('a user connected', socket.id);
+    socket.on('initPlayer', (id, spawnPos, playerSprite) => {
+        console.log('a user connected', socket.id, playerSprite);
         let newPlayer = { socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, 
-        entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [] };
+        entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite };
         players.push(newPlayer);
     })
 

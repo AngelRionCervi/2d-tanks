@@ -52,7 +52,7 @@ export class DrawingTools {
             this.ctx.fillStyle = color;
             this.ctx.fill();
         }
-        
+
         this.ctx.restore();
     }
 
@@ -91,22 +91,24 @@ export class DrawingTools {
         this.ctx.restore();
     }
 
-    drawSprite(sprite, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null) {
+    drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null) {
+
+        let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
 
         let image;
 
-        switch (sprite) {
+        switch (spriteType) {
             case 'playerFrontRight':
-                image = this.playerSprite.frontRight;
+                image = playerSpriteSet.frontRight;
                 break;
             case 'playerFrontLeft':
-                image = this.playerSprite.frontLeft;
+                image = playerSpriteSet.frontLeft;
                 break;
             case 'playerBackRight':
-                image = this.playerSprite.backRight;
+                image = playerSpriteSet.backRight;
                 break;
             case 'playerBackLeft':
-                image = this.playerSprite.backLeft;
+                image = playerSpriteSet.backLeft;
                 break;
             case 'RL':
                 image = this.sprites.weapons.find(el => el.name === "gun").normal;
