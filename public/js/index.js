@@ -213,7 +213,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
                     { x: missile.x, y: missile.y, width: missile.width, height: missile.height });
 
                 if (ghostMissileColl) {
-                    clientHits.push({ shooterID: player.id, targetID: ghost.id, time: new Date().getTime() })
+                    clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
                 }
             })
         })

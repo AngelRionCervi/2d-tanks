@@ -163,7 +163,7 @@ setInterval(() => {
                     }, { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height });
 
                     if (missilePlayerColl) { 
-                        confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: new Date().getTime() });
+                        confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
                         a.splice(i, 1);
                     }
                 })
@@ -174,7 +174,7 @@ setInterval(() => {
     // filters entity object for lighter payload, there's probably something better to do lol
     let packet = JSON.parse(JSON.stringify(players));
     let snapshot = JSON.parse(JSON.stringify(players));
-    packet.time = new Date().getTime();
+    packet.time = Date.now();
     snapshot.time = packet.time;
   
     stateSnapshots.unshift(snapshot);
