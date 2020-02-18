@@ -47,8 +47,8 @@ export class Player {
         this.radToDeg = (rad) => rad * 180 / Math.PI;
     }
 
-    draw(vel) {
-
+    draw(vel, delta) {
+        console.log(delta)
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.baseSizeY);
 
         let collVel = this.mapCollHandler(vel, isColl);
@@ -58,8 +58,8 @@ export class Player {
             collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
         }
 
-        this.x += collVel.velX;
-        this.y += collVel.velY;
+        this.x += collVel.velX * delta;
+        this.y += collVel.velY * delta;
 
         this.updCenters();
 

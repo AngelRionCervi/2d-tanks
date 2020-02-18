@@ -31,18 +31,18 @@ export class GhostPlayer {
     }
 
 
-    update(ghost) {
+    update(ghost, delta) {
 
         if (this.vx !== ghost.vx && this.vy !== ghost.vx) {
             this.x = ghost.coords.x;
             this.y = ghost.coords.y;
         }
 
-        this.vx = ghost.vx;
-        this.vy = ghost.vy;
-        
-        this.x += this.vx;
-        this.y += this.vy;
+        if (this.vx !== ghost.vx) this.vx = ghost.vx;
+        if (this.vy !== ghost.vy) this.vy = ghost.vy;
+
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
 
         this.playerAngle = ghost.playerAngle;
 

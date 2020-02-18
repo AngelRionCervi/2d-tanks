@@ -41,7 +41,7 @@ export class Missile {
         this.vy = (ty / dist) * this.speed;
     }
 
-    draw() {
+    draw(delta) {
 
         let hitX = this.x - this.width / 2;
         let hitY = this.y - this.height / 2 + 9;
@@ -73,8 +73,8 @@ export class Missile {
                 this.missileAngle = -this.missileAngle + 180 * Math.PI / 180;
             }
 
-            this.x += this.vx;
-            this.y += this.vy;
+            this.x += this.vx * delta;
+            this.y += this.vy * delta;
 
             this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
             this.x, this.y, -(this.x), -(this.y), -this.missileAngle);

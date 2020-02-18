@@ -4,6 +4,7 @@ const posPingRate = 1000 / 10;
 const socket = io('http://localhost:5000');
 const showFPS = true;
 
+
 import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
 import { Sender } from "/public/js/class/network/Sender.js";
 import { MapManager } from "/public/js/class/mapManager/MapManager.js";
@@ -184,6 +185,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
         }
 
         let delta = (performance.now() - lastRun) / 1000;
+        let deltaIncrease = delta * 100;
         lastRun = performance.now();
         let fps = 1 / delta;
 
@@ -191,7 +193,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         mapManager.renderMap(map);
 
-        player.draw(vel);
+        player.draw(vel, deltaIncrease);
 
         if (curPos) {
             player.drawAim(curPos, map);
@@ -203,7 +205,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
             if (!missile.vx && !missile.vy) {
                 missile.initDir();
             }
-            missile.draw();
+            missile.draw(deltaIncrease);
 
             if (missile.bounceCount > missile.maxBounce) {
                 a.splice(i, 1);
@@ -225,13 +227,13 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         ghostPlayers.forEach((ghostPlayer) => {
             if (ghostPlayer.id !== player.id) {
-                ghostPlayer.entity.update(ghostPlayer);
+                ghostPlayer.entity.update(ghostPlayer, deltaIncrease);
                 ghostPlayer.missiles.forEach((missile) => {
                     if (!missile.set) { // once a initial pos and missile vels are set, its all front end, except if collision with player (server authority)
                         missile.entity.set(missile);
                         missile.set = true;
                     } else {
-                        missile.entity.update();
+                        missile.entity.update(deltaIncrease);
                     }
                 })
             }
