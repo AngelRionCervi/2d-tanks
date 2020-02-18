@@ -94,6 +94,8 @@ export class DrawingTools {
     drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null) {
 
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
+        let gunModel = this.sprites.weapons.find(el => el.name === "gun");
+        let mapModel = this.sprites.map.find(el => el.name === "base");
 
         let image;
 
@@ -111,19 +113,19 @@ export class DrawingTools {
                 image = playerSpriteSet.backLeft;
                 break;
             case 'RL':
-                image = this.sprites.weapons.find(el => el.name === "gun").normal;
+                image = gunModel.normal;
                 break;
             case 'RLinv':
-                image = this.sprites.weapons.find(el => el.name === "gun").inversed;
+                image = gunModel.inversed;
                 break;
             case 'bullet':
-                image = this.sprites.weapons.find(el => el.name === "gun").bullet;
+                image = gunModel.bullet;
                 break;
             case 'ground':
-                image = this.sprites.map.find(el => el.name === "base").ground;
+                image = mapModel.ground;
                 break;
             case 'wall':
-                image = this.sprites.map.find(el => el.name === "base").wall;
+                image = mapModel.wall;
                 break;
         }
 
