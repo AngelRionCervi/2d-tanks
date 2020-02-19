@@ -48,7 +48,6 @@ export class Player {
     }
 
     draw(vel, delta) {
-        console.log(delta)
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.baseSizeY);
 
         let collVel = this.mapCollHandler(vel, isColl);

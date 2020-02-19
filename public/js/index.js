@@ -195,9 +195,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         player.draw(vel, deltaIncrease);
 
-        if (curPos) {
-            player.drawAim(curPos, map);
-        }
+        if (curPos) player.drawAim(curPos, map);
 
         let clientHits = [];
 
@@ -221,10 +219,6 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
             })
         })
 
-        if (clientHits.length > 0) {
-            sender.sendClientHits(clientHits);
-        }
-
         ghostPlayers.forEach((ghostPlayer) => {
             if (ghostPlayer.id !== player.id) {
                 ghostPlayer.entity.update(ghostPlayer, deltaIncrease);
@@ -238,6 +232,8 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
                 })
             }
         })
+
+        if (clientHits.length > 0) sender.sendClientHits(clientHits);
 
         if (showFPS) showFps(fps);
 

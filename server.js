@@ -5,6 +5,7 @@ const path = require('path');
 const socket = require('socket.io');
 const server = http.Server(app);
 const io = socket(server);
+require('./server/helpers/helpers.js')();
 
 const PlayerEntity = require('./server/playerTracking/PlayerEntity');
 const Collision = require('./server/collision/BackCollisionDetecor');
@@ -51,8 +52,10 @@ io.on('connection', (socket) => {
 
     socket.on('initPlayer', (id, spawnPos, playerSprite) => {
         console.log('a user connected', socket.id, playerSprite);
-        let newPlayer = { socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0, 
-        entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite };
+        let newPlayer = {
+            socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0,
+            entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite
+        };
         players.push(newPlayer);
     })
 
@@ -107,6 +110,36 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
+
+    let packet = [];
+
+    clientHitsBuffer.forEach((clientHit) => {
+
+        clientHit.forEach((hit) => {
+
+            let snapshotsTimes = stateSnapshots.map(el => el.time);
+            let closestSnaphotTime = closest(snapshotsTimes, hit.time);
+            let snapshotIndex = snapshotsTimes.indexOf(closestSnaphotTime);
+            let snapshot = stateSnapshots[snapshotIndex];
+
+            let targetPlayer = snapshot.find(el => el.id === hit.targetID); //finds the targeted player;
+            let shooterMissiles = getPlayer(hit.shooterID).missiles;
+
+            if (Math.abs(closestSnaphotTime - hit.time) <= maxMsLag) {
+                shooterMissiles.forEach((missile, i, a) => {
+                    let missilePlayerColl = collisionDetector.playerMissileCollision({
+                        x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.baseSizeY, height: targetPlayer.entity.baseSizeY
+                    }, { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height });
+
+                    if (missilePlayerColl) {
+                        confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
+                        a.splice(i, 1);
+                    }
+                })
+            }
+        })
+    })
+
     players.forEach((player, playerIndex, playersArray) => {
 
         let playerNewKeys = getPlayerKeysBuffer(player.id);
@@ -142,58 +175,36 @@ setInterval(() => {
                 missile.angle = missile.entity.missileAngle;
             })
         }
-    })
-  
-    clientHitsBuffer.forEach((clientHit) => {
 
-        clientHit.forEach((hit) => {
+        // creates a lightweight object (without entities) to send to clients;
+        let filteredObj = Object.filter(player, val => getKeyByValue(player, val) !== "entity");
+        let filteredMissiles = [];
 
-            let snapshotsTimes = stateSnapshots.map(el => el.time);
-            let closestSnaphotTime = closest(snapshotsTimes, hit.time);
-            let snapshotIndex = snapshotsTimes.indexOf(closestSnaphotTime);
-            let snapshot = stateSnapshots[snapshotIndex];
-
-            let targetPlayer = snapshot.find(el => el.id === hit.targetID); //finds the targeted player;
-            let shooterMissiles = getPlayer(hit.shooterID).missiles;
-           
-            if (Math.abs(closestSnaphotTime - hit.time) <= maxMsLag) {
-                shooterMissiles.forEach((missile, i, a) => {
-                    let missilePlayerColl = collisionDetector.playerMissileCollision({
-                        x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.baseSizeY, height: targetPlayer.entity.baseSizeY
-                    }, { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height });
-
-                    if (missilePlayerColl) { 
-                        confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
-                        a.splice(i, 1);
-                    }
-                })
-            }
+        filteredObj.missiles.forEach((m) => {
+            let filteredM = Object.filter(m, val => getKeyByValue(m, val) !== "entity");
+            filteredMissiles.push(filteredM);
         })
+        
+        filteredObj.missiles = filteredMissiles;
+        packet.push(filteredObj);
     })
 
-    // filters entity object for lighter payload, there's probably something better to do lol
-    let packet = JSON.parse(JSON.stringify(players));
-    let snapshot = JSON.parse(JSON.stringify(players));
+
     packet.time = Date.now();
-    snapshot.time = packet.time;
-  
-    stateSnapshots.unshift(snapshot);
+    players.time = packet.time;
+
+    // saves a snapshot of the current tick;
+    stateSnapshots.unshift(players);
 
     if (stateSnapshots.length > snapshotsLength) {
         stateSnapshots.splice(-1, 1);
     }
-
-    packet.forEach((pack) => {
-        delete pack.entity;
-        pack.missiles.forEach((missile) => {
-            delete missile.entity;
-        })
-    })
 
     io.emit('ghostsData', { ghostsData: packet, hits: confirmedHits });
 
     confirmedHits = [];
     playerKeysBuffer = [];
     clientHitsBuffer = [];
+
 }, tickrate)
 

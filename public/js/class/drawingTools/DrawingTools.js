@@ -26,7 +26,6 @@ export class DrawingTools {
 
         this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];
 
-        console.log('SPRITES', this.sprites, this.playerSprite);
     }
 
     setSrc(src) {
