@@ -243,7 +243,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
             playerAngle = currentPlayerAngle;
         }
         
-        if (showFPS) showFps(fps);
+        if (showFPS) showFps(fps, ctx);
 
         requestAnimationFrame(render);
     }
@@ -264,11 +264,3 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
     }, posPingRate)
     
 })
-
-
-function showFps(fps) {
-    ctx.fillStyle = "black";
-    ctx.font = "normal 16pt Arial";
-
-    ctx.fillText(fps.toFixed() + " fps", 10, 26);
-}
