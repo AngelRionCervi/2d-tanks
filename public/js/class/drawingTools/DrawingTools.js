@@ -3,8 +3,8 @@ export class DrawingTools {
         this.canvas = canvas;
         this.ctx = ctx;
         this.spritesJSON = spritesJSON;
-        this.playerAnimationFrames = [];
-        this.animationIndex = 0;
+
+        console.log(this.playerAnimationFrames);
 
         this.sprites = { players: [], weapons: [], map: [] };
 
@@ -98,42 +98,38 @@ export class DrawingTools {
         this.ctx.restore();
     }
 
-    drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null) {
+    drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null, animationIndex = null) {
 
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
         let gunModel = this.sprites.weapons.find(el => el.name === "gun");
         let mapModel = this.sprites.map.find(el => el.name === "base");
 
-        this.animationIndex++;
-
-        if (this.animationIndex > this.playerAnimationFrames.length-1) this.animationIndex = 0;
-
         let image;
 
         switch (spriteType) {
             case 'playerIdleFrontRight':
-                image = playerSpriteSet["IdleFrontRight" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["IdleFrontRight" + animationIndex];
                 break;
             case 'playerIdleFrontLeft':
-                image = playerSpriteSet["IdleFrontLeft" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["IdleFrontLeft" + animationIndex];
                 break;
             case 'playerIdleBackRight':
-                image = playerSpriteSet["IdleBackRight" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["IdleBackRight" + animationIndex];
                 break;
             case 'playerIdleBackLeft':
-                image = playerSpriteSet["IdleBackLeft" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["IdleBackLeft" + animationIndex];
                 break;
             case 'playerRunFrontRight':
-                image = playerSpriteSet["RunFrontRight" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["RunFrontRight" + animationIndex];
                 break;
             case 'playerRunFrontLeft':
-                image = playerSpriteSet["RunFrontLeft" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["RunFrontLeft" + animationIndex];
                 break;
             case 'playerRunBackRight':
-                image = playerSpriteSet["RunBackRight" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["RunBackRight" + animationIndex];
                 break;
             case 'playerRunBackLeft':
-                image = playerSpriteSet["RunBackLeft" + this.playerAnimationFrames[this.animationIndex]];
+                image = playerSpriteSet["RunBackLeft" + animationIndex];
                 break;
             case 'RL':
                 image = gunModel.normal;

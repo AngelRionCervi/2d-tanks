@@ -27,8 +27,10 @@ export class Player {
         this.diagonalSpeedDiviser = 1.3;
         this.maxConcurringMissiles = 3;
         this.rlPlayerDistance = 20;
-        this.walkAnimationStep = 0;
-        this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        this.playerAnimationFrameDuration = 15;
+        this.playerAnimationFrames = [...new Array(this.playerAnimationFrameDuration).fill(1), 
+            ...new Array(this.playerAnimationFrameDuration).fill(2)];
+        this.animationIndex = 0;
         this.isMoving = false;
 
         this.updCenters = () => {
@@ -254,24 +256,8 @@ export class Player {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
-    walkAnimation() {
-
-        let incY = 0
-
-        let index = this.walkAnimationArr[this.walkAnimationStep];
-        
-        incY = index;
-        
-        this.walkAnimationStep += 1;
-
-        if (this.walkAnimationStep === this.walkAnimationArr.length) {
-            this.walkAnimationStep = 0;
-        }
-
-        return incY;
-    }
-
     drawSprites() {
+
         // draw base
         if (!this.playerAngle) {
             // draw canon
@@ -295,7 +281,9 @@ export class Player {
     drawPlayer(inv = null) {
         let sprite;
 
+        this.animationIndex++;
 
+        if (this.animationIndex > this.playerAnimationFrames.length-1) this.animationIndex = 0;
 
         if (inv) {
             if (this.playerAngle < 0) {
@@ -327,7 +315,9 @@ export class Player {
             }
         }
 
-        this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0);
+        let animationIndex = this.playerAnimationFrames[this.animationIndex];
+
+        this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, false, animationIndex);
     }
 
     drawRL() {
