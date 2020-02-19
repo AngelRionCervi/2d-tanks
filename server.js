@@ -34,7 +34,6 @@ let playerKeysBuffer = [];
 let stateSnapshots = [];
 let clientHitsBuffer = [];
 let confirmedHits = [];
-let allClients = [];
 
 let getPlayer = (id) => players.find(el => el.id === id);
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
@@ -45,7 +44,6 @@ let getMissile = (idPlayer, idMissile) => {
     }
 }
 
-let closest = (arr, nbr) => arr.sort((a, b) => Math.abs(nbr - a) - Math.abs(nbr - b))[0];
 
 
 io.on('connection', (socket) => {

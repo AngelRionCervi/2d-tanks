@@ -41,13 +41,15 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
     let mouse = new Mouse(gameCanvas);
     let keyboard = new Keyboard(gameCanvas);
     let sender = new Sender(socket, keyboard, mouse);
-    let lastRun;
+    
 
     let ghostPlayers = [];
 
     let curPos;
     let vel = [0, 0];
     let playerShots = [];
+    let lastRun;
+    let playerAngle;
 
     let lastKey = { type: "", key: "" };
 
@@ -56,8 +58,6 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
     gameCanvas.addEventListener('mousemove', (evt) => {
         curPos = mouse.getMousePos(evt);
-        let playerAngle = player.getPlayerAngle(curPos);
-        sender.sendMouseMove(player.id, playerAngle);
     });
 
     gameCanvas.addEventListener('mousedown', () => {
@@ -235,6 +235,14 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         if (clientHits.length > 0) sender.sendClientHits(clientHits);
 
+        if (curPos) {
+            let currentPlayerAngle = player.getPlayerAngle(curPos);
+            if (currentPlayerAngle !== playerAngle) {
+                sender.sendMouseMove(player.id, currentPlayerAngle);
+            }
+            playerAngle = currentPlayerAngle;
+        }
+        
         if (showFPS) showFps(fps);
 
         requestAnimationFrame(render);
@@ -254,12 +262,13 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
         sender.pingMissilesPos(player.id, missiles);
     }, posPingRate)
-
-    function showFps(fps) {
-        ctx.fillStyle = "black";
-        ctx.font = "normal 16pt Arial";
-
-        ctx.fillText(fps.toFixed() + " fps", 10, 26);
-    }
     
 })
+
+
+function showFps(fps) {
+    ctx.fillStyle = "black";
+    ctx.font = "normal 16pt Arial";
+
+    ctx.fillText(fps.toFixed() + " fps", 10, 26);
+}
