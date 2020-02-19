@@ -29,6 +29,7 @@ export class Player {
         this.rlPlayerDistance = 20;
         this.walkAnimationStep = 0;
         this.walkAnimationArr = [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        this.isMoving = false;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -57,11 +58,16 @@ export class Player {
             collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
         }
 
+        if (collVel.velX || collVel.velY) {
+            this.isMoving = true;
+        } else {
+            this.isMoving = false;
+        }
+
         this.x += collVel.velX * delta;
         this.y += collVel.velY * delta;
 
         this.updCenters();
-
         this.drawSprites();
     }
 
@@ -289,17 +295,35 @@ export class Player {
     drawPlayer(inv = null) {
         let sprite;
 
+
+
         if (inv) {
             if (this.playerAngle < 0) {
-                sprite = 'playerBackLeft';
+                if (this.isMoving) {
+                    sprite = 'playerRunBackLeft';
+                } else {
+                    sprite = 'playerIdleBackLeft';
+                }
             } else {
-                sprite = 'playerBackRight';
+                if (this.isMoving) {
+                    sprite = 'playerRunBackRight';
+                } else {
+                    sprite = 'playerIdleBackRight';
+                }
             }
         } else {
             if (this.playerAngle < 0) {
-                sprite = 'playerFrontLeft';
+                if (this.isMoving) {
+                    sprite = 'playerRunFrontLeft';
+                } else {
+                    sprite = 'playerIdleFrontLeft';
+                }
             } else {
-                sprite = 'playerFrontRight';
+                if (this.isMoving) {
+                    sprite = 'playerRunFrontRight';
+                } else {
+                    sprite = 'playerIdleFrontRight';
+                }
             }
         }
 
