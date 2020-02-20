@@ -1,5 +1,5 @@
 export class Player {
-    constructor(canvas, ctx, drawingTools, collisionDetector) {
+    constructor(canvas, ctx, drawingTools, collisionDetector, perf) {
         this.ctx = ctx;
         this.canvas = canvas;
         this.drawingTools = drawingTools;
@@ -27,10 +27,19 @@ export class Player {
         this.diagonalSpeedDiviser = 1.3;
         this.maxConcurringMissiles = 3;
         this.rlPlayerDistance = 20;
-        this.playerAnimationFrameDuration = 15;
-        this.playerAnimationFrames = [...new Array(this.playerAnimationFrameDuration).fill(1), 
-            ...new Array(this.playerAnimationFrameDuration).fill(2)];
-        this.animationIndex = 0;
+        this.playerAnimationFrameDuration = perf === "normal" ? 7 : 14;
+        this.runAnimationFrames = [
+            ...new Array(this.playerAnimationFrameDuration).fill(1),
+            ...new Array(this.playerAnimationFrameDuration).fill(2),
+            ...new Array(this.playerAnimationFrameDuration).fill(3),
+            ...new Array(this.playerAnimationFrameDuration).fill(4)
+        ];
+        this.idleAnimationFrames = [
+            ...new Array(this.playerAnimationFrameDuration * 2).fill(1),
+            ...new Array(this.playerAnimationFrameDuration * 2).fill(2)
+        ];
+        this.runAnimationIndex = 0;
+        this.idleAnimationIndex = 0;
         this.isMoving = false;
 
         this.updCenters = () => {
@@ -39,10 +48,10 @@ export class Player {
         }
 
         this.uuidv4 = () => {
-            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-              (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
             );
-          }
+        }
 
         this.id = this.uuidv4();
 
@@ -56,8 +65,8 @@ export class Player {
         let collVel = this.mapCollHandler(vel, isColl);
 
         if (collVel.velX && collVel.velY) {
-            collVel.velX = collVel.velX/this.diagonalSpeedDiviser;
-            collVel.velY = collVel.velY/this.diagonalSpeedDiviser;
+            collVel.velX = collVel.velX / this.diagonalSpeedDiviser;
+            collVel.velY = collVel.velY / this.diagonalSpeedDiviser;
         }
 
         if (collVel.velX || collVel.velY) {
@@ -281,41 +290,24 @@ export class Player {
     drawPlayer(inv = null) {
         let sprite;
 
-        this.animationIndex++;
+        let idleRun = this.isMoving ? "Run" : "Idle";
+        let leftRight = this.playerAngle < 0 ? "Left" : "Right";
+        let frontBack = inv ? "Back" : "Front";
 
-        if (this.animationIndex > this.playerAnimationFrames.length-1) this.animationIndex = 0;
+        sprite = 'player' + idleRun + frontBack + leftRight;
 
-        if (inv) {
-            if (this.playerAngle < 0) {
-                if (this.isMoving) {
-                    sprite = 'playerRunBackLeft';
-                } else {
-                    sprite = 'playerIdleBackLeft';
-                }
-            } else {
-                if (this.isMoving) {
-                    sprite = 'playerRunBackRight';
-                } else {
-                    sprite = 'playerIdleBackRight';
-                }
-            }
-        } else {
-            if (this.playerAngle < 0) {
-                if (this.isMoving) {
-                    sprite = 'playerRunFrontLeft';
-                } else {
-                    sprite = 'playerIdleFrontLeft';
-                }
-            } else {
-                if (this.isMoving) {
-                    sprite = 'playerRunFrontRight';
-                } else {
-                    sprite = 'playerIdleFrontRight';
-                }
-            }
+        let animationIndex;
+
+        if (this.isMoving) {
+            animationIndex = this.runAnimationFrames[this.runAnimationIndex];
+            this.runAnimationIndex++;
+            if (this.runAnimationIndex > this.runAnimationFrames.length - 1) this.runAnimationIndex = 0;
         }
-
-        let animationIndex = this.playerAnimationFrames[this.animationIndex];
+        else {
+            animationIndex = this.idleAnimationFrames[this.idleAnimationIndex];
+            this.idleAnimationIndex++;
+            if (this.idleAnimationIndex > this.idleAnimationFrames.length - 1) this.idleAnimationIndex = 0;
+        }
 
         this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, false, animationIndex);
     }
@@ -323,7 +315,7 @@ export class Player {
     drawRL() {
         let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
 
-        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX-1, this.centerY, 
+        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX - 1, this.centerY,
             -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
 

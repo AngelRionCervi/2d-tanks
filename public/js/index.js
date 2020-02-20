@@ -17,13 +17,15 @@ import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
 import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
 
 let sprites;
+let perfProfile;
 
+const fpsProfile = getFPS();
 const spritesFetch = new Promise((resolve, reject) => {
     fetch("/public/assets/sprites.json")
         .then(response => response.json())
         .then(json => {
             sprites = json;
-            resolve('playerSprites');
+            resolve({ playerSprites: "done" });
         })
         .catch(err => {
             console.log(err);
@@ -31,13 +33,19 @@ const spritesFetch = new Promise((resolve, reject) => {
         });
 })
 
-Promise.all([spritesFetch]).then(() => { //waits for all async fetch
+Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all async fetch
 
+    promiseObjs.forEach((obj) => {
+        if (obj.hasOwnProperty("fps")) {
+            perfProfile = obj.fps > 100 ? "high" : "normal";
+        }
+    })
+    
     let drawingTools = new DrawingTools(gameCanvas, ctx, sprites);
     let mapManager = new MapManager(gameCanvas, ctx, drawingTools);
     let map = mapManager.getMap();
     let collisionDetector = new CollisionDetector(map)
-    let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector);
+    let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector, perfProfile);
     let mouse = new Mouse(gameCanvas);
     let keyboard = new Keyboard(gameCanvas);
     let sender = new Sender(socket, keyboard, mouse);
@@ -101,7 +109,7 @@ Promise.all([spritesFetch]).then(() => { //waits for all async fetch
 
             if (!ghostPlayers.map(el => el.id).includes(player.id)) {
                 let ghostObj = {
-                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id),
+                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, perfProfile),
                     coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
                     ,missiles: [], sprite: player.sprite};
 

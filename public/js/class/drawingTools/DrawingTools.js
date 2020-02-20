@@ -14,6 +14,8 @@ export class DrawingTools {
                 'IdleFrontLeft2', 'IdleFrontRight2', 'IdleBackLeft2', 'IdleBackRight2',
                 'RunFrontLeft1', 'RunFrontRight1', 'RunBackLeft1', 'RunBackRight1',
                 'RunFrontLeft2', 'RunFrontRight2', 'RunBackLeft2', 'RunBackRight2',
+                'RunFrontLeft3', 'RunFrontRight3', 'RunBackLeft3', 'RunBackRight3',
+                'RunFrontLeft4', 'RunFrontRight4', 'RunBackLeft4', 'RunBackRight4',
             ],
             weapons: ['normal', 'inversed', 'bullet'],
             map: ['ground', 'wall'],
@@ -103,7 +105,7 @@ export class DrawingTools {
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
         let gunModel = this.sprites.weapons.find(el => el.name === "gun");
         let mapModel = this.sprites.map.find(el => el.name === "base");
-
+      
         let image;
 
         switch (spriteType) {

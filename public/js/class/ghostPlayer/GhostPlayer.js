@@ -1,5 +1,5 @@
 export class GhostPlayer {
-    constructor(canvas, ctx, drawingTools, id) {
+    constructor(canvas, ctx, drawingTools, id, perf) {
         this.ctx = ctx;
         this.canvas = canvas;
         this.drawingTools = drawingTools;
@@ -17,12 +17,20 @@ export class GhostPlayer {
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
         this.rlPlayerDistance = 20;
-        this.playerAnimationFrameDuration = 15;
-        this.playerAnimationFrames = [...new Array(this.playerAnimationFrameDuration).fill(1), 
-            ...new Array(this.playerAnimationFrameDuration).fill(2)];
-        this.animationIndex = 0;
+        this.playerAnimationFrameDuration = perf === "normal" ? 7 : 14;
+        this.runAnimationFrames = [
+            ...new Array(this.playerAnimationFrameDuration).fill(1), 
+            ...new Array(this.playerAnimationFrameDuration).fill(2),
+            ...new Array(this.playerAnimationFrameDuration).fill(3),
+            ...new Array(this.playerAnimationFrameDuration).fill(4)
+        ];
+        this.idleAnimationFrames = [
+            ...new Array(this.playerAnimationFrameDuration*2).fill(1), 
+            ...new Array(this.playerAnimationFrameDuration*2).fill(2)
+        ];
+        this.runAnimationIndex = 0;
+        this.idleAnimationIndex = 0;
         this.isMoving = false;
-
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -85,41 +93,24 @@ export class GhostPlayer {
     drawPlayer(ghostSprite, inv = null) {
         let sprite;
 
-        this.animationIndex++;
+        let idleRun = this.isMoving ? "Run" : "Idle";
+        let leftRight = this.playerAngle < 0 ? "Left" : "Right";
+        let frontBack = inv ? "Back" : "Front";
 
-        if (this.animationIndex > this.playerAnimationFrames.length-1) this.animationIndex = 0;
+        sprite = 'player' + idleRun + frontBack + leftRight;
 
-        if (inv) {
-            if (this.playerAngle < 0) {
-                if (this.isMoving) {
-                    sprite = 'playerRunBackLeft';
-                } else {
-                    sprite = 'playerIdleBackLeft';
-                }
-            } else {
-                if (this.isMoving) {
-                    sprite = 'playerRunBackRight';
-                } else {
-                    sprite = 'playerIdleBackRight';
-                }
-            }
-        } else {
-            if (this.playerAngle < 0) {
-                if (this.isMoving) {
-                    sprite = 'playerRunFrontLeft';
-                } else {
-                    sprite = 'playerIdleFrontLeft';
-                }
-            } else {
-                if (this.isMoving) {
-                    sprite = 'playerRunFrontRight';
-                } else {
-                    sprite = 'playerIdleFrontRight';
-                }
-            }
+        let animationIndex;
+
+        if (this.isMoving) {
+            animationIndex = this.runAnimationFrames[this.runAnimationIndex];
+            this.runAnimationIndex++;
+            if (this.runAnimationIndex > this.runAnimationFrames.length-1) this.runAnimationIndex = 0;
+        } 
+        else {
+            animationIndex = this.idleAnimationFrames[this.idleAnimationIndex];
+            this.idleAnimationIndex++;
+            if (this.idleAnimationIndex > this.idleAnimationFrames.length-1) this.idleAnimationIndex = 0;
         }
-
-        let animationIndex = this.playerAnimationFrames[this.animationIndex];
 
         this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, ghostSprite, animationIndex);
     }
