@@ -4,7 +4,8 @@
         { "name": "blue", "root": "player/blue/" },
         { "name": "purple", "root": "player/purple/" },
         { "name": "ninja", "root": "player/ninja/" },
-        { "name": "solaire", "root": "player/solaire/" }
+        { "name": "solaire", "root": "player/solaire/" },
+        { "name": "red", "root": "player/red/" }
     ],
     "weapons": [
         { "name": "gun", "root": "weapons/gun/" }
