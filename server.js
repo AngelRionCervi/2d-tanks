@@ -131,6 +131,7 @@ setInterval(() => {
 
                     if (missilePlayerColl) {
                         confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
+                        getPlayer(targetPlayer.id).entity.gotHit();
                         a.splice(i, 1);
                     }
                 })

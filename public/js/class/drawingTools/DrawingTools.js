@@ -4,7 +4,7 @@ export class DrawingTools {
         this.ctx = ctx;
         this.spritesJSON = spritesJSON;
 
-        this.sprites = { players: [], weapons: [], map: [], playerProps: []};
+        this.sprites = { players: [], gun: [], mapBase: [], shadow: [], healthBar: [] };
 
         this.parts = {
             players: [
@@ -15,9 +15,10 @@ export class DrawingTools {
                 'RunFrontLeft3', 'RunFrontRight3', 'RunBackLeft3', 'RunBackRight3',
                 'RunFrontLeft4', 'RunFrontRight4', 'RunBackLeft4', 'RunBackRight4',
             ],
-            weapons: ['normal', 'inversed', 'bullet'],
-            map: ['ground', 'wall'],
-            playerProps: ['shadow'],
+            gun: ['normal', 'inversed', 'bullet'],
+            mapBase: ['ground', 'wall'],
+            shadow: ['shadow'],
+            healthBar: ['healthBar0', 'healthBar1', 'healthBar2', 'healthBar3']
         }
 
         Object.keys(this.sprites).forEach(key => {
@@ -34,17 +35,17 @@ export class DrawingTools {
         })
 
         this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];
-
     }
 
     setSrc(src) {
+        if (!src) return;
         let image = new Image();
         image.src = src;
         return image;
     }
 
-    getModel(type, model) {
-        return this.sprites[type].find(el => el.name === model);
+    getModel(type) {
+        return this.sprites[type][0];
     }
 
     rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null, lineWidth = null, ghostSprite = null) {
@@ -61,7 +62,7 @@ export class DrawingTools {
             this.ctx.strokeStyle = color;
             this.ctx.lineWidth = lineWidth;
             this.ctx.stroke();
-        } 
+        }
         else {
             if (color === "handColor") {
                 this.ctx.fillStyle = this.playerSprite.handColor;
@@ -143,22 +144,34 @@ export class DrawingTools {
                 image = playerSpriteSet["RunBackLeft" + animationIndex];
                 break;
             case 'shadow':
-                image = this.getModel("playerProps", "shadow").shadow;
+                image = this.getModel("shadow").shadow;
+                break;
+            case 'healthBar0':
+                image = this.getModel("healthBar").healthBar0;
+                break;
+            case 'healthBar1':
+                image = this.getModel("healthBar").healthBar1;
+                break;
+            case 'healthBar2':
+                image = this.getModel("healthBar").healthBar2;
+                break;
+            case 'healthBar3':
+                image = this.getModel("healthBar").healthBar3;
                 break;
             case 'RL':
-                image = this.getModel("weapons", "gun").normal;
+                image = this.getModel("gun").normal;
                 break;
             case 'RLinv':
-                image = this.getModel("weapons", "gun").inversed;
+                image = this.getModel("gun").inversed;
                 break;
             case 'bullet':
-                image = this.getModel("weapons", "gun").bullet;
+                image = this.getModel("gun").bullet;
                 break;
             case 'ground':
-                image = this.getModel("map", "base").ground;
+                image = this.getModel("mapBase").ground;
                 break;
             case 'wall':
-                image = this.getModel("map", "base").wall;
+                image = this.getModel("mapBase").wall;
                 break;
         }
 

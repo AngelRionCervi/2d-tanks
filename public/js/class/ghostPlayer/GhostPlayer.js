@@ -31,6 +31,7 @@ export class GhostPlayer {
         this.runAnimationIndex = 0;
         this.idleAnimationIndex = 0;
         this.isMoving = false;
+        this.health = 3;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -94,6 +95,8 @@ export class GhostPlayer {
                 this.drawHand(ghostSprite);
             }
         }
+
+        this.drawHealthBar();
     }
 
     drawShadow() {
@@ -143,6 +146,36 @@ export class GhostPlayer {
 
         this.drawingTools.rect(this.x + 5 + xInc, this.y + 31 + yInc, 5, 5,
             this.centerX, this.centerY, -this.centerX, -this.centerY, -this.playerAngle, "black", true, 2);
+    }
+
+    drawHealthBar() {
+
+        let sprite;
+
+        switch (this.health) {
+            case 3:
+                sprite = "healthBar3";
+                break;
+            case 2:
+                sprite = "healthBar2";
+                break;
+            case 1:
+                sprite = "healthBar1";
+                break;
+            case 0:
+                sprite = "healthBar0";
+                break;
+        }
+
+        this.drawingTools.drawSprite(sprite, this.x + 2 , this.y - 12);
+    }
+
+    gotHit() {
+        this.health -= 1;
+        if (this.health <= 0) {
+            this.health = 0;
+            console.log("ghost dead")
+        }
     }
 
     getPlayerPos() {

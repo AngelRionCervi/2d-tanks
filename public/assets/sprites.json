@@ -7,13 +7,16 @@
         { "name": "solaire", "root": "player/solaire/", "handColor": "#5c5c5c" },
         { "name": "red", "root": "player/red/", "handColor": "#9c3333" }
     ],
-    "weapons": [
+    "gun": [
         { "name": "gun", "root": "weapons/gun/" }
     ],
-    "map": [
+    "mapBase": [
         { "name": "base", "root": "map/base/" }
     ],
-    "playerProps": [
+    "shadow": [
         { "name": "shadow", "root": "player/" }
+    ],
+    "healthBar": [
+        { "name": "healthBar", "root": "player/healthBar/" }
     ]
 }

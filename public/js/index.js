@@ -152,13 +152,17 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         ghosts.hits.forEach((hit) => {
             if (hit.shooterID === player.id && hit.targetID === player.id) {
-                console.log("you suicided :<")
+                console.log("you hit yourself :<")
+                player.gotHit();
             }
             else if (hit.shooterID === player.id) {
-                console.log("killed : " + hit.targetID);
+                console.log("hit : " + hit.targetID);
+                let ghost = ghostPlayers.find(el => el.id === hit.targetID);
+                ghost.entity.gotHit();
             }
             else if (hit.targetID === player.id) {
-                console.log("killed by : " + hit.shooterID);
+                console.log("hit by : " + hit.shooterID);
+                player.gotHit();
             }
 
             if (hit.shooterID === player.id) {
@@ -172,7 +176,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     })
 
     function removeMissile(id, type) {
-
         if (type === 'player') {
             playerShots = playerShots.filter(el => el.id !== id);
         } else {

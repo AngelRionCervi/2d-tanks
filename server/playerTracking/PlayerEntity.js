@@ -14,6 +14,7 @@ module.exports = class PlayerEntity {
         this.playerAngle = 0;
         this.vx = 0;
         this.vy = 0;
+        this.health = 3;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -126,4 +127,11 @@ module.exports = class PlayerEntity {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }  
     
+    gotHit() {
+        this.health -= 1;
+        if (this.health <= 0) {
+            console.log("player : " + this.id + " is dead");
+            this.health = 0;
+        }
+    }
 }

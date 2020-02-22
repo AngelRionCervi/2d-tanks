@@ -26,6 +26,7 @@ export class Player {
         this.curOnCanvas = false;
         this.diagonalSpeedDiviser = 1.3;
         this.maxConcurringMissiles = 3;
+        this.health = 3;
         this.rlPlayerDistance = 20;
         this.playerAnimationFrameDuration = perf === "normal" ? 7 : 14;
         this.runAnimationFrames = [
@@ -290,6 +291,8 @@ export class Player {
                 this.drawHand();
             }
         }
+
+        this.drawHealthBar();
     }
 
     drawShadow() {
@@ -339,6 +342,36 @@ export class Player {
 
         this.drawingTools.rect(this.x + 5 + xInc, this.y + 31 + yInc, 5, 5,
             this.centerX, this.centerY, -this.centerX, -this.centerY, -this.playerAngle, "black", true, 2);
+    }
+
+    drawHealthBar() {
+
+        let sprite;
+
+        switch (this.health) {
+            case 3:
+                sprite = "healthBar3";
+                break;
+            case 2:
+                sprite = "healthBar2";
+                break;
+            case 1:
+                sprite = "healthBar1";
+                break;
+            case 0:
+                sprite = "healthBar0";
+                break;
+        }
+
+        this.drawingTools.drawSprite(sprite, this.x + 2 , this.y - 12);
+    }
+
+    gotHit() {
+        this.health -= 1;
+        if (this.health <= 0) {
+            this.health = 0;
+            console.log("dead")
+        }
     }
 
     getPlayerPos() {
