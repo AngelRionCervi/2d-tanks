@@ -111,7 +111,8 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 let ghostObj = {
                     id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, perfProfile),
                     coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
-                    ,missiles: [], sprite: player.sprite};
+                    ,missiles: [], sprite: player.sprite
+                };
 
                 ghostPlayers.push(ghostObj);
 

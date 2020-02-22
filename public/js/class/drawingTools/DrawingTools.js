@@ -33,8 +33,6 @@ export class DrawingTools {
             })
         })
 
-        console.log(this.sprites)
-
         this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];
 
     }
@@ -49,7 +47,7 @@ export class DrawingTools {
         return this.sprites[type].find(el => el.name === model);
     }
 
-    rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null, lineWidth = null) {
+    rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null, lineWidth = null, ghostSprite = null) {
 
         this.ctx.save();
         this.ctx.beginPath();
@@ -63,9 +61,12 @@ export class DrawingTools {
             this.ctx.strokeStyle = color;
             this.ctx.lineWidth = lineWidth;
             this.ctx.stroke();
-        } else {
+        } 
+        else {
             if (color === "handColor") {
                 this.ctx.fillStyle = this.playerSprite.handColor;
+            } else if (color === "ghostColor") {
+                this.ctx.fillStyle = this.sprites.players.find(el => el.name === ghostSprite).handColor;
             } else {
                 this.ctx.fillStyle = color;
             }

@@ -294,7 +294,6 @@ export class Player {
 
     drawShadow() {
 
-
         this.drawingTools.drawSprite('shadow', this.x + 2, this.y + 2, this.centerX, this.centerY, -this.centerX, -this.centerY);
     }
 
