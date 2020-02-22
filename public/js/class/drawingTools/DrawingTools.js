@@ -45,6 +45,10 @@ export class DrawingTools {
         return image;
     }
 
+    getModel(type, model) {
+        return this.sprites[type].find(el => el.name === model);
+    }
+
     rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null, lineWidth = null) {
 
         this.ctx.save();
@@ -109,9 +113,6 @@ export class DrawingTools {
     drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null, animationIndex = null) {
 
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
-        let gunModel = this.sprites.weapons.find(el => el.name === "gun");
-        let mapModel = this.sprites.map.find(el => el.name === "base");
-        let shadowModel = this.sprites.playerProps.find(el => el.name === "shadow");
 
         let image;
 
@@ -141,22 +142,22 @@ export class DrawingTools {
                 image = playerSpriteSet["RunBackLeft" + animationIndex];
                 break;
             case 'shadow':
-                image = shadowModel.shadow;
+                image = this.getModel("playerProps", "shadow").shadow;
                 break;
             case 'RL':
-                image = gunModel.normal;
+                image = this.getModel("weapons", "gun").normal;
                 break;
             case 'RLinv':
-                image = gunModel.inversed;
+                image = this.getModel("weapons", "gun").inversed;
                 break;
             case 'bullet':
-                image = gunModel.bullet;
+                image = this.getModel("weapons", "gun").bullet;
                 break;
             case 'ground':
-                image = mapModel.ground;
+                image = this.getModel("map", "base").ground;
                 break;
             case 'wall':
-                image = mapModel.wall;
+                image = this.getModel("map", "base").wall;
                 break;
         }
 
