@@ -1,16 +1,19 @@
 {
     "players": [
-        { "name": "green", "root": "player/green/" },
-        { "name": "blue", "root": "player/blue/" },
-        { "name": "purple", "root": "player/purple/" },
-        { "name": "ninja", "root": "player/ninja/" },
-        { "name": "solaire", "root": "player/solaire/" },
-        { "name": "red", "root": "player/red/" }
+        { "name": "green", "root": "player/green/", "handColor": "#409e48" },
+        { "name": "blue", "root": "player/blue/", "handColor": "#5fc5d9" },
+        { "name": "purple", "root": "player/purple/", "handColor": "#71579c" },
+        { "name": "ninja", "root": "player/ninja/", "handColor": "#000000" },
+        { "name": "solaire", "root": "player/solaire/", "handColor": "#5c5c5c" },
+        { "name": "red", "root": "player/red/", "handColor": "#9c3333" }
     ],
     "weapons": [
         { "name": "gun", "root": "weapons/gun/" }
     ],
     "map": [
         { "name": "base", "root": "map/base/" }
+    ],
+    "playerProps": [
+        { "name": "shadow", "root": "player/" }
     ]
 }

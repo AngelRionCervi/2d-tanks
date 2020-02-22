@@ -4,9 +4,7 @@ export class DrawingTools {
         this.ctx = ctx;
         this.spritesJSON = spritesJSON;
 
-        console.log(this.playerAnimationFrames);
-
-        this.sprites = { players: [], weapons: [], map: [] };
+        this.sprites = { players: [], weapons: [], map: [], playerProps: []};
 
         this.parts = {
             players: [
@@ -19,12 +17,14 @@ export class DrawingTools {
             ],
             weapons: ['normal', 'inversed', 'bullet'],
             map: ['ground', 'wall'],
+            playerProps: ['shadow'],
         }
 
         Object.keys(this.sprites).forEach(key => {
             this.spritesJSON[key].forEach(type => {
                 let set = {};
                 set.name = type.name;
+                if (key === "players") set.handColor = type.handColor;
                 this.parts[key].forEach(part => {
                     let ext = part === "ground" ? ".jpg" : ".png";
                     set[part] = this.setSrc("/public/assets/sprites/" + type.root + part + ext);
@@ -33,7 +33,8 @@ export class DrawingTools {
             })
         })
 
-        /*this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];*/
+        console.log(this.sprites)
+
         this.playerSprite = this.sprites.players[Math.floor(Math.random() * this.sprites.players.length)];
 
     }
@@ -44,7 +45,7 @@ export class DrawingTools {
         return image;
     }
 
-    rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null) {
+    rect(rectX, rectY, rectW, rectH, trans1X, trans1Y, trans2X, trans2Y, angle, color, stroke = null, lineWidth = null) {
 
         this.ctx.save();
         this.ctx.beginPath();
@@ -56,9 +57,14 @@ export class DrawingTools {
 
         if (stroke) {
             this.ctx.strokeStyle = color;
+            this.ctx.lineWidth = lineWidth;
             this.ctx.stroke();
         } else {
-            this.ctx.fillStyle = color;
+            if (color === "handColor") {
+                this.ctx.fillStyle = this.playerSprite.handColor;
+            } else {
+                this.ctx.fillStyle = color;
+            }
             this.ctx.fill();
         }
 
@@ -105,7 +111,8 @@ export class DrawingTools {
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;
         let gunModel = this.sprites.weapons.find(el => el.name === "gun");
         let mapModel = this.sprites.map.find(el => el.name === "base");
-      
+        let shadowModel = this.sprites.playerProps.find(el => el.name === "shadow");
+
         let image;
 
         switch (spriteType) {
@@ -132,6 +139,9 @@ export class DrawingTools {
                 break;
             case 'playerRunBackLeft':
                 image = playerSpriteSet["RunBackLeft" + animationIndex];
+                break;
+            case 'shadow':
+                image = shadowModel.shadow;
                 break;
             case 'RL':
                 image = gunModel.normal;
