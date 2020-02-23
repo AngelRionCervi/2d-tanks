@@ -211,14 +211,14 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         let clientHits = [];
 
-        playerShots.forEach((missile, i, a) => {
+        playerShots.forEach((missile) => {
             if (!missile.vx && !missile.vy) {
                 missile.initDir();
             }
             missile.draw(deltaIncrease);
 
             if (missile.bounceCount > missile.maxBounce) {
-                a.splice(i, 1);
+                removeMissile(missile.id, "player");
             }
 
             ghostPlayers.forEach((ghost) => {
@@ -227,6 +227,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
                 if (ghostMissileColl) {
                     clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
+                    missile.hide = true;
                 }
             })
         })
@@ -245,7 +246,10 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             }
         })
 
-        if (clientHits.length > 0) sender.sendClientHits(clientHits);
+        if (clientHits.length > 0)  {
+            console.log(clientHits.length)
+            sender.sendClientHits(clientHits);
+        } 
 
         if (curPos) {
             let currentPlayerAngle = player.getPlayerAngle(curPos);

@@ -15,6 +15,7 @@ export class GhostMissile {
         this.missileLaunchOffset = 40;
         this.maxBounce = 1;
         this.bounceCount = 0;
+        this.hide = false;
     }
 
     set(missile) {
@@ -62,8 +63,11 @@ export class GhostMissile {
             this.x += this.vx * delta;
             this.y += this.vy * delta;
 
-            this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
-            this.x, this.y, -(this.x), -(this.y), -this.angle);
+            if (!this.hide) {
+                this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
+                this.x, this.y, -(this.x), -(this.y), -this.angle);
+            }
+            
         }
     }
 }

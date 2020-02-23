@@ -71,4 +71,9 @@ module.exports = class Missile {
         this.y = y;
         this.missileAngle = angle;
     }
+
+    updateDeltaPos(delta) {
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
+    }
 }

@@ -2,7 +2,9 @@ module.exports = function () {
 
     this.getKeyByValue = (object, value) => Object.keys(object).find(key => object[key] === value);
 
-    this.closest = (arr, nbr) => arr.sort((a, b) => Math.abs(nbr - a) - Math.abs(nbr - b))[0];
+    this.closest = (arr, nbr) => arr.reduce((prev, curr) => {
+        return (Math.abs(curr - nbr) < Math.abs(prev - nbr) ? curr : prev);
+    });
 
     Object.filter = (obj, predicate) =>
         Object.keys(obj)
