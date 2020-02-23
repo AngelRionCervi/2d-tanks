@@ -4,7 +4,7 @@ export class DrawingTools {
         this.ctx = ctx;
         this.spritesJSON = spritesJSON;
 
-        this.sprites = { players: [], gun: [], mapBase: [], shadow: [], healthBar: [] };
+        this.sprites = { players: [], gun: [], mapBase: [], shadow: [], healthBar: [], explosion: [] };
 
         this.parts = {
             players: [
@@ -18,7 +18,8 @@ export class DrawingTools {
             gun: ['normal', 'inversed', 'bullet'],
             mapBase: ['ground', 'wall'],
             shadow: ['shadow'],
-            healthBar: ['healthBar0', 'healthBar1', 'healthBar2', 'healthBar3']
+            healthBar: ['healthBar0', 'healthBar1', 'healthBar2', 'healthBar3'],
+            explosion: ['explosion0', 'explosion1', 'explosion2', 'explosion3']
         }
 
         Object.keys(this.sprites).forEach(key => {
@@ -157,6 +158,18 @@ export class DrawingTools {
                 break;
             case 'healthBar3':
                 image = this.getModel("healthBar").healthBar3;
+                break;
+            case 'explosion0':
+                image = this.getModel("explosion").explosion0;
+                break;
+            case 'explosion1':
+                image = this.getModel("explosion").explosion1;
+                break;
+            case 'explosion2':
+                image = this.getModel("explosion").explosion2;
+                break;
+            case 'explosion3':
+                image = this.getModel("explosion").explosion3;
                 break;
             case 'RL':
                 image = this.getModel("gun").normal;

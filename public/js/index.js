@@ -15,6 +15,7 @@ import { Keyboard } from "/public/js/class/keyboardHandling/Keyboard.js";
 import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.js";
 import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
 import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
+import { Explosion } from "./class/weapon/Explosion.js";
 
 let sprites;
 let perfProfile;
@@ -56,6 +57,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let curPos;
     let vel = [0, 0];
     let playerShots = [];
+    let explosions = [];
     let lastRun;
     let playerAngle;
 
@@ -128,7 +130,13 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                             coords: { x: newMissile.x, y: newMissile.y }, vx: 0, vy: 0, angle: newMissile.missileAngle, set: false
                         };
                         ghost.missiles.push(missileObj);
+
                     } else {
+                        ghost.missiles.forEach((missile) => {
+                            if (!player.missiles.map(e => e.id).includes(missile.id)) {
+                                explosions.push(new Explosion(missile.entity.x, missile.entity.y, missile.entity.id, drawingTools));
+                            }
+                        })
                         ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); //remove missile if the missile isnt in the session
                     }
                 }
@@ -219,15 +227,19 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
             if (missile.bounceCount > missile.maxBounce) {
                 removeMissile(missile.id, "player");
+                explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
             }
 
             ghostPlayers.forEach((ghost) => {
-                let ghostMissileColl = collisionDetector.playerMissileCollision({ x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.baseSizeY, height: ghost.entity.baseSizeY },
-                    { x: missile.x, y: missile.y, width: missile.width, height: missile.height });
+                let ghostMissileColl = collisionDetector.playerMissileCollision(
+                    { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.baseSizeY, height: ghost.entity.baseSizeY },
+                    { x: missile.x, y: missile.y, width: missile.width, height: missile.height }
+                    );
 
                 if (ghostMissileColl) {
                     clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
                     missile.hide = true;
+                    explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
                 }
             })
         })
@@ -239,24 +251,26 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                     if (!missile.set) { // once a initial pos and missile vels are set, its all front end, except if collision with player (server authority)
                         missile.entity.set(missile);
                         missile.set = true;
-                    } else {
+                    } 
+                    else {
                         missile.entity.update(deltaIncrease);
-
-                        let missileGhostColl = collisionDetector.playerMissileCollision( // hide ghost missile when it hits you
-                            { x: player.x, y: player.y, width: player.baseSizeY, height: player.baseSizeY },
-                            { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height }
-                            );
-
-                        if (missileGhostColl) {
-                            missile.entity.hide = true;
-                        }
                     }
                 })
             }
         })
 
+        explosions.forEach((explosion, i, a) => {
+            if (!explosion.started) {
+                explosion.started = true;
+            } else {
+                explosion.animate();
+                if (explosion.ended) {
+                    a.splice(i, 1);
+                }
+            }
+        })
+
         if (clientHits.length > 0)  {
-            console.log(clientHits.length)
             sender.sendClientHits(clientHits);
         } 
 

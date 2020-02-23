@@ -18,5 +18,8 @@
     ],
     "healthBar": [
         { "name": "healthBar", "root": "player/healthBar/" }
+    ],
+    "explosion": [
+        { "name": "explosion", "root": "weapons/explosion/" }
     ]
 }
