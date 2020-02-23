@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
         console.log('a user connected', socket.id, playerSprite);
         let newPlayer = {
             socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0,
-            entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite
+            entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite,
         };
         players.push(newPlayer);
     })
@@ -160,6 +160,7 @@ setInterval(() => {
         player.vx = player.entity.vx;
         player.vy = player.entity.vy;
         player.angle = player.entity.playerAngle;
+        player.health = player.entity.health;
 
         if (player.missiles.length > 0) {
             player.missiles.forEach((missile, i, a) => {

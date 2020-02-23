@@ -106,17 +106,16 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         }
 
         ghosts.ghostsData.forEach((player) => {
-
             if (!ghostPlayers.map(el => el.id).includes(player.id)) {
                 let ghostObj = {
                     id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, perfProfile),
                     coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
-                    ,missiles: [], sprite: player.sprite
+                    ,missiles: [], sprite: player.sprite, health: player.health
                 };
 
                 ghostPlayers.push(ghostObj);
-
-            } else {
+            } 
+            else {
                 let ghost = ghostPlayers.find(el => el.id === player.id);
 
                 if (player.missiles.length !== ghost.missiles.length) {
@@ -139,6 +138,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.vx = player.vx;
                 ghost.vy = player.vy;
                 ghost.playerAngle = player.angle;
+                ghost.entity.health = player.health;
 
                 ghost.missiles.forEach((missile, i) => {
                     missile.coords.x = player.missiles[i].coords.x;
@@ -241,6 +241,15 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                         missile.set = true;
                     } else {
                         missile.entity.update(deltaIncrease);
+
+                        let missileGhostColl = collisionDetector.playerMissileCollision( // hide ghost missile when it hits you
+                            { x: player.x, y: player.y, width: player.baseSizeY, height: player.baseSizeY },
+                            { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height }
+                            );
+
+                        if (missileGhostColl) {
+                            missile.entity.hide = true;
+                        }
                     }
                 })
             }

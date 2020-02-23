@@ -18,6 +18,7 @@ export class Missile {
         this.bounceCount = 0;
         this.maxBounce = 1;
         this.missileLaunchOffset = 40;
+        this.hide = false;
   
         this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
         this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;
@@ -76,8 +77,11 @@ export class Missile {
             this.x += this.vx * delta;
             this.y += this.vy * delta;
 
-            this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
-            this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
+            if (!this.hide) {
+                this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
+                this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
+            }
+            
         }
 
         /* missile hitbox
