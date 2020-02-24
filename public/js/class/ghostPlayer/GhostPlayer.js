@@ -154,16 +154,16 @@ export class GhostPlayer {
 
         switch (this.health) {
             case 3:
-                sprite = "healthBar3";
+                sprite = "healthBar_3";
                 break;
             case 2:
-                sprite = "healthBar2";
+                sprite = "healthBar_2";
                 break;
             case 1:
-                sprite = "healthBar1";
+                sprite = "healthBar_1";
                 break;
             case 0:
-                sprite = "healthBar0";
+                sprite = "healthBar_0";
                 break;
         }
 
@@ -174,7 +174,6 @@ export class GhostPlayer {
         this.health -= 1;
         if (this.health <= 0) {
             this.health = 0;
-            console.log("ghost dead")
         }
     }
 

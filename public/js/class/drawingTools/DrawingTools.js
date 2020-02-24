@@ -19,7 +19,7 @@ export class DrawingTools {
             mapBase: ['ground', 'wall'],
             shadow: ['shadow'],
             healthBar: ['healthBar0', 'healthBar1', 'healthBar2', 'healthBar3'],
-            explosion: ['explosion0', 'explosion1', 'explosion2', 'explosion3']
+            explosion: ['explosion0', 'explosion1', 'explosion2', 'explosion3', 'explosion4', 'explosion5', 'explosion6', 'explosion7', 'explosion8']
         }
 
         Object.keys(this.sprites).forEach(key => {
@@ -103,7 +103,6 @@ export class DrawingTools {
     }
 
     circ(centerX, centerY, radius, startAngle, endAngle, rev, color) {
-
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, radius, startAngle, endAngle, rev);
@@ -147,30 +146,6 @@ export class DrawingTools {
             case 'shadow':
                 image = this.getModel("shadow").shadow;
                 break;
-            case 'healthBar0':
-                image = this.getModel("healthBar").healthBar0;
-                break;
-            case 'healthBar1':
-                image = this.getModel("healthBar").healthBar1;
-                break;
-            case 'healthBar2':
-                image = this.getModel("healthBar").healthBar2;
-                break;
-            case 'healthBar3':
-                image = this.getModel("healthBar").healthBar3;
-                break;
-            case 'explosion0':
-                image = this.getModel("explosion").explosion0;
-                break;
-            case 'explosion1':
-                image = this.getModel("explosion").explosion1;
-                break;
-            case 'explosion2':
-                image = this.getModel("explosion").explosion2;
-                break;
-            case 'explosion3':
-                image = this.getModel("explosion").explosion3;
-                break;
             case 'RL':
                 image = this.getModel("gun").normal;
                 break;
@@ -186,6 +161,16 @@ export class DrawingTools {
             case 'wall':
                 image = this.getModel("mapBase").wall;
                 break;
+        }
+
+        if (spriteType.includes('explosion')) {
+            let explosionFrame = spriteType.split('_').pop();
+            image = this.getModel("explosion")["explosion" + explosionFrame];
+        }
+
+        if (spriteType.includes('healthBar')) {
+            let healBarNbr = spriteType.split('_').pop();
+            image = this.getModel("healthBar")["healthBar" + healBarNbr];
         }
 
         this.ctx.save();
