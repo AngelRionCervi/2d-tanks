@@ -16,7 +16,10 @@ export class DrawingTools {
                 'RunFrontLeft4', 'RunFrontRight4', 'RunBackLeft4', 'RunBackRight4',
             ],
             gun: ['normal', 'inversed', 'bullet'],
-            mapBase: ['ground', 'wall'],
+            mapBase: [
+                'ground1', 'ground2', 'ground3',
+                'wall'
+            ],
             shadow: ['shadow'],
             healthBar: ['healthBar0', 'healthBar1', 'healthBar2', 'healthBar3'],
             explosion: ['explosion0', 'explosion1', 'explosion2', 'explosion3', 'explosion4', 'explosion5', 'explosion6', 'explosion7', 'explosion8']
@@ -28,8 +31,7 @@ export class DrawingTools {
                 set.name = type.name;
                 if (key === "players") set.handColor = type.handColor;
                 this.parts[key].forEach(part => {
-                    let ext = part === "ground" ? ".jpg" : ".png";
-                    set[part] = this.setSrc("/public/assets/sprites/" + type.root + part + ext);
+                    set[part] = this.setSrc("/public/assets/sprites/" + type.root + part + ".png");
                 })
                 this.sprites[key].push(set);
             })
@@ -155,9 +157,6 @@ export class DrawingTools {
             case 'bullet':
                 image = this.getModel("gun").bullet;
                 break;
-            case 'ground':
-                image = this.getModel("mapBase").ground;
-                break;
             case 'wall':
                 image = this.getModel("mapBase").wall;
                 break;
@@ -171,6 +170,11 @@ export class DrawingTools {
         if (spriteType.includes('healthBar')) {
             let healBarNbr = spriteType.split('_').pop();
             image = this.getModel("healthBar")["healthBar" + healBarNbr];
+        }
+
+        if (spriteType.includes('ground')) {
+            let tileNbr = spriteType.split('_').pop();
+            image = this.getModel("mapBase")["ground" + tileNbr];
         }
 
         this.ctx.save();
