@@ -44,7 +44,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     })
     
     let drawingTools = new DrawingTools(gameCanvas, ctx, sprites);
-    let mapManager = new MapManager(gameCanvas, ctx, drawingTools);
+    let mapManager = new MapManager(gameCanvas, ctx, drawingTools, rndmInteger);
     let map = mapManager.getMap();
     let collisionDetector = new CollisionDetector(map)
     let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector, perfProfile);
@@ -246,7 +246,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             if (missile.bounceCount > missile.maxBounce) {
                 removeMissile(missile.id, "player");
                 explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
-                screenShake = new ScreenShake(ctx);
+                screenShake = new ScreenShake(rndmFloat);
             }
 
             ghostPlayers.forEach((ghost) => {
@@ -259,7 +259,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                     clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
                     missile.hide = true;
                     explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
-                    screenShake = new ScreenShake(ctx);
+                    screenShake = new ScreenShake(rndmFloat);
                 }
             })
         })

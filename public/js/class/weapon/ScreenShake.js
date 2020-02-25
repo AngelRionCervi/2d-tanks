@@ -1,11 +1,10 @@
 export class ScreenShake {
-    constructor() {
-
+    constructor(rndmFloat) {
         this.duration = 10;
         this.intensity = 2;
         this.elapsedFrames = 0;
         this.ended = false;
-        this.rndmFloat = (min, max) =>  Math.random() * (max - min) + min;
+        this.rndmFloat = rndmFloat;
     }
 
     preShake() {
