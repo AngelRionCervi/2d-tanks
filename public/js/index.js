@@ -16,6 +16,7 @@ import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.
 import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
 import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
 import { Explosion } from "./class/weapon/Explosion.js";
+import { ScreenShake } from "./class/weapon/ScreenSHake.js";
 
 let sprites;
 let perfProfile;
@@ -60,6 +61,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let explosions = [];
     let lastRun;
     let playerAngle;
+    let screenShake = false;
 
     let lastKey = { type: "", key: "" };
 
@@ -209,9 +211,25 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         lastRun = performance.now();
         let fps = 1 / delta;
 
-        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+        //ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+        let shakeX = 0;
+        let shakeY = 0;
 
-        mapManager.renderMap(map);
+        if (screenShake) {
+            let shake = screenShake.preShake();
+            shakeX = shake.dx;
+            shakeY = shake.dy;
+        }
+     
+        mapManager.renderMap(map, shakeX, shakeY);
+
+        if (screenShake) {
+            screenShake.postShake();
+            if (screenShake.ended) {
+                console.log('shake ended');
+                screenShake = false;
+            }
+        }
 
         player.draw(vel, deltaIncrease);
 
@@ -228,6 +246,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             if (missile.bounceCount > missile.maxBounce) {
                 removeMissile(missile.id, "player");
                 explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
+                screenShake = new ScreenShake(ctx);
             }
 
             ghostPlayers.forEach((ghost) => {
@@ -240,6 +259,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                     clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
                     missile.hide = true;
                     explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
+                    screenShake = new ScreenShake(ctx);
                 }
             })
         })
