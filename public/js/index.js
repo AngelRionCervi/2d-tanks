@@ -16,7 +16,7 @@ import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.
 import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
 import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
 import { Explosion } from "./class/weapon/Explosion.js";
-import { ScreenShake } from "./class/weapon/ScreenSHake.js";
+import { ScreenShake } from "./class/weapon/ScreenShake.js";
 
 let sprites;
 let perfProfile;
