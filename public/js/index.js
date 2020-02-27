@@ -64,6 +64,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let screenShake = false;
 
     let lastKey = { type: "", key: "" };
+    let roll = false;
 
 
     sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name);
@@ -84,19 +85,21 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
     document.addEventListener('keydown', (evt) => {
         if (lastKey.type !== evt.type || lastKey.key !== evt.key) {
-            vel = keyboard.getDirection(evt);
+            vel = keyboard.getKeys(evt);
             sender.sendKeys(player.id, vel);
             lastKey.type = evt.type;
             lastKey.key = evt.key;
+            roll = keyboard.getSpaceBar();
         }
     });
 
     document.addEventListener('keyup', (evt) => {
         if (lastKey.type !== evt.type || lastKey.key !== evt.key) {
-            vel = keyboard.getDirection(evt);
+            vel = keyboard.getKeys(evt);
             sender.sendKeys(player.id, vel);
             lastKey.type = evt.type;
             lastKey.key = evt.key;
+            roll = keyboard.getSpaceBar();
         }
     });
 
@@ -226,7 +229,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         if (screenShake) {
             screenShake.postShake();
             if (screenShake.ended) {
-                console.log('shake ended');
                 screenShake = false;
             }
         }
@@ -234,6 +236,8 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         player.draw(vel, deltaIncrease);
 
         if (curPos) player.drawAim(curPos, map);
+
+        if (roll && !player.rolling) player.rolling = true;
 
         let clientHits = [];
 
@@ -253,7 +257,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 let ghostMissileColl = collisionDetector.playerMissileCollision(
                     { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.baseSizeY, height: ghost.entity.baseSizeY },
                     { x: missile.x, y: missile.y, width: missile.width, height: missile.height }
-                    );
+                );
 
                 if (ghostMissileColl) {
                     clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })

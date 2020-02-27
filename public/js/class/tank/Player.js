@@ -42,6 +42,11 @@ export class Player {
         this.runAnimationIndex = 0;
         this.idleAnimationIndex = 0;
         this.isMoving = false;
+        this.rollDuration = 150;
+        this.rollIndex = 0;
+        this.rolling = false;
+        this.rollVel = { x: 0, y: 0 };
+        this.rollSpeedMult = 2;
 
         this.updCenters = () => {
             this.centerX = this.x + this.baseSizeX / 2;
@@ -62,7 +67,7 @@ export class Player {
 
     draw(vel, delta) {
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.baseSizeY);
-
+        
         let collVel = this.mapCollHandler(vel, isColl);
 
         if (collVel.velX && collVel.velY) {
@@ -72,14 +77,40 @@ export class Player {
 
         if (collVel.velX || collVel.velY) {
             this.isMoving = true;
-        } else {
+        } 
+        else {
             this.isMoving = false;
         }
 
-        this.x += collVel.velX * delta;
-        this.y += collVel.velY * delta;
-
+        let velX = collVel.velX * delta;
+        let velY = collVel.velY * delta;
+        
         this.updCenters();
+
+        if (this.rolling) {
+            if (this.rollVel.x === 0 && this.rollVel.y === 0) {
+                this.rollVel.x = velX;
+                this.rollVel.y = velY;
+            }
+            if (isColl.size > 0) {
+                
+                this.rolling = false;
+                this.rollIndex = 0;
+
+                this.rollVel.x = 0;
+                this.rollVel.y = 0;
+                //console.log("rolling ended col")
+            }  else {
+                this.roll();
+            }
+            
+            
+        } 
+        else {
+            this.x += velX;
+            this.y += velY;
+        }
+
         this.drawSprites();
     }
 
@@ -266,6 +297,25 @@ export class Player {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
+    roll() {
+        if (this.rollIndex < this.rollDuration) {
+            console.log(this.rollVel.x, this.rollVel.y)
+            this.x += this.rollVel.x*this.rollSpeedMult;
+            this.y += this.rollVel.y*this.rollSpeedMult;
+            
+            this.rollIndex++;
+        } 
+        else {
+            console.log("roll eneded")
+            this.rolling = false;
+            this.rollIndex = 0;
+            this.rollVel.x = 0;
+            this.rollVel.y = 0;
+        }
+
+        //console.log('rollllinn')
+    }
+
     drawSprites() {
 
         this.drawShadow();
@@ -363,7 +413,7 @@ export class Player {
                 break;
         }
 
-        this.drawingTools.drawSprite(sprite, this.x + 2 , this.y - 12);
+        this.drawingTools.drawSprite(sprite, this.x + 2, this.y - 12);
     }
 
     gotHit() {
