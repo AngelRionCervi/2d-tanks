@@ -1,5 +1,5 @@
 export class CollisionDetector {
-    constructor(map, player) {
+    constructor(map) {
         this.map = map;
         this.mapCollisionReduction = 5;
     }
@@ -11,7 +11,7 @@ export class CollisionDetector {
         let playerY = y;
         let collReduction = this.mapCollisionReduction;
 
-        let isColl = new Set();
+        let isColl = [];
 
         this.map.coords.forEach((v) => {
 
@@ -20,12 +20,14 @@ export class CollisionDetector {
                 || (playerY - size / 2 + collReduction > v.y && playerY - size / 2 + collReduction < v.y + v.h)) {
 
                 if (playerX - size / 2 <= v.x && playerX + size / 2 >= v.x) {
-
-                    isColl.add('left');
+     
+                    let leftCorrection = Math.abs(v.x - (playerX - size / 2) - size);
+                    if (isColl.length < 2) isColl.push({ type : "left", amount: leftCorrection });
 
                 } else if (playerX - size / 2 <= v.x + v.w && playerX + size / 2 >= v.x) {
 
-                    isColl.add('right');
+                    let rightCorrection = Math.abs((v.x + v.w) - (playerX - size / 2));
+                    if (isColl.length < 2) isColl.push({ type : "right", amount: rightCorrection });
 
                 }
             }
@@ -36,16 +38,19 @@ export class CollisionDetector {
 
                 if (playerY - size / 2 <= v.y && playerY + size / 2 >= v.y) {
 
-                    isColl.add('top');
+                    let topCorrection = Math.abs(v.y - (playerY - size / 2) - size);
+                    if (isColl.length < 2) isColl.push({ type : "top", amount: topCorrection });
 
                 } else if (playerY - size / 2 <= v.y + v.h && playerY + size / 2 >= v.y) {
 
-                    isColl.add('bottom');
+                    let bottomCorrection = Math.abs((v.y + v.h) - (playerY - size / 2));
+                    if (isColl.length < 2) isColl.push({ type : "bottom", amount: bottomCorrection });
 
                 }
             }
         })
 
+/*
         if (playerX + size / 2 > this.map.width) {
             isColl.add('left');
         } else if (playerX - size / 2 < 0) {
@@ -56,7 +61,7 @@ export class CollisionDetector {
             isColl.add('top');
         } else if (playerY - size / 2 < 0) {
             isColl.add('bottom');
-        }
+        }*/
 
         return isColl;
     }

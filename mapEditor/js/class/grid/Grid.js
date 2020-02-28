@@ -187,6 +187,7 @@ export class Grid {
         }
 
         // adds map limits;
+        
         stacked.push(
             { x: 0, y: 0, w: 1, h: this.canvas.width}, //bottom
             { x: 0, y: this.canvas.height, w: this.canvas.width, h: 1}, //top
@@ -194,21 +195,23 @@ export class Grid {
             { x: this.canvas.width, y: 0, w: 1, h: this.canvas.height} //left
         )
 
+        const uniq = new Set(stacked.map(e => JSON.stringify(e)));
+        const res = Array.from(uniq).map(e => JSON.parse(e));
 
-        return stacked;
+        return res;
     }
 
     debugBlocks(nMap) {
         console.log('nMap', nMap)
 
         let colliders = [];
-
+        /*
         nMap.forEach((v) => {
             colliders.push([{ type: 'yWall', x: v.x + this.colliderW, y: v.y, w: v.w - this.colliderW, h: this.colliderW }, //top
                 { type: 'yWall', x: v.x + this.colliderW, y: v.y + v.h - this.colliderW, w: v.w - this.colliderW, h: this.colliderW }, //bottom
                 { type: 'xWall', x: v.x, y: v.y, w: this.colliderW, h: v.h }, //left
                 { type: 'xWall', x: v.x + v.w - this.colliderW, y: v.y, w: this.colliderW, h: v.h }]); //right
-        })
+        })*/
 
         return colliders;
     }

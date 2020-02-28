@@ -114,6 +114,10 @@ export class DrawingTools {
         this.ctx.restore();
     }
 
+    debugCirc(x, y, r) {
+        this.circ(x, y, r, 0, Math.PI*180, false, "red");
+    }
+
     drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null, animationIndex = null) {
 
         let playerSpriteSet = ghostSprite ? this.sprites.players.find(el => el.name === ghostSprite) : this.playerSprite;

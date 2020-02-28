@@ -6,18 +6,18 @@ export class Player {
         this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.4;
-        this.baseSizeX = 32;
-        this.baseSizeY = 32;
-        this.canonSizeX = 28;
+        this.speed = 1.6;
+        this.size = 26;
+        this.spriteComp = 2;
+        this.canonSizeX = 26;
         this.canonSizeY = 32;
         this.aimWidth = 1;
         this.aimSize = 0;
         this.projectionSize = 200;
         this.aimColor = "black";
         this.projectionColor = "red";
-        this.centerX = this.x + this.baseSizeX / 2;
-        this.centerY = this.y + this.baseSizeY / 2;
+        this.centerX = this.x + this.size / 2 + this.spriteComp;
+        this.centerY = this.y + this.size / 2 + this.spriteComp;
         this.canonOffsetCenter = 5;
         this.turnVelX = 0;
         this.turnVelY = 0;
@@ -49,8 +49,9 @@ export class Player {
         this.rollSpeedMult = 2;
 
         this.updCenters = () => {
-            this.centerX = this.x + this.baseSizeX / 2;
-            this.centerY = this.y + this.baseSizeY / 2;
+            this.centerX = this.x + this.size / 2 + this.spriteComp;
+            this.centerY = this.y + this.size / 2 + this.spriteComp;
+            //this.drawingTools.debugCirc(this.centerX, this.centerY, 15)
         }
 
         this.uuidv4 = () => {
@@ -66,7 +67,7 @@ export class Player {
     }
 
     draw(vel, delta) {
-        let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.baseSizeY);
+        let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
         
         let collVel = this.mapCollHandler(vel, isColl);
 
@@ -235,53 +236,57 @@ export class Player {
         let velX = 0;
         let velY = 0;
 
-        if (isColl.size > 0) {
+        if (isColl.length > 0) {
 
             isColl.forEach((v, i, a) => {
 
-                if (v === 'left') {
+                if (v.type === 'left') {
+                    this.x -= v.amount;
                     if (vel[1] < 0) {
                         velY -= vel[0];
                         velX += vel[1];
                     } else {
                         velY -= vel[0];
-                        if (a.size === 1) {
+                        if (a.length === 1) {
                             velX = velX;
                         } else {
                             velX -= vel[1];
                         }
                     }
-                } else if (v === 'right') {
+                } else if (v.type === 'right') {
+                    this.x += v.amount;
                     if (vel[1] > 0) {
                         velY -= vel[0];
                         velX += vel[1];
                     } else {
                         velY -= vel[0];
-                        if (a.size === 1) {
+                        if (a.length === 1) {
                             velX = velX;
                         } else {
                             velX -= vel[1];
                         }
                     }
-                } else if (v === 'top') {
+                } else if (v.type === 'top') {
+                    this.y -= v.amount;
                     if (vel[0] > 0) {
                         velY -= vel[0];
                         velX += vel[1];
                     } else {
                         velX += vel[1];
-                        if (a.size === 1) {
+                        if (a.length === 1) {
                             velY = velY;
                         } else {
                             velY += vel[0];
                         }
                     }
-                } else if (v === 'bottom') {
+                } else if (v.type === 'bottom') {
+                    this.y += v.amount;
                     if (vel[0] < 0) {
                         velY -= vel[0];
                         velX += vel[1];
                     } else {
                         velX += vel[1];
-                        if (a.size === 1) {
+                        if (a.length === 1) {
                             velY = velY;
                         } else {
                             velY += vel[0];
@@ -432,7 +437,7 @@ export class Player {
     }
 
     getPlayerSpecs() {
-        return { baseSizeX: this.baseSizeX, baseSizeY: this.baseSizeY, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
+        return { baseSizeX: this.baseSizeX, baseSizeY: this.size, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
     }
 
 }

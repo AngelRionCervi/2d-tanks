@@ -5,13 +5,13 @@ export class GhostPlayer {
         this.drawingTools = drawingTools;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.4;
-        this.baseSizeX = 32;
-        this.baseSizeY = 32;
+        this.speed = 1.6;
+        this.size = 26;
+        this.spriteComp = 2;
         this.canonSizeX = 28;
         this.canonSizeY = 32;
-        this.centerX = this.x + this.baseSizeX / 2;
-        this.centerY = this.y + this.baseSizeY / 2;
+        this.centerX = this.x + this.size / 2 + this.spriteComp;
+        this.centerY = this.y + this.size / 2 + this.spriteComp;
         this.canonOffsetCenter = 5;
         this.playerAngle = -90 * Math.PI / 180;
         this.curOnCanvas = false;
@@ -34,8 +34,9 @@ export class GhostPlayer {
         this.health = 3;
 
         this.updCenters = () => {
-            this.centerX = this.x + this.baseSizeX / 2;
-            this.centerY = this.y + this.baseSizeY / 2;
+            this.centerX = this.x + this.size / 2 + this.spriteComp;
+            this.centerY = this.y + this.size / 2 + this.spriteComp;
+            this.drawingTools.debugCirc(this.centerX, this.centerY, 15)
         }
 
         this.id = id;
@@ -186,7 +187,7 @@ export class GhostPlayer {
     }
 
     getPlayerSpecs() {
-        return { baseSizeX: this.baseSizeX, baseSizeY: this.baseSizeY, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
+        return { baseSizeX: this.baseSizeX, baseSizeY: this.size, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
     }
 
 }
