@@ -154,11 +154,13 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.entity.health = player.health;
 
                 ghost.missiles.forEach((missile, i) => {
-                    missile.coords.x = player.missiles[i].coords.x;
-                    missile.coords.y = player.missiles[i].coords.y;
-                    missile.vx = player.missiles[i].vx;
-                    missile.vy = player.missiles[i].vy;
-                    missile.angle = player.missiles[i].angle;
+                    if (player.missiles[i]) {
+                        missile.coords.x = player.missiles[i].coords.x;
+                        missile.coords.y = player.missiles[i].coords.y;
+                        missile.vx = player.missiles[i].vx;
+                        missile.vy = player.missiles[i].vy;
+                        missile.angle = player.missiles[i].angle;
+                    }
                 })
             }
         })

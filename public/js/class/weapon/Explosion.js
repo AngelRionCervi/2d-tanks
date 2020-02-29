@@ -19,10 +19,9 @@ export class Explosion {
     animate() {
         if (this.index !== this.frames.length - 1) {
             let sprite = "explosion_" + this.frames[this.index];
-            this.drawingTools.drawSprite(sprite, this.x-this.size/2, this.y-this.size/2, this.centerX, this.centerY, -this.centerX, -this.centerY);
+            this.drawingTools.drawSprite(sprite, this.x-this.size/2, this.y-this.size/2);
         } else {
             this.ended = true;
-            console.log("explosion ended")
         }
         this.index++;
     }

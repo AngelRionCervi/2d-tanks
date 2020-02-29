@@ -64,6 +64,36 @@ export class Player {
 
         this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
         this.radToDeg = (rad) => rad * 180 / Math.PI;
+
+        this.getFacingDir = () => {
+            let degAngle = this.radToDeg(this.playerAngle);
+            let dir;
+            if (degAngle >= -22.5 && degAngle <= 22.5) {
+                dir = { x: 0, y: 1 };
+            }
+            if (degAngle >= 22.5 && degAngle <= 67.5) {
+                dir = { x: 1, y: 1 };
+            }
+            if (degAngle >= 67.5 && degAngle <= 112.5) {
+                dir = { x: 1, y: 0 };
+            }
+            if (degAngle >= 112.5 && degAngle <= 157.5) {
+                dir = { x: 1, y: -1 };
+            }
+            if (degAngle >= 157.5 || degAngle <= -157.5) {
+                dir = { x: 0, y: -1 };
+            }
+            if (degAngle >= -157.5 && degAngle <= -112.5) {
+                dir = { x: -1, y: -1 };
+            }
+            if (degAngle >= -112.5 && degAngle <= -67.5) {
+                dir = { x: -1, y: 0 };
+            }
+            if (degAngle >= -67.5 && degAngle <= -22.5) {
+                dir = { x: -1, y: 1 };
+            }
+            return dir;
+        }
     }
 
     draw(vel, delta) {
@@ -72,8 +102,8 @@ export class Player {
         let collVel = this.mapCollHandler(vel, isColl);
 
         if (collVel.velX && collVel.velY) {
-            collVel.velX = collVel.velX / this.diagonalSpeedDiviser;
-            collVel.velY = collVel.velY / this.diagonalSpeedDiviser;
+            collVel.velX /= this.diagonalSpeedDiviser;
+            collVel.velY /= this.diagonalSpeedDiviser;
         }
 
         if (collVel.velX || collVel.velY) {
@@ -85,33 +115,33 @@ export class Player {
 
         let velX = collVel.velX * delta;
         let velY = collVel.velY * delta;
-        
-        this.updCenters();
 
         if (this.rolling) {
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
-                this.rollVel.x = velX;
-                this.rollVel.y = velY;
-            }
-            if (isColl.size > 0) {
-                
-                this.rolling = false;
-                this.rollIndex = 0;
-
-                this.rollVel.x = 0;
-                this.rollVel.y = 0;
-                //console.log("rolling ended col")
-            }  else {
-                this.roll();
+                if (velX !== 0 || velY !== 0) {
+                    this.rollVel.x = velX;
+                    this.rollVel.y = velY;
+                } 
+                else if (velX === 0 && velY === 0) {
+                    console.log("roll no dir")
+                    let facingDir = this.getFacingDir();
+                    if (facingDir.x && facingDir.y) {
+                        facingDir.x /= this.diagonalSpeedDiviser;
+                        facingDir.y /= this.diagonalSpeedDiviser;
+                    }
+                    this.rollVel.x = facingDir.x * delta;
+                    this.rollVel.y = facingDir.y * delta;
+                }
             }
             
-            
+            this.roll(delta);
         } 
         else {
             this.x += velX;
             this.y += velY;
         }
 
+        this.updCenters();
         this.drawSprites();
     }
 
@@ -302,9 +332,10 @@ export class Player {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
-    roll() {
+    roll(delta) {
         if (this.rollIndex < this.rollDuration) {
             console.log(this.rollVel.x, this.rollVel.y)
+            
             this.x += this.rollVel.x*this.rollSpeedMult;
             this.y += this.rollVel.y*this.rollSpeedMult;
             
