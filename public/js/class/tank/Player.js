@@ -42,11 +42,12 @@ export class Player {
         this.runAnimationIndex = 0;
         this.idleAnimationIndex = 0;
         this.isMoving = false;
-        this.rollDuration = 150;
-        this.rollIndex = 0;
+        this.rollDuration = 1000;
+        this.rollElapsedMS = 0;
+        this.rollStartTime = 0;
         this.rolling = false;
         this.rollVel = { x: 0, y: 0 };
-        this.rollSpeedMult = 2;
+        this.rollSpeedMult = 1.6;
 
         this.updCenters = () => {
             this.centerX = this.x + this.size / 2 + this.spriteComp;
@@ -114,23 +115,24 @@ export class Player {
         }
 
         let velX = collVel.velX * delta;
-        let velY = collVel.velY * delta;
+        let velY = collVel.velY * delta; 
 
         if (this.rolling) {
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
-                if (velX !== 0 || velY !== 0) {
-                    this.rollVel.x = velX;
-                    this.rollVel.y = velY;
+                this.rollStartTime = Date.now();
+                if (collVel.velX !== 0 || collVel.velY !== 0) {
+                    this.rollVel.x = collVel.velX;
+                    this.rollVel.y = collVel.velY;
                 } 
-                else if (velX === 0 && velY === 0) {
+                else if (collVel.velX === 0 && collVel.velY === 0) {
                     console.log("roll no dir")
                     let facingDir = this.getFacingDir();
                     if (facingDir.x && facingDir.y) {
                         facingDir.x /= this.diagonalSpeedDiviser;
                         facingDir.y /= this.diagonalSpeedDiviser;
                     }
-                    this.rollVel.x = facingDir.x * delta;
-                    this.rollVel.y = facingDir.y * delta;
+                    this.rollVel.x = facingDir.x;
+                    this.rollVel.y = facingDir.y;
                 }
             }
             
@@ -333,18 +335,21 @@ export class Player {
     }
 
     roll(delta) {
-        if (this.rollIndex < this.rollDuration) {
-            console.log(this.rollVel.x, this.rollVel.y)
+        if (this.rollElapsedMS < this.rollDuration) {
             
-            this.x += this.rollVel.x*this.rollSpeedMult;
-            this.y += this.rollVel.y*this.rollSpeedMult;
+            let velX = this.rollVel.x * this.rollSpeedMult;
+            let velY = this.rollVel.y * this.rollSpeedMult;
+
+            this.x += velX * delta;
+            this.y += velY * delta;
             
-            this.rollIndex++;
+            this.rollElapsedMS = Date.now() - this.rollStartTime;
         } 
         else {
-            console.log("roll eneded")
+            console.log("roll ended")
             this.rolling = false;
-            this.rollIndex = 0;
+            this.rollElapsedMS = 0;
+            this.rollStartTime = 0;
             this.rollVel.x = 0;
             this.rollVel.y = 0;
         }
