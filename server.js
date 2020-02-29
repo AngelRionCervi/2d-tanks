@@ -121,19 +121,22 @@ setInterval(() => {
             let targetPlayer = snapshot.players.find(el => el.id === hit.targetID); //finds the targeted player;
             let shooterMissiles = getPlayer(hit.shooterID).missiles;
             let delta = Math.abs(closestSnapshotTime - hit.time);
-            
+
             if (delta <= maxMsLag) {
                 shooterMissiles.forEach((missile, i, a) => {
 
+                    delta /= 1000;
+                    delta++;
                     missile.entity.updateDeltaPos(delta); 
                     /* clients and server do not run at the same speed, so we need to adjsut the position of the missile based on the difference between 
-                    the time at which player shot the missile and the time at which the snapsho has been taken */
+                    the time at which player shot the missile and the time at which the snapshot has been taken */
                     missile.coords.x = missile.entity.x;
                     missile.coords.y = missile.entity.y;
 
-                    let missilePlayerColl = collisionDetector.playerMissileCollision({
-                        x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.baseSizeY, height: targetPlayer.entity.baseSizeY
-                    }, { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height });
+                    let missilePlayerColl = collisionDetector.playerMissileCollision(
+                        { x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.size, height: targetPlayer.entity.size}, 
+                        { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height }
+                    );
 
                     if (missilePlayerColl) {
                         confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });

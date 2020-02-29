@@ -36,7 +36,7 @@ export class GhostPlayer {
         this.updCenters = () => {
             this.centerX = this.x + this.size / 2 + this.spriteComp;
             this.centerY = this.y + this.size / 2 + this.spriteComp;
-            this.drawingTools.debugCirc(this.centerX, this.centerY, 15)
+            //this.drawingTools.debugCirc(this.centerX, this.centerY, 15)
         }
 
         this.id = id;

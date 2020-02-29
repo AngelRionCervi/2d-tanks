@@ -8,8 +8,8 @@ module.exports = class Missile {
         this.collisionDetector = collisionDetector;
         this.vx;
         this.vy;
-        this.width = 4*2;
-        this.height = 6*2;
+        this.width = 4 * 2;
+        this.height = 6 * 2;
         this.x = playerPos.x;
         this.y = playerPos.y;
         this.radius = 6;
@@ -31,15 +31,15 @@ module.exports = class Missile {
 
     updatePos() {
 
-        let hitX = this.x-this.width/2;
-        let hitY = this.y-this.height/2+9;
+        let hitX = this.x - this.width / 2;
+        let hitY = this.y - this.height / 2 + 9;
 
         let coll = this.collisionDetector.mapMissileCollision(hitX, hitY, 6);
 
         if (coll) this.bounceCount++;
 
         if (this.bounceCount <= 1) {
-            
+
             if (coll === "left") {
                 this.x--;
                 this.vx = -this.vx;

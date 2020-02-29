@@ -255,12 +255,12 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
             ghostPlayers.forEach((ghost) => {
                 let ghostMissileColl = collisionDetector.playerMissileCollision(
-                    { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.baseSizeY, height: ghost.entity.baseSizeY },
+                    { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.size, height: ghost.entity.size },
                     { x: missile.x, y: missile.y, width: missile.width, height: missile.height }
                 );
 
                 if (ghostMissileColl) {
-                    clientHits.push({ shooterID: player.id, targetID: ghost.id, time: Date.now() })
+                    clientHits.push({ missileID: missile.id, shooterID: player.id, targetID: ghost.id, time: Date.now() })
                     missile.hide = true;
                     explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
                     screenShake = new ScreenShake(rndmFloat);
@@ -293,7 +293,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 }
             }
         })
-
+        
         if (clientHits.length > 0)  {
             sender.sendClientHits(clientHits);
         } 
