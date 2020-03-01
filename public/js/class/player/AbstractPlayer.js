@@ -6,7 +6,6 @@ export class AbstractPlayer {
         this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
-        this.id = id;
         this.speed = 1.4;
         this.size = 26;
         this.rollingAccel = 0.015;
@@ -56,10 +55,11 @@ export class AbstractPlayer {
         this.rollStartTime = 0;
         this.rolling = false;
         this.rollVel = { x: 0, y: 0 };
-        this.rollSpeedMult = 1.6;
+        this.rollSpeedMult = 2;
         this.vx = 0;
         this.vy = 0;
-        this.id = this.id ? this.id : this.uuidv4();
+        this.addedRollVel = { x: 0, y: 0 };
+        this.id = id ? id : this.uuidv4();
     }
 
     uuidv4() {
@@ -97,6 +97,140 @@ export class AbstractPlayer {
         }
 
         return dir;
+    }
+
+    accelerate(vx, vy) {
+
+        let accel = this.rolling ? this.rollingAccel : this.accel
+        let maxAccel = this.rolling ? this.maxRollingAccel : this.maxAccel
+        let decelerationMult = this.rolling ? this.rollingDecelerationMult : this.decelerationMult;
+
+        if (vx > 0) {
+            if (this.buildedAccelX < maxAccel) this.buildedAccelX += accel;
+        } else if (vx < 0) {
+            if (this.buildedAccelX > -maxAccel) this.buildedAccelX -= accel;
+        }
+
+        if (vy > 0) {
+            if (this.buildedAccelY < maxAccel) this.buildedAccelY += accel;
+        } else if (vy < 0) {
+            if (this.buildedAccelY > -maxAccel) this.buildedAccelY -= accel;
+        }
+
+        if (vx === 0) {
+            if (this.buildedAccelX > 0) {
+                this.buildedAccelX -= accel * decelerationMult;
+            } else if (this.buildedAccelX < 0) {
+                this.buildedAccelX += accel * decelerationMult;
+            }
+        }
+
+        if (vy === 0) {
+            if (this.buildedAccelY > 0) {
+                this.buildedAccelY -= accel * decelerationMult;
+            } else if (this.buildedAccelY < 0) {
+                this.buildedAccelY += accel * decelerationMult;
+            }
+        }
+
+       
+        this.buildedAccelX = roundTo(this.buildedAccelX, 3);
+        this.buildedAccelY = roundTo(this.buildedAccelY, 3);
+
+        if (Math.abs(this.buildedAccelX) < this.accel) this.buildedAccelX = 0;
+        if (Math.abs(this.buildedAccelY) < this.accel) this.buildedAccelY = 0;
+
+        /*
+        if (this.buildedAccelX !== 0 || this.buildedAccelY !== 0) {
+            console.log(this.buildedAccelX, this.buildedAccelY)
+        }*/
+    }
+
+
+    roll() {
+        if (this.rollElapsedMS < this.rollDuration) {
+            this.vx = this.rollVel.x * this.rollSpeedMult;
+            this.vy = this.rollVel.y * this.rollSpeedMult;
+            this.rollElapsedMS = Date.now() - this.rollStartTime;
+        }
+        else {
+            this.rolling = false;
+            this.rollElapsedMS = 0;
+            this.rollStartTime = 0;
+            this.rollVel.x = 0;
+            this.rollVel.y = 0;
+        }
+    }
+
+    mapCollHandler(vel, isColl) {
+
+        let velX = 0;
+        let velY = 0;
+
+        if (isColl.length > 0) {
+
+            isColl.forEach((v, i, a) => {
+
+                if (v.type === 'left') {
+                    this.x -= v.amount;
+                    if (vel[1] < 0) {
+                        velY -= vel[0];
+                        velX += vel[1];
+                    } else {
+                        velY -= vel[0];
+                        if (a.length === 1) {
+                            velX = velX;
+                        } else {
+                            velX -= vel[1];
+                        }
+                    }
+                } else if (v.type === 'right') {
+                    this.x += v.amount;
+                    if (vel[1] > 0) {
+                        velY -= vel[0];
+                        velX += vel[1];
+                    } else {
+                        velY -= vel[0];
+                        if (a.length === 1) {
+                            velX = velX;
+                        } else {
+                            velX -= vel[1];
+                        }
+                    }
+                } else if (v.type === 'top') {
+                    this.y -= v.amount;
+                    if (vel[0] > 0) {
+                        velY -= vel[0];
+                        velX += vel[1];
+                    } else {
+                        velX += vel[1];
+                        if (a.length === 1) {
+                            velY = velY;
+                        } else {
+                            velY += vel[0];
+                        }
+                    }
+                } else if (v.type === 'bottom') {
+                    this.y += v.amount;
+                    if (vel[0] < 0) {
+                        velY -= vel[0];
+                        velX += vel[1];
+                    } else {
+                        velX += vel[1];
+                        if (a.length === 1) {
+                            velY = velY;
+                        } else {
+                            velY += vel[0];
+                        }
+                    }
+                }
+            })
+        } else {
+            velY -= vel[0];
+            velX += vel[1];
+        }
+
+        return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
     radToDeg(rad) {

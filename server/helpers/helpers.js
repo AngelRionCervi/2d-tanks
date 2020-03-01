@@ -10,4 +10,6 @@ module.exports = function () {
         Object.keys(obj)
             .filter(key => predicate(obj[key]))
             .reduce((res, key) => (res[key] = obj[key], res), {});
+
+    this.roundTo = (num, places) => +(Math.round(num + "e+" + places)  + "e-" + places);
 }

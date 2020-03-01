@@ -32,6 +32,6 @@ export class AbstractProjectile {
             );
         }
 
-        this.id = this.id ? this.id : this.uuidv4();
+        this.id = id ? id : this.uuidv4();
     }
 }

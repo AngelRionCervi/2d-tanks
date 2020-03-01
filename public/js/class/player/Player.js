@@ -7,7 +7,6 @@ export class Player extends AbstractPlayer {
 
     draw(vel, delta) {
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
-
         let collVel = this.mapCollHandler(vel, isColl);
 
         if (collVel.velX && collVel.velY) {
@@ -29,10 +28,13 @@ export class Player extends AbstractPlayer {
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now();
-                if (this.vx !== 0 || this.vy !== 0) {
+                if (this.vx === 0 && this.vy === 0) {
+                    this.rolling = false;
+                } 
+                else if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
-                }
+                }/*
                 else if (this.vx === 0 && this.vy === 0) {
                     console.log("roll no dir")
                     let facingDir = this.getFacingDir();
@@ -42,7 +44,7 @@ export class Player extends AbstractPlayer {
                     }
                     this.rollVel.x = facingDir.x;
                     this.rollVel.y = facingDir.y;
-                }
+                }*/
             }
             this.roll();
         }
@@ -50,8 +52,11 @@ export class Player extends AbstractPlayer {
             this.accelerate(this.vx, this.vy);
         }
 
-        this.x += this.vx * delta + this.buildedAccelX;
-        this.y += this.vy * delta + this.buildedAccelY;
+        let fVelX = this.vx * delta + this.buildedAccelX;
+        let fVelY = this.vy * delta + this.buildedAccelY;
+
+        this.x += fVelX;
+        this.y += fVelY;
 
         this.updCenters();
         this.drawSprites();
@@ -173,139 +178,6 @@ export class Player extends AbstractPlayer {
         else {
             
             return false;
-        }
-    }
-
-
-    mapCollHandler(vel, isColl) {
-
-        let velX = 0;
-        let velY = 0;
-
-        if (isColl.length > 0) {
-
-            isColl.forEach((v, i, a) => {
-
-                if (v.type === 'left') {
-                    this.x -= v.amount;
-                    if (vel[1] < 0) {
-                        velY -= vel[0];
-                        velX += vel[1];
-                    } else {
-                        velY -= vel[0];
-                        if (a.length === 1) {
-                            velX = velX;
-                        } else {
-                            velX -= vel[1];
-                        }
-                    }
-                } else if (v.type === 'right') {
-                    this.x += v.amount;
-                    if (vel[1] > 0) {
-                        velY -= vel[0];
-                        velX += vel[1];
-                    } else {
-                        velY -= vel[0];
-                        if (a.length === 1) {
-                            velX = velX;
-                        } else {
-                            velX -= vel[1];
-                        }
-                    }
-                } else if (v.type === 'top') {
-                    this.y -= v.amount;
-                    if (vel[0] > 0) {
-                        velY -= vel[0];
-                        velX += vel[1];
-                    } else {
-                        velX += vel[1];
-                        if (a.length === 1) {
-                            velY = velY;
-                        } else {
-                            velY += vel[0];
-                        }
-                    }
-                } else if (v.type === 'bottom') {
-                    this.y += v.amount;
-                    if (vel[0] < 0) {
-                        velY -= vel[0];
-                        velX += vel[1];
-                    } else {
-                        velX += vel[1];
-                        if (a.length === 1) {
-                            velY = velY;
-                        } else {
-                            velY += vel[0];
-                        }
-                    }
-                }
-            })
-        } else {
-            velY -= vel[0];
-            velX += vel[1];
-        }
-
-        return { velX: velX * this.speed, velY: velY * this.speed };
-    }
-
-
-    accelerate(vx, vy) {
-
-        let accel = this.rolling ? this.rollingAccel : this.accel
-        let maxAccel = this.rolling ? this.maxRollingAccel : this.maxAccel
-        let decelerationMult = this.rolling ? this.rollingDecelerationMult : this.decelerationMult;
-
-        if (vx > 0) {
-            if (this.buildedAccelX < maxAccel) this.buildedAccelX += accel;
-        } else if (vx < 0) {
-            if (this.buildedAccelX > -maxAccel) this.buildedAccelX -= accel;
-        }
-
-        if (vy > 0) {
-            if (this.buildedAccelY < maxAccel) this.buildedAccelY += accel;
-        } else if (vy < 0) {
-            if (this.buildedAccelY > -maxAccel) this.buildedAccelY -= accel;
-        }
-
-        if (vx === 0) {
-            if (this.buildedAccelX > 0) {
-                this.buildedAccelX -= accel * decelerationMult;
-            } else if (this.buildedAccelX < 0) {
-                this.buildedAccelX += accel * decelerationMult;
-            }
-        }
-
-        if (vy === 0) {
-            if (this.buildedAccelY > 0) {
-                this.buildedAccelY -= accel * decelerationMult;
-            } else if (this.buildedAccelY < 0) {
-                this.buildedAccelY += accel * decelerationMult;
-            }
-        }
-       
-        this.buildedAccelX = roundTo(this.buildedAccelX, 3);
-        this.buildedAccelY = roundTo(this.buildedAccelY, 3);
-
-        /*
-        if (this.buildedAccelX !== 0 || this.buildedAccelY !== 0) {
-            console.log(this.buildedAccelX, this.buildedAccelY)
-        }*/
-    }
-
-
-    roll() {
-        if (this.rollElapsedMS < this.rollDuration) {
-            this.vx = this.rollVel.x * this.rollSpeedMult;
-            this.vy = this.rollVel.y * this.rollSpeedMult;
-            this.rollElapsedMS = Date.now() - this.rollStartTime;
-        }
-        else {
-            console.log("roll ended")
-            this.rolling = false;
-            this.rollElapsedMS = 0;
-            this.rollStartTime = 0;
-            this.rollVel.x = 0;
-            this.rollVel.y = 0;
         }
     }
 

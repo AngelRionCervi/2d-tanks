@@ -65,6 +65,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
     let lastKey = { type: "", key: "" };
     let roll = false;
+    let rollKeyUp = true;
 
 
     sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name);
@@ -90,6 +91,10 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             lastKey.type = evt.type;
             lastKey.key = evt.key;
             roll = keyboard.getSpaceBar();
+            if (roll) {
+                console.log("sending rolls to oblivion")
+                sender.sendRoll(player.id, roll);
+            } 
         }
     });
 
@@ -115,9 +120,9 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         ghosts.ghostsData.forEach((player) => {
             if (!ghostPlayers.map(el => el.id).includes(player.id)) {
                 let ghostObj = {
-                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, player.coords.x, player.coords.y),
-                    coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
-                    ,missiles: [], sprite: player.sprite, health: player.health
+                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, collisionDetector, player.coords.x, player.coords.y),
+                    coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle,
+                    missiles: [], sprite: player.sprite, health: player.health, rolling: player.rolling
                 };
 
                 ghostPlayers.push(ghostObj);
@@ -152,6 +157,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.vy = player.vy;
                 ghost.playerAngle = player.angle;
                 ghost.entity.health = player.health;
+                ghost.entity.rolling = player.rolling;
 
                 ghost.missiles.forEach((missile, i) => {
                     if (player.missiles[i]) {
@@ -239,7 +245,10 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         if (curPos) player.drawAim(curPos, map);
 
-        if (roll && !player.rolling) player.rolling = true;
+        if (roll && !player.rolling){
+            player.rolling = true;
+            roll = false;
+        } 
 
         let clientHits = [];
 

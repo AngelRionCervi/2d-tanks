@@ -13,6 +13,11 @@ export class Sender {
         this.socket.emit('keys', {keys: keys, id: id});
     }
 
+    sendRoll(id, roll) {
+
+        this.socket.emit('roll', {rolling: roll, id: id});
+    }
+
     sendMissileInit(id, missile) {
 
         this.socket.emit('missileInit', id, missile);

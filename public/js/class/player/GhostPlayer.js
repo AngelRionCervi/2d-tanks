@@ -1,8 +1,8 @@
 import { AbstractPlayer } from "./AbstractPlayer.js";
 
 export class GhostPlayer extends AbstractPlayer {
-    constructor(canvas, ctx, drawingTools, id, x, y) {
-        super(canvas, ctx, drawingTools, id);
+    constructor(canvas, ctx, drawingTools, id, collisionDetector, x, y) {
+        super(canvas, ctx, drawingTools, id, collisionDetector);
         this.setPos(x, y)
     }
 
@@ -12,8 +12,8 @@ export class GhostPlayer extends AbstractPlayer {
     }
 
     update(ghost, delta) {
-
-        if (this.vx !== ghost.vx && this.vy !== ghost.vx) {
+        
+        if (this.vx !== ghost.vx && this.vy !== ghost.vy && !this.rolling) {
             this.x = ghost.coords.x;
             this.y = ghost.coords.y;
         }
@@ -27,8 +27,47 @@ export class GhostPlayer extends AbstractPlayer {
         if (this.vx !== ghost.vx) this.vx = ghost.vx;
         if (this.vy !== ghost.vy) this.vy = ghost.vy;
 
-        this.x += this.vx * delta;
-        this.y += this.vy * delta;
+        let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
+        this.mapCollHandler([this.vy, this.vx], isColl);
+        
+        if (this.rolling) {
+            this.accelerate(this.rollVel.x, this.rollVel.y);
+            if (this.rollVel.x === 0 && this.rollVel.y === 0) {
+                this.rollStartTime = Date.now();
+                if (this.vx === 0 && this.vy === 0) {
+                    this.rolling = false;
+                } 
+                else if (this.vx !== 0 || this.vy !== 0) {
+                    this.rollVel.x = this.vx;
+                    this.rollVel.y = this.vy;
+                }/*
+                else if (this.vx === 0 && this.vy === 0) {
+                    console.log("roll no dir")
+                    let facingDir = this.getFacingDir();
+                    if (facingDir.x && facingDir.y) {
+                        facingDir.x /= this.diagonalSpeedDiviser;
+                        facingDir.y /= this.diagonalSpeedDiviser;
+                    }
+                    this.rollVel.x = facingDir.x;
+                    this.rollVel.y = facingDir.y;
+                }*/
+            }
+            this.roll();
+        }
+        else {
+            this.accelerate(this.vx, this.vy);
+        }
+
+        let fVelX = this.vx * delta + this.buildedAccelX;
+        let fVelY = this.vy * delta + this.buildedAccelY;
+
+        this.x += fVelX;
+        this.y += fVelY;
+
+        if (fVelX !== 0 || fVelY !== 0) {
+            //console.log(this.x, this.y)
+            console.log(fVelX, fVelY)
+        }
 
         this.playerAngle = ghost.playerAngle;
 

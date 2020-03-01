@@ -2,8 +2,16 @@ module.exports = class PlayerEntity {
     constructor(id, spawnPos, collisionDetector) {
         this.id = id;
         this.collisionDetector = collisionDetector;
-        this.speed = 1.6;
+        this.speed = 1.4;
         this.size = 26;
+        this.rollingAccel = 0.015;
+        this.accel = 0.005;
+        this.maxAccel = 0.2;
+        this.maxRollingAccel = 0.3;
+        this.decelerationMult = 1;
+        this.rollingDecelerationMult = 0.8;
+        this.buildedAccelX = 0;
+        this.buildedAccelY = 0;
         this.spriteComp = 2;
         this.centerX = this.x + this.size / 2 + this.spriteComp;
         this.centerY = this.y + this.size / 2 + this.spriteComp;
@@ -15,12 +23,53 @@ module.exports = class PlayerEntity {
         this.vx = 0;
         this.vy = 0;
         this.health = 3;
+        this.rollDuration = 300;
+        this.rollElapsedMS = 0;
+        this.rollStartTime = 0;
+        this.rolling = false;
+        this.rollVel = { x: 0, y: 0 };
+        this.rollSpeedMult = 2;
+        this.addedRollVel = { x: 0, y: 0 };
 
         this.updCenters = () => {
             this.centerX = this.x + this.size / 2 + this.spriteComp;
             this.centerY = this.y + this.size / 2 + this.spriteComp;
         }
+    }
 
+    radToDeg(rad) {
+        return rad * 180 / Math.PI;
+    } 
+
+    getFacingDir() {
+        let degAngle = this.radToDeg(this.playerAngle);
+        let dir;
+        if (degAngle >= -22.5 && degAngle <= 22.5) {
+            dir = { x: 0, y: 1 };
+        }
+        if (degAngle >= 22.5 && degAngle <= 67.5) {
+            dir = { x: 1, y: 1 };
+        }
+        if (degAngle >= 67.5 && degAngle <= 112.5) {
+            dir = { x: 1, y: 0 };
+        }
+        if (degAngle >= 112.5 && degAngle <= 157.5) {
+            dir = { x: 1, y: -1 };
+        }
+        if (degAngle >= 157.5 || degAngle <= -157.5) {
+            dir = { x: 0, y: -1 };
+        }
+        if (degAngle >= -157.5 && degAngle <= -112.5) {
+            dir = { x: -1, y: -1 };
+        }
+        if (degAngle >= -112.5 && degAngle <= -67.5) {
+            dir = { x: -1, y: 0 };
+        }
+        if (degAngle >= -67.5 && degAngle <= -22.5) {
+            dir = { x: -1, y: 1 };
+        }
+
+        return dir;
     }
 
     updateKeys(playerKeys) {
@@ -45,11 +94,56 @@ module.exports = class PlayerEntity {
             collVel.velX = collVel.velX / this.diagonalSpeedDiviser;
             collVel.velY = collVel.velY / this.diagonalSpeedDiviser;
         }
+
         this.vx = collVel.velX;
         this.vy = collVel.velY;
 
-        this.x += collVel.velX;
-        this.y += collVel.velY;
+        if (this.rolling) {
+            console.log("server rolllling")
+            this.accelerate(this.rollVel.x, this.rollVel.y);
+            if (this.rollVel.x === 0 && this.rollVel.y === 0) {
+                this.rollStartTime = Date.now();
+                if (this.vx === 0 && this.vy === 0) {
+                    this.rolling = false;
+                } 
+                else if (this.vx !== 0 || this.vy !== 0) {
+                    this.rollVel.x = this.vx;
+                    this.rollVel.y = this.vy;
+                }/*
+                else if (this.vx === 0 && this.vy === 0) {
+                    console.log("roll no dir")
+                    let facingDir = this.getFacingDir();
+                    if (facingDir.x && facingDir.y) {
+                        facingDir.x /= this.diagonalSpeedDiviser;
+                        facingDir.y /= this.diagonalSpeedDiviser;
+                    }
+                    this.rollVel.x = facingDir.x;
+                    this.rollVel.y = facingDir.y;
+                }*/
+            }
+            this.roll();
+        }
+        else {
+            this.accelerate(this.vx, this.vy);
+        }
+
+        let fVelX;
+        let fVelY;
+
+        if (this.rolling) {
+            fVelX = this.addedRollVel.x + this.buildedAccelX;
+            fVelY = this.addedRollVel.y + this.buildedAccelY;
+        } else {
+            fVelX = this.vx + this.buildedAccelX;
+            fVelY = this.vy + this.buildedAccelY;
+        }
+/*
+        if (fVelX !== 0 || fVelY !== 0) {
+            console.log(this.x, this.y)
+        }*/
+
+        this.x += fVelX;
+        this.y += fVelY;
 
         this.updCenters();
 
@@ -131,6 +225,71 @@ module.exports = class PlayerEntity {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
+    accelerate(vx, vy) {
+
+        let accel = this.rolling ? this.rollingAccel : this.accel
+        let maxAccel = this.rolling ? this.maxRollingAccel : this.maxAccel
+        let decelerationMult = this.rolling ? this.rollingDecelerationMult : this.decelerationMult;
+
+        if (vx > 0) {
+            if (this.buildedAccelX < maxAccel) this.buildedAccelX += accel;
+        } else if (vx < 0) {
+            if (this.buildedAccelX > -maxAccel) this.buildedAccelX -= accel;
+        }
+
+        if (vy > 0) {
+            if (this.buildedAccelY < maxAccel) this.buildedAccelY += accel;
+        } else if (vy < 0) {
+            if (this.buildedAccelY > -maxAccel) this.buildedAccelY -= accel;
+        }
+
+        if (vx === 0) {
+            if (this.buildedAccelX > 0) {
+                this.buildedAccelX -= accel * decelerationMult;
+            } else if (this.buildedAccelX < 0) {
+                this.buildedAccelX += accel * decelerationMult;
+            }
+        }
+
+        if (vy === 0) {
+            if (this.buildedAccelY > 0) {
+                this.buildedAccelY -= accel * decelerationMult;
+            } else if (this.buildedAccelY < 0) {
+                this.buildedAccelY += accel * decelerationMult;
+            }
+        }
+
+       
+        this.buildedAccelX = roundTo(this.buildedAccelX, 3);
+        this.buildedAccelY = roundTo(this.buildedAccelY, 3);
+
+        if (Math.abs(this.buildedAccelX) < this.accel) this.buildedAccelX = 0;
+        if (Math.abs(this.buildedAccelY) < this.accel) this.buildedAccelY = 0;
+
+        /*
+        if (this.buildedAccelX !== 0 || this.buildedAccelY !== 0) {
+            console.log(this.buildedAccelX, this.buildedAccelY)
+        }*/
+    }
+
+
+    roll() {
+        if (this.rollElapsedMS < this.rollDuration) {
+            this.addedRollVel.x = this.rollVel.x * this.rollSpeedMult;
+            this.addedRollVel.y = this.rollVel.y * this.rollSpeedMult;
+            this.rollElapsedMS = Date.now() - this.rollStartTime;
+        }
+        else {
+            console.log("roll ended")
+            this.rolling = false;
+            this.rollElapsedMS = 0;
+            this.rollStartTime = 0;
+            this.rollVel.x = 0;
+            this.rollVel.y = 0;
+        }
+    }
+
+    
     gotHit() {
         this.health -= 1;
         if (this.health <= 0) {

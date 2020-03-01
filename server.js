@@ -31,12 +31,14 @@ server.listen(5000, () => {
 
 let players = [];
 let playerKeysBuffer = [];
+let playerRollBuffer = [];
 let stateSnapshots = [];
 let clientHitsBuffer = [];
 let confirmedHits = [];
 
 let getPlayer = (id) => players.find(el => el.id === id);
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
+let getPlayerRollBuffer = (id) => playerRollBuffer.find(el => el.id === id);
 let getMissile = (idPlayer, idMissile) => {
     let player = getPlayer(idPlayer)
     if (player) {
@@ -59,13 +61,16 @@ io.on('connection', (socket) => {
 
     socket.on('keys', (data) => {
         let keys = { id: data.id, keys: { x: data.keys[1], y: data.keys[0] } };
-
         playerKeysBuffer.unshift(keys);
+    })
+
+    socket.on('roll', (data) => {
+        let roll = { id: data.id, rolling: data.rolling };
+        playerRollBuffer.unshift(roll);
     })
 
     socket.on('playerPos', (id, x, y) => {
         let player = getPlayer(id);
-
         if (player) {
             player.entity.correctPos(x, y);
         }
@@ -73,10 +78,12 @@ io.on('connection', (socket) => {
 
     socket.on('missileInit', (id, missile) => {
         let player = getPlayer(id);
-        player.missiles.push({
-            id: missile.id, angle: missile.playerAngle, coords: { x: missile.playerPos.x, y: missile.playerPos.y },
-            entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, player.id, collisionDetector)
-        });
+        if (player) {
+            player.missiles.push({
+                id: missile.id, angle: missile.playerAngle, coords: { x: missile.playerPos.x, y: missile.playerPos.y },
+                entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, player.id, collisionDetector)
+            });
+        }
     })
 
     socket.on('missilesPos', (id, missiles) => {
@@ -151,9 +158,14 @@ setInterval(() => {
     players.forEach((player, playerIndex, playersArray) => {
 
         let playerNewKeys = getPlayerKeysBuffer(player.id);
+        let playerNewRoll = getPlayerRollBuffer(player.id);
 
         if (playerNewKeys) {
             player.entity.updateKeys(playerNewKeys);
+        }
+
+        if (playerNewRoll) {
+            if (playerNewRoll.rolling) player.entity.rolling = true;
         }
 
         player.entity.updatePos();
@@ -164,7 +176,8 @@ setInterval(() => {
         player.vy = player.entity.vy;
         player.angle = player.entity.playerAngle;
         player.health = player.entity.health;
-
+        player.rolling = player.entity.rolling;
+        
         if (player.missiles.length > 0) {
             player.missiles.forEach((missile, i, a) => {
 
@@ -212,6 +225,7 @@ setInterval(() => {
 
     confirmedHits = [];
     playerKeysBuffer = [];
+    playerRollBuffer = [];
     clientHitsBuffer = [];
 
 }, tickrate)
