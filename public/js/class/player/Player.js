@@ -423,17 +423,4 @@ export class Player extends AbstractPlayer {
         }
     }
 
-
-    getPlayerPos() {
-        return { x: this.centerX, y: this.centerY }
-    }
-
-    getPlayerAngle(curPos) {
-        return this.getAngle(curPos);
-    }
-
-    getPlayerSpecs() {
-        return { baseSizeX: this.baseSizeX, baseSizeY: this.size, canonSizeX: this.canonSizeX, canonSizeY: this.canonSizeY }
-    }
-
 }

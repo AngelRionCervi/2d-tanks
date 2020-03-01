@@ -111,4 +111,12 @@ export class AbstractPlayer {
         this.centerX = this.x + this.size / 2 + this.spriteComp;
         this.centerY = this.y + this.size / 2 + this.spriteComp;
     }
+
+    getPlayerPos() {
+        return { x: this.centerX, y: this.centerY }
+    }
+
+    getPlayerAngle(curPos) {
+        return this.getAngle(curPos);
+    }
 }
