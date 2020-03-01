@@ -283,8 +283,8 @@ export class Player extends AbstractPlayer {
             }
         }
        
-        this.buildedAccelX = roundTo(this.buildedAccelX, 4);
-        this.buildedAccelY = roundTo(this.buildedAccelY, 4);
+        this.buildedAccelX = roundTo(this.buildedAccelX, 3);
+        this.buildedAccelY = roundTo(this.buildedAccelY, 3);
 
         /*
         if (this.buildedAccelX !== 0 || this.buildedAccelY !== 0) {
