@@ -14,6 +14,8 @@ const rndmInteger = (min, max) => {
 
 const rndmFloat = (min, max) =>  Math.random() * (max - min) + min;
 
+const roundTo = (num, places) => +(Math.round(num + "e+" + places)  + "e-" + places);
+
 const getFPS = () =>
         new Promise(resolve =>
             requestAnimationFrame(t1 =>

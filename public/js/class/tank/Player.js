@@ -6,8 +6,16 @@ export class Player {
         this.collisionDetector = collisionDetector;
         this.x = 200;
         this.y = 100;
-        this.speed = 1.6;
+        this.speed = 1.4;
         this.size = 26;
+        this.rollingAccel = 0.015;
+        this.accel = 0.005;
+        this.maxAccel = 0.2;
+        this.maxRollingAccel = 0.3;
+        this.decelerationMult = 1;
+        this.rollingDecelerationMult = 0.8;
+        this.buildedAccelX = 0;
+        this.buildedAccelY = 0;
         this.spriteComp = 2;
         this.canonSizeX = 26;
         this.canonSizeY = 32;
@@ -42,12 +50,14 @@ export class Player {
         this.runAnimationIndex = 0;
         this.idleAnimationIndex = 0;
         this.isMoving = false;
-        this.rollDuration = 1000;
+        this.rollDuration = 300;
         this.rollElapsedMS = 0;
         this.rollStartTime = 0;
         this.rolling = false;
         this.rollVel = { x: 0, y: 0 };
         this.rollSpeedMult = 1.6;
+        this.vx = 0;
+        this.vy = 0;
 
         this.updCenters = () => {
             this.centerX = this.x + this.size / 2 + this.spriteComp;
@@ -97,9 +107,10 @@ export class Player {
         }
     }
 
+    
     draw(vel, delta) {
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
-        
+
         let collVel = this.mapCollHandler(vel, isColl);
 
         if (collVel.velX && collVel.velY) {
@@ -109,22 +120,23 @@ export class Player {
 
         if (collVel.velX || collVel.velY) {
             this.isMoving = true;
-        } 
+        }
         else {
             this.isMoving = false;
         }
 
-        let velX = collVel.velX * delta;
-        let velY = collVel.velY * delta; 
+        this.vx = collVel.velX;
+        this.vy = collVel.velY;
 
         if (this.rolling) {
+            this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now();
-                if (collVel.velX !== 0 || collVel.velY !== 0) {
-                    this.rollVel.x = collVel.velX;
-                    this.rollVel.y = collVel.velY;
-                } 
-                else if (collVel.velX === 0 && collVel.velY === 0) {
+                if (this.vx !== 0 || this.vy !== 0) {
+                    this.rollVel.x = this.vx;
+                    this.rollVel.y = this.vy;
+                }
+                else if (this.vx === 0 && this.vy === 0) {
                     console.log("roll no dir")
                     let facingDir = this.getFacingDir();
                     if (facingDir.x && facingDir.y) {
@@ -135,17 +147,19 @@ export class Player {
                     this.rollVel.y = facingDir.y;
                 }
             }
-            
-            this.roll(delta);
-        } 
-        else {
-            this.x += velX;
-            this.y += velY;
+            this.roll();
         }
+        else {
+            this.accelerate(this.vx, this.vy);
+        }
+
+        this.x += this.vx * delta + this.buildedAccelX;
+        this.y += this.vy * delta + this.buildedAccelY;
 
         this.updCenters();
         this.drawSprites();
     }
+
 
     drawAim(curPos, map) {
 
@@ -169,6 +183,7 @@ export class Player {
             this.aimProjection(isAimColl.x, isAimColl.y, angle, isAimColl.type, isAimColl.dist, map);
         }
     }
+
 
     aimProjection(x, y, angle, wallType, length, map) {
 
@@ -204,6 +219,7 @@ export class Player {
             x, y, -x, -y, angle, this.projectionColor, 4, 12, rev);
 
     }
+
 
     checkAimColl(map, x0, y0, x1, y1, objX, objY, bounceNbr) {
 
@@ -262,6 +278,7 @@ export class Player {
             return false;
         }
     }
+
 
     mapCollHandler(vel, isColl) {
 
@@ -334,17 +351,57 @@ export class Player {
         return { velX: velX * this.speed, velY: velY * this.speed };
     }
 
-    roll(delta) {
-        if (this.rollElapsedMS < this.rollDuration) {
-            
-            let velX = this.rollVel.x * this.rollSpeedMult;
-            let velY = this.rollVel.y * this.rollSpeedMult;
 
-            this.x += velX * delta;
-            this.y += velY * delta;
-            
+    accelerate(vx, vy) {
+
+        let accel = this.rolling ? this.rollingAccel : this.accel
+        let maxAccel = this.rolling ? this.maxRollingAccel : this.maxAccel
+        let decelerationMult = this.rolling ? this.rollingDecelerationMult : this.decelerationMult;
+
+        if (vx > 0) {
+            if (this.buildedAccelX < maxAccel) this.buildedAccelX += accel;
+        } else if (vx < 0) {
+            if (this.buildedAccelX > -maxAccel) this.buildedAccelX -= accel;
+        }
+
+        if (vy > 0) {
+            if (this.buildedAccelY < maxAccel) this.buildedAccelY += accel;
+        } else if (vy < 0) {
+            if (this.buildedAccelY > -maxAccel) this.buildedAccelY -= accel;
+        }
+
+        if (vx === 0) {
+            if (this.buildedAccelX > 0) {
+                this.buildedAccelX -= accel * decelerationMult;
+            } else if (this.buildedAccelX < 0) {
+                this.buildedAccelX += accel * decelerationMult;
+            }
+        }
+
+        if (vy === 0) {
+            if (this.buildedAccelY > 0) {
+                this.buildedAccelY -= accel * decelerationMult;
+            } else if (this.buildedAccelY < 0) {
+                this.buildedAccelY += accel * decelerationMult;
+            }
+        }
+       
+        this.buildedAccelX = roundTo(this.buildedAccelX, 4);
+        this.buildedAccelY = roundTo(this.buildedAccelY, 4);
+
+        /*
+        if (this.buildedAccelX !== 0 || this.buildedAccelY !== 0) {
+            console.log(this.buildedAccelX, this.buildedAccelY)
+        }*/
+    }
+
+
+    roll() {
+        if (this.rollElapsedMS < this.rollDuration) {
+            this.vx = this.rollVel.x * this.rollSpeedMult;
+            this.vy = this.rollVel.y * this.rollSpeedMult;
             this.rollElapsedMS = Date.now() - this.rollStartTime;
-        } 
+        }
         else {
             console.log("roll ended")
             this.rolling = false;
@@ -353,9 +410,8 @@ export class Player {
             this.rollVel.x = 0;
             this.rollVel.y = 0;
         }
-
-        //console.log('rollllinn')
     }
+
 
     drawSprites() {
 
@@ -386,10 +442,12 @@ export class Player {
         this.drawHealthBar();
     }
 
+
     drawShadow() {
 
         this.drawingTools.drawSprite('shadow', this.x + 2, this.y + 2, this.centerX, this.centerY, -this.centerX, -this.centerY);
     }
+
 
     drawPlayer(inv = null) {
         let sprite;
@@ -416,12 +474,14 @@ export class Player {
         this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, false, animationIndex);
     }
 
+
     drawRL() {
         let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
 
         this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX - 1, this.centerY,
             -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
+
 
     drawHand() {
 
@@ -434,6 +494,7 @@ export class Player {
         this.drawingTools.rect(this.x + 5 + xInc, this.y + 31 + yInc, 5, 5,
             this.centerX, this.centerY, -this.centerX, -this.centerY, -this.playerAngle, "black", true, 2);
     }
+
 
     drawHealthBar() {
 
@@ -457,12 +518,14 @@ export class Player {
         this.drawingTools.drawSprite(sprite, this.x + 2, this.y - 12);
     }
 
+
     gotHit() {
         this.health -= 1;
         if (this.health <= 0) {
             this.health = 0;
         }
     }
+
 
     getPlayerPos() {
         return { x: this.centerX, y: this.centerY }

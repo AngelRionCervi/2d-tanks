@@ -315,7 +315,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
     setInterval(() => {
         render();
-    }, 1000/200)
+    }, 1000/144)
 
     // ping player position
     setInterval(() => {
