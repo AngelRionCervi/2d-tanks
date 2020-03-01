@@ -30,15 +30,13 @@ export class GhostPlayer extends AbstractPlayer {
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
         this.mapCollHandler([this.vy, this.vx], isColl);
         
-        if (this.rolling) {
+        if (this.rolling && this.rollTimeoutDone) {
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now(); 
                 console.log("GHOST ROLL")
-                if (this.vx === 0 && this.vy === 0) {
-                    this.rolling = false;
-                } 
-                else if (this.vx !== 0 || this.vy !== 0) {
+                
+                if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
                 }/*

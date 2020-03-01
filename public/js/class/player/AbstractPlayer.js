@@ -56,6 +56,10 @@ export class AbstractPlayer {
         this.rolling = false;
         this.rollVel = { x: 0, y: 0 };
         this.rollSpeedMult = 2;
+        this.rollEndTime = 0;
+        this.rollTimeout = 500;
+        this.rollTimeoutCount = 0;
+        this.rollTimeoutDone = true;
         this.vx = 0;
         this.vy = 0;
         this.addedRollVel = { x: 0, y: 0 };
@@ -158,6 +162,7 @@ export class AbstractPlayer {
             this.rollStartTime = 0;
             this.rollVel.x = 0;
             this.rollVel.y = 0;
+            this.rollEndTime = Date.now();
         }
     }
 

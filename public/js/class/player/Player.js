@@ -24,14 +24,23 @@ export class Player extends AbstractPlayer {
         this.vx = collVel.velX;
         this.vy = collVel.velY;
 
-        if (this.rolling) {
+        if (this.rollEndTime !== 0) {
+            this.rollTimeoutCount = Date.now() - this.rollEndTime;
+            this.rollTimeoutDone = false;
+            if (this.rollTimeoutCount >= this.rollTimeout) {
+                this.rollTimeoutDone = true;
+                this.rollTimeoutCount = 0;
+            }
+        }
+
+        if (this.rolling && this.rollTimeoutDone) {
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now();
                 if (this.vx === 0 && this.vy === 0) {
                     this.rolling = false;
-                } 
-                else if (this.vx !== 0 || this.vy !== 0) {
+                }
+                if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
                 }/*

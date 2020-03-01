@@ -29,6 +29,10 @@ module.exports = class PlayerEntity {
         this.rolling = false;
         this.rollVel = { x: 0, y: 0 };
         this.rollSpeedMult = 2;
+        this.rollEndTime = 0;
+        this.rollTimeout = 300;
+        this.rollTimeoutCount = 0;
+        this.rollTimeoutDone = true;
         this.addedRollVel = { x: 0, y: 0 };
 
         this.updCenters = () => {
@@ -98,18 +102,25 @@ module.exports = class PlayerEntity {
         this.vx = collVel.velX;
         this.vy = collVel.velY;
 
-        if (this.rolling) {
+        if (this.rollEndTime !== 0) {
+            this.rollTimeoutCount = Date.now() - this.rollEndTime;
+            this.rollTimeoutDone = false;
+            if (this.rollTimeoutCount >= this.rollTimeout) {
+                this.rollTimeoutDone = true;
+                this.rollTimeoutCount = 0;
+            }
+        }
+
+        if (this.rolling && this.rollTimeoutDone) {
             console.log("server rolllling")
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now();
-                if (this.vx === 0 && this.vy === 0) {
-                    this.rolling = false;
-                } 
-                else if (this.vx !== 0 || this.vy !== 0) {
+   
+                if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
-                }/*
+                }
                 else if (this.vx === 0 && this.vy === 0) {
                     console.log("roll no dir")
                     let facingDir = this.getFacingDir();
@@ -119,7 +130,7 @@ module.exports = class PlayerEntity {
                     }
                     this.rollVel.x = facingDir.x;
                     this.rollVel.y = facingDir.y;
-                }*/
+                }
             }
             this.roll();
         }
@@ -280,12 +291,13 @@ module.exports = class PlayerEntity {
             this.rollElapsedMS = Date.now() - this.rollStartTime;
         }
         else {
-            console.log("roll ended")
+            console.log("roll ended serv")
             this.rolling = false;
             this.rollElapsedMS = 0;
             this.rollStartTime = 0;
             this.rollVel.x = 0;
             this.rollVel.y = 0;
+            this.rollEndTime = Date.now();
         }
     }
 
