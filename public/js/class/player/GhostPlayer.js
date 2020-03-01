@@ -24,8 +24,8 @@ export class GhostPlayer extends AbstractPlayer {
             this.isMoving = false;
         }
 
-        if (this.vx !== ghost.vx && !this.rolling) this.vx = ghost.vx;
-        if (this.vy !== ghost.vy && !this.rolling) this.vy = ghost.vy;
+        if (this.vx !== ghost.vx) this.vx = ghost.vx;
+        if (this.vy !== ghost.vy) this.vy = ghost.vy;
 
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
         this.mapCollHandler([this.vy, this.vx], isColl);
