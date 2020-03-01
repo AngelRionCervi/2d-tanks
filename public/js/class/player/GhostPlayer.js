@@ -33,7 +33,8 @@ export class GhostPlayer extends AbstractPlayer {
         if (this.rolling) {
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
-                this.rollStartTime = Date.now();
+                this.rollStartTime = Date.now(); 
+                console.log("GHOST ROLL")
                 if (this.vx === 0 && this.vy === 0) {
                     this.rolling = false;
                 } 
@@ -66,7 +67,7 @@ export class GhostPlayer extends AbstractPlayer {
 
         if (fVelX !== 0 || fVelY !== 0) {
             //console.log(this.x, this.y)
-            console.log(fVelX, fVelY)
+            //console.log(fVelX, fVelY)
         }
 
         this.playerAngle = ghost.playerAngle;
