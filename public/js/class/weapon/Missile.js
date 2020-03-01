@@ -1,35 +1,8 @@
-export class Missile {
+import { AbstractProjectile } from './AbstractProjectile.js';
+
+export class Missile extends AbstractProjectile {
     constructor(canvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) {
-        this.ctx = ctx;
-        this.canvas = canvas;
-        this.drawingTools = drawingTools;
-        this.collisionDetector = collisionDetector;
-        this.missileAngle = playerAngle;
-        this.vx;
-        this.vy;
-        this.width = 4 * 2;
-        this.height = 6 * 2;
-        this.radius = 6;
-        this.color = "blue";
-        this.speed = 2.2;
-        this.shotPos = curPos;
-        this.playerPos = playerPos;
-        this.lastColl = [];
-        this.bounceCount = 0;
-        this.maxBounce = 1;
-        this.missileLaunchOffset = 40;
-        this.hide = false;
-  
-        this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
-        this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;
-
-        this.uuidv4 = () => {
-            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-        }
-
-        this.id = this.uuidv4();
+        super (canvas, ctx, drawingTools, collisionDetector, curPos, playerPos, playerAngle, null)
     }
 
     initDir() {

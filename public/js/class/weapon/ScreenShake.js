@@ -1,7 +1,7 @@
 export class ScreenShake {
     constructor(rndmFloat) {
         this.duration = 10;
-        this.intensity = 2;
+        this.intensity = 4;
         this.elapsedFrames = 0;
         this.ended = false;
         this.rndmFloat = rndmFloat;

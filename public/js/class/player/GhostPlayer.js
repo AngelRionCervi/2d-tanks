@@ -1,50 +1,15 @@
-export class GhostPlayer {
-    constructor(canvas, ctx, drawingTools, id, perf) {
-        this.ctx = ctx;
-        this.canvas = canvas;
-        this.drawingTools = drawingTools;
-        this.x = 200;
-        this.y = 100;
-        this.speed = 1.6;
-        this.size = 26;
-        this.spriteComp = 2;
-        this.canonSizeX = 28;
-        this.canonSizeY = 32;
-        this.centerX = this.x + this.size / 2 + this.spriteComp;
-        this.centerY = this.y + this.size / 2 + this.spriteComp;
-        this.canonOffsetCenter = 5;
-        this.playerAngle = -90 * Math.PI / 180;
-        this.curOnCanvas = false;
-        this.diagonalSpeedDiviser = 1.3;
-        this.rlPlayerDistance = 20;
-        this.playerAnimationFrameDuration = perf === "normal" ? 7 : 14;
-        this.runAnimationFrames = [
-            ...new Array(this.playerAnimationFrameDuration).fill(1), 
-            ...new Array(this.playerAnimationFrameDuration).fill(2),
-            ...new Array(this.playerAnimationFrameDuration).fill(3),
-            ...new Array(this.playerAnimationFrameDuration).fill(4)
-        ];
-        this.idleAnimationFrames = [
-            ...new Array(this.playerAnimationFrameDuration*2).fill(1), 
-            ...new Array(this.playerAnimationFrameDuration*2).fill(2)
-        ];
-        this.runAnimationIndex = 0;
-        this.idleAnimationIndex = 0;
-        this.isMoving = false;
-        this.health = 3;
+import { AbstractPlayer } from "./AbstractPlayer.js";
 
-        this.updCenters = () => {
-            this.centerX = this.x + this.size / 2 + this.spriteComp;
-            this.centerY = this.y + this.size / 2 + this.spriteComp;
-            //this.drawingTools.debugCirc(this.centerX, this.centerY, 15)
-        }
-
-        this.id = id;
-
-        this.getAngle = (curPos) => Math.atan2(curPos.x - this.centerX, curPos.y - this.centerY);
-        this.radToDeg = (rad) => rad * 180 / Math.PI;
+export class GhostPlayer extends AbstractPlayer {
+    constructor(canvas, ctx, drawingTools, id, x, y) {
+        super(canvas, ctx, drawingTools, id);
+        this.setPos(x, y)
     }
 
+    setPos(x, y) {
+        this.x = x;
+        this.y = y;
+    }
 
     update(ghost, delta) {
 
@@ -75,15 +40,12 @@ export class GhostPlayer {
 
         this.drawShadow();
 
-        // draw base
         if (!this.playerAngle) {
-            // draw canon
             this.drawPlayer(ghostSprite);
             this.drawRL();
             this.drawHand(ghostSprite);
-
-        } else {
-
+        } 
+        else {
             let degAngle = this.radToDeg(this.playerAngle);
 
             if (!(degAngle >= -120 && degAngle <= 120)) {

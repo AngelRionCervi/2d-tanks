@@ -1,21 +1,8 @@
-export class GhostMissile {
-    constructor(canvas, ctx, drawingTools, id, collisionDetector) {
-        this.ctx = ctx;
-        this.canvas = canvas;
-        this.drawingTools = drawingTools;
-        this.id = id;
-        this.collisionDetector = collisionDetector;
-        this.width = 4*2;
-        this.height = 6*2;
-        this.x;
-        this.y;
-        this.vx;
-        this.vy;
-        this.angle;
-        this.missileLaunchOffset = 40;
-        this.maxBounce = 1;
-        this.bounceCount = 0;
-        this.hide = false;
+import { AbstractProjectile } from './AbstractProjectile.js';
+
+export class GhostMissile extends AbstractProjectile {
+    constructor(canvas, ctx, drawingTools, collisionDetector, id) {
+        super (canvas, ctx, drawingTools, collisionDetector, null, null, null, id)
     }
 
     set(missile) {
@@ -32,7 +19,6 @@ export class GhostMissile {
 
         let hitX = this.x - this.width / 2;
         let hitY = this.y - this.height / 2 + 9;
-
         let coll = this.collisionDetector.mapMissileCollision(hitX, hitY, 6);
 
         if (coll) this.bounceCount++;

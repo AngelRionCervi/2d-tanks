@@ -9,12 +9,12 @@ import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
 import { Sender } from "/public/js/class/network/Sender.js";
 import { MapManager } from "/public/js/class/mapManager/MapManager.js";
 import { Missile } from "/public/js/class/weapon/Missile.js";
-import { Player } from "/public/js/class/tank/Player.js";
+import { Player } from "/public/js/class/player/Player.js";
 import { Mouse } from "/public/js/class/mouseHandling/Mouse.js";
 import { Keyboard } from "/public/js/class/keyboardHandling/Keyboard.js";
 import { CollisionDetector } from "/public/js/class/collision/CollisionDetector.js";
-import { GhostPlayer } from "/public/js/class/ghostPlayer/GhostPlayer.js";
-import { GhostMissile } from "./class/ghostMissile/GhostMissile.js";
+import { GhostPlayer } from "/public/js/class/player/GhostPlayer.js";
+import { GhostMissile } from "./class/weapon/GhostMissile.js";
 import { Explosion } from "./class/weapon/Explosion.js";
 import { ScreenShake } from "./class/weapon/ScreenShake.js";
 
@@ -47,7 +47,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let mapManager = new MapManager(gameCanvas, ctx, drawingTools, rndmInteger);
     let map = mapManager.getMap();
     let collisionDetector = new CollisionDetector(map)
-    let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector, perfProfile);
+    let player = new Player(gameCanvas, ctx, drawingTools, collisionDetector);
     let mouse = new Mouse(gameCanvas);
     let keyboard = new Keyboard(gameCanvas);
     let sender = new Sender(socket, keyboard, mouse);
@@ -115,7 +115,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         ghosts.ghostsData.forEach((player) => {
             if (!ghostPlayers.map(el => el.id).includes(player.id)) {
                 let ghostObj = {
-                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, perfProfile),
+                    id: player.id, entity: new GhostPlayer(gameCanvas, ctx, drawingTools, player.id, player.coords.x, player.coords.y),
                     coords: { x: player.coords.x, y: player.coords.y }, vx: 0, vy: 0, playerAngle: player.coords.playerAngle
                     ,missiles: [], sprite: player.sprite, health: player.health
                 };
@@ -131,7 +131,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
                     if (newMissile) {
                         let missileObj = {
-                            id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, newMissile.id, collisionDetector),
+                            id: newMissile.id, entity: new GhostMissile(gameCanvas, ctx, drawingTools, collisionDetector, newMissile.id),
                             coords: { x: newMissile.x, y: newMissile.y }, vx: 0, vy: 0, angle: newMissile.missileAngle, set: false
                         };
                         ghost.missiles.push(missileObj);
