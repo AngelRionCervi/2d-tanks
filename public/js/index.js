@@ -92,7 +92,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             lastKey.key = evt.key;
             roll = keyboard.getSpaceBar();
             if (roll) {
-                sender.sendRoll(player.id, roll, { x: player.x, y: player.y, vx: player.vx, vy: player.vy });
+                sender.sendRoll(player.id, roll, { vx: player.vx, vy: player.vy });
             } 
         }
     });
@@ -149,7 +149,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                         ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); //remove missile if the missile isnt in the session
                     }
                 }
-                
+              
                 ghost.coords.x = player.coords.x;
                 ghost.coords.y = player.coords.y;
                 ghost.vx = player.vx;
@@ -157,6 +157,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.playerAngle = player.angle;
                 ghost.entity.health = player.health;
                 ghost.entity.rolling = player.rolling;
+                
 
                 ghost.missiles.forEach((missile, i) => {
                     if (player.missiles[i]) {

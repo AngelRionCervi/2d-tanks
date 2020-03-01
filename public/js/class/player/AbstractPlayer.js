@@ -132,7 +132,6 @@ export class AbstractPlayer {
                 this.buildedAccelY += accel * decelerationMult;
             }
         }
-
        
         this.buildedAccelX = roundTo(this.buildedAccelX, 3);
         this.buildedAccelY = roundTo(this.buildedAccelY, 3);

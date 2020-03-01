@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('roll', (data) => {
-        let roll = { id: data.id, rolling: data.rolling, player: data.player };
+        let roll = { id: data.id, rolling: data.rolling, vel: data.player };
         playerRollBuffer.unshift(roll);
     })
 
@@ -165,7 +165,10 @@ setInterval(() => {
         }
 
         if (playerNewRoll) {
-            if (playerNewRoll.rolling) player.entity.rolling = true;
+            if (playerNewRoll.rolling) {
+                player.entity.rolling = true;
+                player.rollVel = playerNewRoll.vel;
+            } 
         }
 
         player.entity.updatePos();
