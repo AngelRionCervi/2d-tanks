@@ -91,8 +91,11 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             lastKey.type = evt.type;
             lastKey.key = evt.key;
             roll = keyboard.getSpaceBar();
-            if (roll) {
+            if (roll && player.rollTimeoutDone && !player.rolling && (player.vx || player.vy)) {
+                player.rollTimeoutDone = false;
+                player.rolling = true;
                 sender.sendRoll(player.id, roll, { vx: player.vx, vy: player.vy });
+                roll = false;
             } 
         }
     });
@@ -245,11 +248,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         if (curPos) player.drawAim(curPos, map);
 
-        if (roll && !player.rolling){
-            player.rolling = true;
-            roll = false;
-        } 
-
         let clientHits = [];
 
         playerShots.forEach((missile) => {
@@ -319,7 +317,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         
         if (showFPS) showFps(fps, ctx);
 
-        
     }
 
     setInterval(() => {

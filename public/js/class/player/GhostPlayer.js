@@ -18,23 +18,23 @@ export class GhostPlayer extends AbstractPlayer {
             this.y = ghost.coords.y;
         }
 
-        if (this.vx || this.vy) {
-            this.isMoving = true;
-        } else {
-            this.isMoving = false;
-        }
-
         if (this.vx !== ghost.vx) this.vx = ghost.vx;
         if (this.vy !== ghost.vy) this.vy = ghost.vy;
 
         let isColl = this.collisionDetector.mapPlayerCollision(this.centerX, this.centerY, this.size);
         this.mapCollHandler([this.vy, this.vx], isColl);
         
-        if (this.rolling && this.rollTimeoutDone) {
+        if (this.vx || this.vy || ((this.rollVel.x || this.rollVel.y) && this.rolling)) { // pure garbage
+            this.isMoving = true;
+        }
+        else {
+            this.isMoving = false;
+        }
+
+        if (this.rolling && this.isMoving) {
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
                 this.rollStartTime = Date.now(); 
-                console.log("GHOST ROLL")
                 
                 if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;

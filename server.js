@@ -163,13 +163,12 @@ setInterval(() => {
         if (playerNewKeys) {
             player.entity.updateKeys(playerNewKeys);
         }
-
+        
         if (playerNewRoll) {
             if (playerNewRoll.rolling) {
                 player.entity.rolling = true;
-                player.rollVel = playerNewRoll.vel;
             } 
-        }
+        } 
 
         player.entity.updatePos();
 

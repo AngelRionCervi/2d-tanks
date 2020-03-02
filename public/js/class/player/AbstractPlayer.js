@@ -57,7 +57,7 @@ export class AbstractPlayer {
         this.rollVel = { x: 0, y: 0 };
         this.rollSpeedMult = 2;
         this.rollEndTime = 0;
-        this.rollTimeout = 500;
+        this.rollTimeout = 200;
         this.rollTimeoutCount = 0;
         this.rollTimeoutDone = true;
         this.vx = 0;

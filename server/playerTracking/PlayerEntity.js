@@ -30,7 +30,7 @@ module.exports = class PlayerEntity {
         this.rollVel = { x: 0, y: 0 };
         this.rollSpeedMult = 2;
         this.rollEndTime = 0;
-        this.rollTimeout = 300;
+        this.rollTimeout = 200;
         this.rollTimeoutCount = 0;
         this.rollTimeoutDone = true;
         this.addedRollVel = { x: 0, y: 0 };
@@ -86,6 +86,15 @@ module.exports = class PlayerEntity {
         this.playerAngle = playerAngle;
     }
 
+    isMoving() {
+        if (this.vx || this.vy) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     updatePos() {
 
         let vel = [this.lastKeys.y, this.lastKeys.x];
@@ -108,19 +117,22 @@ module.exports = class PlayerEntity {
             if (this.rollTimeoutCount >= this.rollTimeout) {
                 this.rollTimeoutDone = true;
                 this.rollTimeoutCount = 0;
-            }
+            }      
         }
 
-        if (this.rolling && this.rollTimeoutDone) {
+        if (this.rolling && this.isMoving()) {
             console.log("server rolllling")
             this.accelerate(this.rollVel.x, this.rollVel.y);
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
-                this.rollStartTime = Date.now();
-   
+                if (this.vx === 0 && this.vy === 0) {
+                    this.rolling = false;
+                } else {
+                    this.rollStartTime = Date.now();
+                }
                 if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
-                }
+                }/*
                 else if (this.vx === 0 && this.vy === 0) {
                     console.log("roll no dir")
                     let facingDir = this.getFacingDir();
@@ -130,7 +142,7 @@ module.exports = class PlayerEntity {
                     }
                     this.rollVel.x = facingDir.x;
                     this.rollVel.y = facingDir.y;
-                }
+                }*/
             }
             this.roll();
         }

@@ -14,13 +14,6 @@ export class Player extends AbstractPlayer {
             collVel.velY /= this.diagonalSpeedDiviser;
         }
 
-        if (collVel.velX || collVel.velY) {
-            this.isMoving = true;
-        }
-        else {
-            this.isMoving = false;
-        }
-
         this.vx = collVel.velX;
         this.vy = collVel.velY;
 
@@ -33,13 +26,19 @@ export class Player extends AbstractPlayer {
             }
         }
 
-        if (this.rolling && this.rollTimeoutDone) {
-            this.accelerate(this.rollVel.x, this.rollVel.y);
+        if (this.vx || this.vy || ((this.rollVel.x || this.rollVel.y) && this.rolling)) { // pure garbage
+            this.isMoving = true;
+        }
+        else {
+            this.isMoving = false;
+        }
+
+        if (this.rolling && this.isMoving) {
+            
             if (this.rollVel.x === 0 && this.rollVel.y === 0) {
+               
                 this.rollStartTime = Date.now();
-                if (this.vx === 0 && this.vy === 0) {
-                    this.rolling = false;
-                }
+                
                 if (this.vx !== 0 || this.vy !== 0) {
                     this.rollVel.x = this.vx;
                     this.rollVel.y = this.vy;
@@ -55,6 +54,7 @@ export class Player extends AbstractPlayer {
                     this.rollVel.y = facingDir.y;
                 }*/
             }
+            this.accelerate(this.rollVel.x, this.rollVel.y);
             this.roll();
         }
         else {
