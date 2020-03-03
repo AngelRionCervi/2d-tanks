@@ -13,7 +13,7 @@ export class GhostPlayer extends AbstractPlayer {
 
     update(ghost, delta) {
         
-        if (this.vx !== ghost.vx && this.vy !== ghost.vy && !this.rolling) {
+        if ((this.vx !== ghost.vx || this.vy !== ghost.vy) && !this.rolling) {
             this.x = ghost.coords.x;
             this.y = ghost.coords.y;
         }
