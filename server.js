@@ -42,7 +42,7 @@ let getPlayerRollBuffer = (id) => playerRollBuffer.find(el => el.id === id);
 let getMissile = (idPlayer, idMissile) => {
     let player = getPlayer(idPlayer)
     if (player) {
-        return player.missiles.find(el => el.id === idMissile);
+        return player.projectiles.find(el => el.id === idMissile);
     }
 }
 
@@ -50,11 +50,11 @@ let getMissile = (idPlayer, idMissile) => {
 
 io.on('connection', (socket) => {
 
-    socket.on('initPlayer', (id, spawnPos, playerSprite) => {
+    socket.on('initPlayer', (id, spawnPos, playerSprite, gun) => {
         console.log('a user connected', socket.id, playerSprite);
         let newPlayer = {
             socketID: socket.id, id: id, angle: 0, coords: { x: 0, y: 0 }, vx: 0, vy: 0,
-            entity: new PlayerEntity(id, spawnPos, collisionDetector), missiles: [], sprite: playerSprite,
+            entity: new PlayerEntity(id, spawnPos, collisionDetector), projectiles: [], sprite: playerSprite, gun: gun,
         };
         players.push(newPlayer);
     })
@@ -76,12 +76,12 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('missileInit', (id, missile) => {
+    socket.on('projectileInit', (id, projectile) => {
         let player = getPlayer(id);
         if (player) {
-            player.missiles.push({
-                id: missile.id, angle: missile.playerAngle, coords: { x: missile.playerPos.x, y: missile.playerPos.y },
-                entity: new MissileEntity(missile.curPos, missile.playerPos, missile.playerAngle, missile.id, player.id, collisionDetector)
+            player.projectiles.push({
+                id: projectile.id, type: projectile.type,  angle: projectile.playerAngle, coords: { x: projectile.playerPos.x, y: projectile.playerPos.y },
+                entity: new MissileEntity(projectile.curPos, projectile.playerPos, projectile.playerAngle, projectile.id, player.id, collisionDetector)
             });
         }
     })
@@ -180,36 +180,36 @@ setInterval(() => {
         player.health = player.entity.health;
         player.rolling = player.entity.rolling;
         
-        if (player.missiles.length > 0) {
-            player.missiles.forEach((missile, i, a) => {
+        if (player.projectiles.length > 0) {
+            player.projectiles.forEach((missile, i, a) => {
 
-                if (!missile.entity.vx && !missile.entity.vy) {
-                    missile.entity.initDir();
+                if (!projectile.entity.fired) {
+                    projectile.entity.initDir();
                 }
-                missile.entity.updatePos();
+                projectile.entity.updatePos();
 
-                if (missile.entity.bounceCount > missile.entity.maxBounce) {
+                if (projectile.entity.bounceCount > projectile.entity.maxBounce) {
                     a.splice(i, 1);
                 }
 
-                missile.coords.x = missile.entity.x;
-                missile.coords.y = missile.entity.y;
-                missile.vx = missile.entity.vx;
-                missile.vy = missile.entity.vy;
-                missile.angle = missile.entity.missileAngle;
+                projectile.coords.x = projectile.entity.x;
+                projectile.coords.y = projectile.entity.y;
+                projectile.vx = projectile.entity.vx;
+                projectile.vy = projectile.entity.vy;
+                projectile.angle = projectile.entity.projectileAngle;
             })
         }
 
         // creates a lightweight object (without entities) to send to clients;
         let filteredObj = Object.filter(player, val => getKeyByValue(player, val) !== "entity");
-        let filteredMissiles = [];
+        let filteredprojectiles = [];
 
-        filteredObj.missiles.forEach((m) => {
+        filteredObj.projectiles.forEach((m) => {
             let filteredM = Object.filter(m, val => getKeyByValue(m, val) !== "entity");
-            filteredMissiles.push(filteredM);
+            filteredprojectiles.push(filteredM);
         })
         
-        filteredObj.missiles = filteredMissiles;
+        filteredObj.projectiles = filteredprojectiles;
         packet.push(filteredObj);
     })
 

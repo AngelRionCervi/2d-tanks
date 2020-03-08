@@ -75,7 +75,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let rollKeyUp = true;
 
 
-    sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name);
+    sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name, player.currentGun);
 
     gameCanvas.addEventListener('mousemove', (evt) => {
         curPos = mouse.getMousePos(evt);
@@ -89,12 +89,13 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             projectile = { type: "Missile", obj: new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) };
             if (playerShots.filter(el => el.type === "Missile").length < player.maxConcurringMissiles) {
                 playerShots.push(projectile);
-                sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: projectile.obj.id });
+                sender.sendProjectileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: projectile.obj.id, type: "missile" });
             }
         }
         else if (player.currentGun === "shotgun") {
             projectile = { type: "Pellets", obj: new Pellets(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) };
             playerShots.push(projectile);
+            sender.sendProjectileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: projectile.obj.id, type: "pellets" });
         }
     });
 

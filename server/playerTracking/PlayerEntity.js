@@ -34,6 +34,7 @@ module.exports = class PlayerEntity {
         this.rollTimeoutCount = 0;
         this.rollTimeoutDone = true;
         this.addedRollVel = { x: 0, y: 0 };
+        this.currentGun;
 
         this.updCenters = () => {
             this.centerX = this.x + this.size / 2 + this.spriteComp;

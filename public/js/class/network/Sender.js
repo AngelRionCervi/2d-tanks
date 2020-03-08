@@ -5,7 +5,7 @@ export class Sender {
 
     initPlayer(id, spawnPos, playerSprite) {
 
-        this.socket.emit('initPlayer', id, spawnPos, playerSprite);
+        this.socket.emit('initPlayer', id, spawnPos, playerSprite, gun);
     }
 
     sendKeys(id, keys) {
@@ -18,9 +18,9 @@ export class Sender {
         this.socket.emit('roll', { rolling: roll, id: id, player: player });
     }
 
-    sendMissileInit(id, missile) {
+    sendProjectileInit(id, missile) {
 
-        this.socket.emit('missileInit', id, missile);
+        this.socket.emit('projectileInit', id, missile);
     }
 
     sendMouseMove(id, curPos) {

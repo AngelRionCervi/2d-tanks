@@ -17,6 +17,7 @@ module.exports = class Missile {
         this.lastColl = [];
         this.bounceCount = 0;
         this.maxBounce = 1;
+        this.fired = false;
     }
 
     initDir() {
@@ -27,6 +28,8 @@ module.exports = class Missile {
 
         this.vx = (tx / dist) * this.speed;
         this.vy = (ty / dist) * this.speed;
+        
+        this.fired = true;
     }
 
     updatePos() {
