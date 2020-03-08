@@ -4,7 +4,7 @@ export class DrawingTools {
         this.ctx = ctx;
         this.spritesJSON = spritesJSON;
 
-        this.sprites = { players: [], gun: [], mapBase: [], shadow: [], healthBar: [], explosion: [] };
+        this.sprites = { players: [], gun: [], shotgun: [], mapBase: [], shadow: [], healthBar: [], explosion: [] };
 
         this.parts = {
             players: [
@@ -16,6 +16,7 @@ export class DrawingTools {
                 'RunFrontLeft4', 'RunFrontRight4', 'RunBackLeft4', 'RunBackRight4',
             ],
             gun: ['normal', 'inversed', 'bullet'],
+            shotgun: ['normal', 'inversed', 'bullet'],
             mapBase: [
                 'ground1', 'ground2', 'ground3',
                 'wall'
@@ -115,7 +116,7 @@ export class DrawingTools {
     }
 
     debugCirc(x, y, r) {
-        this.circ(x, y, r, 0, Math.PI*180, false, "red");
+        this.circ(x, y, r, 0, Math.PI * 180, false, "red");
     }
 
     drawSprite(spriteType, x, y, trans1X = null, trans1Y = null, trans2X = null, trans2Y = null, angle = null, ghostSprite = null, animationIndex = null) {
@@ -158,8 +159,17 @@ export class DrawingTools {
             case 'RLinv':
                 image = this.getModel("gun").inversed;
                 break;
-            case 'bullet':
+            case 'RLAmmo':
                 image = this.getModel("gun").bullet;
+                break;
+            case 'shotgun':
+                image = this.getModel("shotgun").normal;
+                break;
+            case 'shotguninv':
+                image = this.getModel("shotgun").inversed;
+                break;
+            case 'shotgunAmmo':
+                image = this.getModel("shotgun").bullet;
                 break;
             case 'wall':
                 image = this.getModel("mapBase").wall;

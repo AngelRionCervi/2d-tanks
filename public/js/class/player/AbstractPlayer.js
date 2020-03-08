@@ -63,6 +63,8 @@ export class AbstractPlayer {
         this.vx = 0;
         this.vy = 0;
         this.addedRollVel = { x: 0, y: 0 };
+        this.gunInventory = ["RL", "shotgun"];
+        this.currentGun = "RL";
         this.id = id ? id : this.uuidv4();
     }
 
@@ -254,7 +256,11 @@ export class AbstractPlayer {
         return { x: this.centerX, y: this.centerY }
     }
 
-    getPlayerAngle(curPos) {
-        return this.getAngle(curPos);
+    getPlayerAbsolutePos() {
+        return { x: this.x, y: this.y }
+    }
+
+    getPlayerAngle() {
+        return this.playerAngle;
     }
 }

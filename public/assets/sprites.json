@@ -10,6 +10,9 @@
     "gun": [
         { "name": "gun", "root": "weapons/gun/" }
     ],
+    "shotgun": [
+        { "name": "shotgun", "root": "weapons/shotgun/" }
+    ],
     "mapBase": [
         { "name": "base", "root": "map/base/" }
     ],

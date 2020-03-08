@@ -20,10 +20,11 @@ export class AbstractProjectile {
         this.maxBounce = 1;
         this.missileLaunchOffset = 40;
         this.hide = false;
+        this.fired = false;
         
         if (this.playerPos) {
-            this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
-            this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;
+            this.x = Math.sin(this.missileAngle) * this.missileLaunchOffset + playerPos.x;
+            this.y = Math.cos(this.missileAngle) * this.missileLaunchOffset + playerPos.y;
         }
         
         this.uuidv4 = () => {
@@ -34,4 +35,6 @@ export class AbstractProjectile {
 
         this.id = id ? id : this.uuidv4();
     }
+
+    
 }

@@ -13,6 +13,8 @@ export class Missile extends AbstractProjectile {
 
         this.vx = (tx / dist) * this.speed;
         this.vy = (ty / dist) * this.speed;
+
+        this.fired = true;
     }
 
     draw(delta) {
@@ -51,7 +53,7 @@ export class Missile extends AbstractProjectile {
             this.y += this.vy * delta;
 
             if (!this.hide) {
-                this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
+                this.drawingTools.drawSprite('RLAmmo',this.x - this.width / 2 - 1 , this.y - this.height / 2,
                 this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
             }
             

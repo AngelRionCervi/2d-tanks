@@ -9,6 +9,9 @@ import { DrawingTools } from "/public/js/class/drawingTools/DrawingTools.js";
 import { Sender } from "/public/js/class/network/Sender.js";
 import { MapManager } from "/public/js/class/mapManager/MapManager.js";
 import { Missile } from "/public/js/class/weapon/Missile.js";
+import { Pellets } from "/public/js/class/weapon/Pellets.js";
+import { Shotgun } from "./class/weapon/Shotgun.js";
+import { RocketLauncher } from "./class/weapon/RocketLauncher.js";
 import { Player } from "/public/js/class/player/Player.js";
 import { Mouse } from "/public/js/class/mouseHandling/Mouse.js";
 import { Keyboard } from "/public/js/class/keyboardHandling/Keyboard.js";
@@ -42,7 +45,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             perfProfile = obj.fps > 100 ? "high" : "normal";
         }
     })
-    
+
     let drawingTools = new DrawingTools(gameCanvas, ctx, sprites);
     let mapManager = new MapManager(gameCanvas, ctx, drawingTools, rndmInteger);
     let map = mapManager.getMap();
@@ -51,11 +54,15 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     let mouse = new Mouse(gameCanvas);
     let keyboard = new Keyboard(gameCanvas);
     let sender = new Sender(socket, keyboard, mouse);
-    
+    let curPos = null;
+
+    const weapons = {
+        shotgun: new Shotgun(ctx, drawingTools, player.getPlayerPos(), player.getPlayerAbsolutePos(), player.playerAngle, "Pellets"),
+        RL: new RocketLauncher(ctx, drawingTools, player.getPlayerPos(), player.getPlayerAbsolutePos(), player.playerAngle, "Missile")
+    }
 
     let ghostPlayers = [];
 
-    let curPos;
     let vel = [0, 0];
     let playerShots = [];
     let explosions = [];
@@ -77,10 +84,17 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     gameCanvas.addEventListener('mousedown', () => {
         let playerPos = player.getPlayerPos();
         let playerAngle = player.getPlayerAngle(curPos);
-        let missile = new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector);
-        if (playerShots.length < player.maxConcurringMissiles) {
-            playerShots.push(missile);
-            sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: missile.id });
+        let projectile;
+        if (player.currentGun === "RL") {
+            projectile = { type: "Missile", obj: new Missile(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) };
+            if (playerShots.filter(el => el.type === "Missile").length < player.maxConcurringMissiles) {
+                playerShots.push(projectile);
+                sender.sendMissileInit(player.id, { curPos: curPos, playerPos: playerPos, playerAngle: playerAngle, id: projectile.obj.id });
+            }
+        }
+        else if (player.currentGun === "shotgun") {
+            projectile = { type: "Pellets", obj: new Pellets(gameCanvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) };
+            playerShots.push(projectile);
         }
     });
 
@@ -96,7 +110,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 player.rolling = true;
                 sender.sendRoll(player.id, roll, { vx: player.vx, vy: player.vy });
                 roll = false;
-            } 
+            }
         }
     });
 
@@ -128,7 +142,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 };
 
                 ghostPlayers.push(ghostObj);
-            } 
+            }
             else {
                 let ghost = ghostPlayers.find(el => el.id === player.id);
 
@@ -152,7 +166,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                         ghost.missiles = ghost.missiles.filter(el => player.missiles.map(e => e.id).includes(el.id)); //remove missile if the missile isnt in the session
                     }
                 }
-              
+
                 ghost.coords.x = player.coords.x;
                 ghost.coords.y = player.coords.y;
                 ghost.vx = player.vx;
@@ -160,7 +174,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.playerAngle = player.angle;
                 ghost.entity.health = player.health;
                 ghost.entity.rolling = player.rolling;
-                
+
 
                 ghost.missiles.forEach((missile, i) => {
                     if (player.missiles[i]) {
@@ -199,13 +213,13 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         })
     })
 
-    function removeMissile(id, type) {
-        if (type === 'player') {
-            playerShots = playerShots.filter(el => el.id !== id);
+    function removeMissile(id, player) {
+        if (player === 'player') {
+            playerShots = playerShots.filter(el => el.obj.id !== id);
         } else {
             ghostPlayers.forEach((ghost) => {
-                if (ghost.missiles.map(el => el.id).includes(id)) {
-                    ghost.missiles = ghost.missiles.filter(el => el.id !== id);
+                if (ghost.missiles.map(el => el.obj.id).includes(id)) {
+                    ghost.missiles = ghost.missiles.filter(el => el.obj.id !== id);
                 }
             })
         }
@@ -234,7 +248,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             shakeX = shake.dx;
             shakeY = shake.dy;
         }
-     
+
         mapManager.renderMap(map, shakeX, shakeY);
 
         if (screenShake) {
@@ -248,31 +262,48 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         if (curPos) player.drawAim(curPos, map);
 
+        weapons[player.currentGun].draw(player.currentGun, player.getPlayerPos(), player.getPlayerAbsolutePos(), player.getPlayerAngle());
+
         let clientHits = [];
 
-        playerShots.forEach((missile) => {
-            if (!missile.vx && !missile.vy) {
-                missile.initDir();
+        playerShots.forEach((projectile) => {
+            if (!projectile.obj.fired) {
+                projectile.obj.initDir();
             }
-            missile.draw(deltaIncrease);
-
-            if (missile.bounceCount > missile.maxBounce) {
-                removeMissile(missile.id, "player");
-                explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
-                screenShake = new ScreenShake(rndmFloat);
+            projectile.obj.draw(deltaIncrease);
+ 
+            if (projectile.type === "Missile") {
+                if (projectile.obj.bounceCount > projectile.obj.maxBounce) {
+                    removeMissile(projectile.obj.id, "player");
+                    explosions.push(new Explosion(projectile.obj.x, projectile.obj.y, projectile.obj.id, drawingTools));
+                    screenShake = new ScreenShake(rndmFloat);
+                    projectile.obj.fired = false;
+                }
             }
+            else if (projectile.type === "Pellets") {
+                if (projectile.obj.collidedPellets.length > 0) {
+                    projectile.obj.collidedPellets.forEach((pellet) => {
+                        explosions.push(new Explosion(pellet.x, pellet.y, pellet.id, drawingTools));
+                        screenShake = new ScreenShake(rndmFloat);
+                    })
+                    projectile.obj.collidedPellets = [];
+                }
+            }
+            
 
             ghostPlayers.forEach((ghost) => {
-                let ghostMissileColl = collisionDetector.playerMissileCollision(
-                    { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.size, height: ghost.entity.size },
-                    { x: missile.x, y: missile.y, width: missile.width, height: missile.height }
-                );
+                if (ghost.id !== player.id) {
+                    let ghostProjectileColl = collisionDetector.playerMissileCollision(
+                        { x: ghost.coords.x, y: ghost.coords.y, width: ghost.entity.size, height: ghost.entity.size },
+                        { x: projectile.obj.x, y: projectile.obj.y, width: projectile.obj.width, height: projectile.obj.height }
+                    );
 
-                if (ghostMissileColl) {
-                    clientHits.push({ missileID: missile.id, shooterID: player.id, targetID: ghost.id, time: Date.now() })
-                    missile.hide = true;
-                    explosions.push(new Explosion(missile.x, missile.y, missile.id, drawingTools));
-                    screenShake = new ScreenShake(rndmFloat);
+                    if (ghostProjectileColl) {
+                        clientHits.push({ missileID: projectile.obj.id, shooterID: player.id, targetID: ghost.id, time: Date.now() })
+                        projectile.obj.hide = true;
+                        explosions.push(new Explosion(projectile.obj.x, projectile.obj.y, projectile.id, drawingTools));
+                        screenShake = new ScreenShake(rndmFloat);
+                    }
                 }
             })
         })
@@ -284,7 +315,7 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                     if (!missile.set) { // once a initial pos and missile vels are set, its all front end, except if collision with player (server authority)
                         missile.entity.set(missile);
                         missile.set = true;
-                    } 
+                    }
                     else {
                         missile.entity.update(deltaIncrease);
                     }
@@ -302,10 +333,10 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 }
             }
         })
-        
-        if (clientHits.length > 0)  {
+
+        if (clientHits.length > 0) {
             sender.sendClientHits(clientHits);
-        } 
+        }
 
         if (curPos) {
             let currentPlayerAngle = player.getPlayerAngle(curPos);
@@ -314,14 +345,14 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             }
             playerAngle = currentPlayerAngle;
         }
-        
+
         if (showFPS) showFps(fps, ctx);
 
     }
 
     setInterval(() => {
         render();
-    }, 1000/144)
+    }, 1000 / 144)
 
     // ping player position
     setInterval(() => {
@@ -335,5 +366,5 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
         sender.pingMissilesPos(player.id, missiles);
     }, posPingRate)
-    
+
 })

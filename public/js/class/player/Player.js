@@ -199,7 +199,6 @@ export class Player extends AbstractPlayer {
         if (!this.playerAngle) {
             // draw canon
             this.drawPlayer();
-            this.drawRL();
             this.drawHand();
 
         } else {
@@ -207,12 +206,10 @@ export class Player extends AbstractPlayer {
             let degAngle = this.radToDeg(this.playerAngle);
 
             if (!(degAngle >= -120 && degAngle <= 120)) {
-                this.drawRL();
                 this.drawHand();
                 this.drawPlayer(true);
             } else {
                 this.drawPlayer();
-                this.drawRL();
                 this.drawHand();
             }
         }
@@ -250,14 +247,6 @@ export class Player extends AbstractPlayer {
         }
 
         this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, false, animationIndex);
-    }
-
-
-    drawRL() {
-        let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
-
-        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX - 1, this.centerY,
-            -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
 
 
