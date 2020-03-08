@@ -64,7 +64,7 @@ export class AbstractPlayer {
         this.vy = 0;
         this.addedRollVel = { x: 0, y: 0 };
         this.gunInventory = ["RL", "shotgun"];
-        this.currentGun = "RL";
+        this.currentGun = "shotgun";
         this.id = id ? id : this.uuidv4();
     }
 

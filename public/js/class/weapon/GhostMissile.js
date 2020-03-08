@@ -2,12 +2,16 @@ import { AbstractProjectile } from './AbstractProjectile.js';
 
 export class GhostMissile extends AbstractProjectile {
     constructor(canvas, ctx, drawingTools, collisionDetector, id) {
-        super (canvas, ctx, drawingTools, collisionDetector, null, null, null, id)
+        super (canvas, ctx, drawingTools, collisionDetector, null, null, null, id);
+        this.bounceCount = 0;
+        this.maxBounce = 1;
+        this.explode = false;
     }
 
     set(missile) {
-        this.x = (Math.sin(missile.angle) * this.missileLaunchOffset) + missile.coords.x;
-        this.y = (Math.cos(missile.angle) * this.missileLaunchOffset) + missile.coords.y;
+        
+        this.x = (Math.sin(missile.angle)) + missile.coords.x;
+        this.y = (Math.cos(missile.angle)) + missile.coords.y;
 
         this.angle = missile.angle;
 
@@ -50,10 +54,11 @@ export class GhostMissile extends AbstractProjectile {
             this.y += this.vy * delta;
 
             if (!this.hide) {
-                this.drawingTools.drawSprite('bullet',this.x - this.width / 2 - 1 , this.y - this.height / 2,
+                this.drawingTools.drawSprite('RLAmmo', this.x - this.width / 2 - 1 , this.y - this.height / 2,
                 this.x, this.y, -this.x, -this.y, -this.angle);
             }
-            
+        } else {
+            this.explode = true;
         }
     }
 }

@@ -16,8 +16,6 @@ export class AbstractProjectile {
         this.speed = 2.2;
         this.shotPos = curPos;
         this.lastColl = [];
-        this.bounceCount = 0;
-        this.maxBounce = 1;
         this.missileLaunchOffset = 40;
         this.hide = false;
         this.fired = false;

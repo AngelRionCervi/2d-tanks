@@ -3,7 +3,7 @@ export class Sender {
         this.socket = socket;
     }
 
-    initPlayer(id, spawnPos, playerSprite) {
+    initPlayer(id, spawnPos, playerSprite, gun) {
 
         this.socket.emit('initPlayer', id, spawnPos, playerSprite, gun);
     }

@@ -10,8 +10,9 @@ module.exports = class Missile {
         this.vy;
         this.width = 4 * 2;
         this.height = 6 * 2;
-        this.x = playerPos.x;
-        this.y = playerPos.y;
+        this.missileLaunchOffset = 40;
+        this.x = (Math.sin(this.missileAngle) * this.missileLaunchOffset) + playerPos.x;
+        this.y = (Math.cos(this.missileAngle) * this.missileLaunchOffset) + playerPos.y;
         this.radius = 6;
         this.speed = 2.2;
         this.lastColl = [];

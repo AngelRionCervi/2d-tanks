@@ -8,10 +8,12 @@ export class Pellets extends AbstractProjectile {
         this.startSpreadAngle = -(this.spreadSize / 2);
         this.pellets = [];
         this.collidedPellets = [];
+        this.pelletIds = [];
 
         for (let u = 0; u < this.pelletCount; u++) {
-            this.startSpreadAngle += this.spreadSize / (this.pelletCount+1);
-            this.pellets[u] = { x: this.x, y: this.y, vx: 0, vy: 0, id: "pellet_" + this.uuidv4, angle: this.missileAngle + this.startSpreadAngle };
+            this.pelletIds[u] = "pellet_" + this.uuidv4();
+            this.startSpreadAngle += this.spreadSize / (this.pelletCount + 1);
+            this.pellets[u] = { x: this.x, y: this.y, vx: 0, vy: 0, id: this.pelletIds[u], angle: this.missileAngle + this.startSpreadAngle };
         }
     }
 

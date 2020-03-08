@@ -1,9 +1,10 @@
 import { AbstractPlayer } from "./AbstractPlayer.js";
 
 export class GhostPlayer extends AbstractPlayer {
-    constructor(canvas, ctx, drawingTools, id, collisionDetector, x, y) {
+    constructor(canvas, ctx, drawingTools, id, collisionDetector, x, y, gun) {
         super(canvas, ctx, drawingTools, id, collisionDetector);
         this.setPos(x, y)
+        this.currentGun = gun;
     }
 
     setPos(x, y) {
@@ -80,19 +81,16 @@ export class GhostPlayer extends AbstractPlayer {
 
         if (!this.playerAngle) {
             this.drawPlayer(ghostSprite);
-            this.drawRL();
             this.drawHand(ghostSprite);
         } 
         else {
             let degAngle = this.radToDeg(this.playerAngle);
 
             if (!(degAngle >= -120 && degAngle <= 120)) {
-                this.drawRL();
                 this.drawHand(ghostSprite);
                 this.drawPlayer(ghostSprite, true);
             } else {
                 this.drawPlayer(ghostSprite);
-                this.drawRL();
                 this.drawHand(ghostSprite);
             }
         }
@@ -128,13 +126,6 @@ export class GhostPlayer extends AbstractPlayer {
         }
 
         this.drawingTools.drawSprite(sprite, this.x, this.y, this.centerX, this.centerY, -this.centerX, -this.centerY, 0, ghostSprite, animationIndex);
-    }
-
-    drawRL() {
-        let sprite = this.playerAngle < 0 ? 'RLinv' : 'RL';
-
-        this.drawingTools.drawSprite(sprite, this.x, this.y + this.rlPlayerDistance, this.centerX-1, this.centerY, 
-            -(this.x + this.canonSizeX / 2), -(this.y + this.canonSizeY / 2 - this.canonOffsetCenter), -this.playerAngle);
     }
 
     drawHand(ghostSprite) {

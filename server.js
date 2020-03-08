@@ -11,6 +11,11 @@ const PlayerEntity = require('./server/playerTracking/PlayerEntity');
 const Collision = require('./server/collision/BackCollisionDetecor');
 const MapMg = require('./server/map/BackMapManager');
 const MissileEntity = require('./server/missileTracking/MissileEntity');
+const PelletsEntity = require('./server/missileTracking/PelletsEntity');
+const ammoTypesClasses = {
+    MissileEntity,
+    PelletsEntity
+}
 
 const tickrate = 1000 / 60;
 const snapshotsLength = 200;
@@ -35,6 +40,7 @@ let playerRollBuffer = [];
 let stateSnapshots = [];
 let clientHitsBuffer = [];
 let confirmedHits = [];
+
 
 let getPlayer = (id) => players.find(el => el.id === id);
 let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
@@ -80,8 +86,8 @@ io.on('connection', (socket) => {
         let player = getPlayer(id);
         if (player) {
             player.projectiles.push({
-                id: projectile.id, type: projectile.type,  angle: projectile.playerAngle, coords: { x: projectile.playerPos.x, y: projectile.playerPos.y },
-                entity: new MissileEntity(projectile.curPos, projectile.playerPos, projectile.playerAngle, projectile.id, player.id, collisionDetector)
+                id: projectile.id, type: projectile.type, angle: projectile.playerAngle, coords: { x: projectile.playerPos.x, y: projectile.playerPos.y },
+                entity: new ammoTypesClasses[projectile.type + "Entity"](projectile.curPos, projectile.playerPos, projectile.playerAngle, projectile.id, player.id, collisionDetector)
             });
         }
     })
@@ -117,7 +123,7 @@ io.on('connection', (socket) => {
 setInterval(() => {
 
     let packet = [];
-
+/*
     clientHitsBuffer.forEach((clientHit) => {
 
         clientHit.forEach((hit) => {
@@ -126,34 +132,33 @@ setInterval(() => {
             let closestSnapshotTime = closest(snapshotsTimes, hit.time);
             let snapshot = stateSnapshots[snapshotsTimes.indexOf(closestSnapshotTime)];
             let targetPlayer = snapshot.players.find(el => el.id === hit.targetID); //finds the targeted player;
-            let shooterMissiles = getPlayer(hit.shooterID).missiles;
+            let shooterProjectiles = getPlayer(hit.shooterID).projectiles;
             let delta = Math.abs(closestSnapshotTime - hit.time);
 
             if (delta <= maxMsLag) {
-                shooterMissiles.forEach((missile, i, a) => {
-
+                shooterProjectiles.forEach((projectile, i, a) => {
                     delta /= 1000;
-                    delta++;
-                    missile.entity.updateDeltaPos(delta); 
-                    /* clients and server do not run at the same speed, so we need to adjsut the position of the missile based on the difference between 
-                    the time at which player shot the missile and the time at which the snapshot has been taken */
-                    missile.coords.x = missile.entity.x;
-                    missile.coords.y = missile.entity.y;
+                    delta += 1;
+                    projectile.entity.updateDeltaPos(delta);
+                     clients and server do not run at the same speed, so we need to adjsut the position of the projectile based on the difference between 
+                    the time at which player shot the projectile and the time at which the snapshot has been taken 
+                    projectile.coords.x = projectile.entity.x;
+                    projectile.coords.y = projectile.entity.y;
 
-                    let missilePlayerColl = collisionDetector.playerMissileCollision(
-                        { x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.size, height: targetPlayer.entity.size}, 
-                        { x: missile.coords.x, y: missile.coords.y, width: missile.entity.width, height: missile.entity.height }
+                    let projectilePlayerColl = collisionDetector.playerProjectileCollision(
+                        { x: targetPlayer.coords.x, y: targetPlayer.coords.y, width: targetPlayer.entity.size, height: targetPlayer.entity.size },
+                        { x: projectile.coords.x, y: projectile.coords.y, width: projectile.entity.width, height: projectile.entity.height }
                     );
 
-                    if (missilePlayerColl) {
-                        confirmedHits.push({ missileID: missile.id, shooterID: missile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
+                    if (projectilePlayerColl) {
+                        confirmedHits.push({ projectileID: projectile.id, shooterID: projectile.entity.playerID, targetID: targetPlayer.id, time: Date.now() });
                         getPlayer(targetPlayer.id).entity.gotHit();
                         a.splice(i, 1);
                     }
                 })
             }
         })
-    })
+    })*/
 
     players.forEach((player, playerIndex, playersArray) => {
 
@@ -163,12 +168,12 @@ setInterval(() => {
         if (playerNewKeys) {
             player.entity.updateKeys(playerNewKeys);
         }
-        
+
         if (playerNewRoll) {
             if (playerNewRoll.rolling) {
                 player.entity.rolling = true;
-            } 
-        } 
+            }
+        }
 
         player.entity.updatePos();
 
@@ -179,24 +184,34 @@ setInterval(() => {
         player.angle = player.entity.playerAngle;
         player.health = player.entity.health;
         player.rolling = player.entity.rolling;
-        
+
         if (player.projectiles.length > 0) {
-            player.projectiles.forEach((missile, i, a) => {
+            player.projectiles.forEach((projectile, i, a) => {
 
                 if (!projectile.entity.fired) {
                     projectile.entity.initDir();
                 }
                 projectile.entity.updatePos();
 
-                if (projectile.entity.bounceCount > projectile.entity.maxBounce) {
-                    a.splice(i, 1);
+                if (projectile.type === "Missile") {
+                    if (projectile.entity.bounceCount > projectile.entity.maxBounce) {
+                        a.splice(i, 1);
+                    }
+                    projectile.coords.x = projectile.entity.x;
+                    projectile.coords.y = projectile.entity.y;
+                    projectile.vx = projectile.entity.vx;
+                    projectile.vy = projectile.entity.vy;
+                    projectile.angle = projectile.entity.missileAngle;
                 }
+                else if (projectile.type === "Pellets") {
 
-                projectile.coords.x = projectile.entity.x;
-                projectile.coords.y = projectile.entity.y;
-                projectile.vx = projectile.entity.vx;
-                projectile.vy = projectile.entity.vy;
-                projectile.angle = projectile.entity.projectileAngle;
+                    if (projectile.entity.pellets.length === 0) {
+                        a.splice(i, 1);
+                    }
+
+                    projectile.pellets = projectile.entity.pellets;
+                    //console.log([projectile.entity.pellets.map(el => el.x), projectile.entity.pellets.map(el => el.y)]);
+                }
             })
         }
 
@@ -208,7 +223,7 @@ setInterval(() => {
             let filteredM = Object.filter(m, val => getKeyByValue(m, val) !== "entity");
             filteredprojectiles.push(filteredM);
         })
-        
+
         filteredObj.projectiles = filteredprojectiles;
         packet.push(filteredObj);
     })
@@ -217,7 +232,7 @@ setInterval(() => {
     packet.time = Date.now();
 
     // saves a snapshot of the current tick;
-    stateSnapshots.unshift({players: players, time: packet.time});
+    stateSnapshots.unshift({ players: players, time: packet.time });
 
     if (stateSnapshots.length > snapshotsLength) {
         stateSnapshots.splice(-1, 1);

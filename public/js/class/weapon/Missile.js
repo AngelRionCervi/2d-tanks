@@ -2,7 +2,10 @@ import { AbstractProjectile } from './AbstractProjectile.js';
 
 export class Missile extends AbstractProjectile {
     constructor(canvas, ctx, curPos, playerPos, playerAngle, drawingTools, collisionDetector) {
-        super (canvas, ctx, drawingTools, collisionDetector, curPos, playerPos, playerAngle, null)
+        super (canvas, ctx, drawingTools, collisionDetector, curPos, playerPos, playerAngle, null);
+        this.bounceCount = 0;
+        this.maxBounce = 1;
+        this.explode = false;
     }
 
     initDir() {
@@ -18,7 +21,7 @@ export class Missile extends AbstractProjectile {
     }
 
     draw(delta) {
-
+        
         let hitX = this.x - this.width / 2;
         let hitY = this.y - this.height / 2 + 9;
 
@@ -57,6 +60,8 @@ export class Missile extends AbstractProjectile {
                 this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
             }
             
+        } else {
+            this.explode = true;
         }
 
         /* missile hitbox
