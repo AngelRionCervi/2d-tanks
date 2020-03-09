@@ -67,6 +67,7 @@ module.exports = class Missile {
 
             this.x += this.vx;
             this.y += this.vy;
+            console.log(this.x, this.y)
         }
     }
 

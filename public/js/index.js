@@ -146,8 +146,9 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghostPlayers.push(ghostObj);
             }
             else {
+                
                 let ghost = ghostPlayers.find(el => el.id === player.id);
-
+                //console.log("ghost data", player.projectiles, ghost.projectiles)
                 if (player.projectiles.length !== ghost.projectiles.length) {
 
                     let newProjectile = player.projectiles.find(el => !ghost.projectiles.map(e => e.id).includes(el.id));
@@ -181,7 +182,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
                 ghost.playerAngle = player.angle;
                 ghost.entity.health = player.health;
                 ghost.entity.rolling = player.rolling;
-
 
                 ghost.projectiles.forEach((projectile, i) => {
                     if (player.projectiles[i]) {
@@ -372,7 +372,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
         }
 
         if (showFPS) showFps(fps, ctx);
-
     }
 
     setInterval(() => {
