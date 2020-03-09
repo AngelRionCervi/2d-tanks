@@ -33,7 +33,7 @@ export class Sender {
         this.socket.emit('playerPos', id, x, y);
     }
 
-    pingMissilesPos(id, missiles)  {
+    pingProjectilesPos(id, missiles)  {
         
         this.socket.emit('missilesPos', id, missiles);
     }

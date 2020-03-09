@@ -59,8 +59,6 @@ export class Missile extends AbstractProjectile {
                 this.drawingTools.drawSprite('RLAmmo',this.x - this.width / 2 - 1 , this.y - this.height / 2,
                 this.x, this.y, -(this.x), -(this.y), -this.missileAngle);
             }
-            console.log(this.x, this.y)
-            
         } else {
             this.explode = true;
         }

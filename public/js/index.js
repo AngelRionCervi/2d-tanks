@@ -73,7 +73,6 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
 
     let lastKey = { type: "", key: "" };
     let roll = false;
-    let rollKeyUp = true;
 
 
     sender.initPlayer(player.id, { x: player.x, y: player.y }, drawingTools.playerSprite.name, player.currentGun);
@@ -290,10 +289,15 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
             else if (projectile.type === "Pellets") {
                 if (projectile.obj.collidedPellets.length > 0) {
                     projectile.obj.collidedPellets.forEach((pellet) => {
-                        explosions.push(new Explosion(pellet.x, pellet.y, pellet.id, drawingTools));
-                        screenShake = new ScreenShake(rndmFloat);
+                        if (!pellet.hasExplode) {
+                            explosions.push(new Explosion(pellet.x, pellet.y, pellet.id, drawingTools));
+                            screenShake = new ScreenShake(rndmFloat);
+                            pellet.hasExplode = true;
+                        }
                     })
-                    projectile.obj.collidedPellets = [];
+                }  
+                if (projectile.obj.collidedPellets.length === projectile.obj.pelletCount) {
+                    removeMissile(projectile.obj.id, "player");
                 }
             }
 
@@ -382,13 +386,14 @@ Promise.all([spritesFetch, fpsProfile]).then((promiseObjs) => { //waits for all 
     setInterval(() => {
         sender.pingPlayerPos(player.id, player.x, player.y);
 
-        let missiles = [];
+        let projectiles = [];
         playerShots.forEach((m) => {
-            let missileCoord = { x: m.x, y: m.y, angle: m.missileAngle, id: m.id };
-            missiles.push(missileCoord);
+            console.log(m)
+            let projectileCoord = { x: m.obj.x, y: m.obj.y, angle: m.obj.missileAngle, id: m.obj.id };
+            projectiles.push(projectileCoord);
         })
 
-        sender.pingMissilesPos(player.id, missiles);
+        sender.pingProjectilesPos(player.id, projectiles);
     }, posPingRate)
 
 })

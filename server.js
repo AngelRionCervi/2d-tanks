@@ -47,6 +47,7 @@ let getPlayerKeysBuffer = (id) => playerKeysBuffer.find(el => el.id === id);
 let getPlayerRollBuffer = (id) => playerRollBuffer.find(el => el.id === id);
 let getMissile = (idPlayer, idMissile) => {
     let player = getPlayer(idPlayer)
+    //console.log(player, idMissile)
     if (player) {
         return player.projectiles.find(el => el.id === idMissile);
     }
